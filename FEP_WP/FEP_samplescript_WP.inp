@@ -1,0 +1,88 @@
+clear
+set verbose off
+include FEP.gfn --force
+open "/home/at/Dropbox/ATSS_Projekte/FEP/FEP_WP/EA_GDP_FCdata.gdt" --quiet
+
+#------------------------------------------------
+# FEP illustrating example using EA survey-based
+# real GDP forecast from the Economist
+#-------------------------------------------------
+
+#---------------------
+# Plot forecast error
+#---------------------
+#series e = y - fc
+#setinfo e --graph-name="Forecast Error"
+#gnuplot e --time-series --with-impulses --output=display
+
+#--------
+# MZ test
+#--------
+bundle b = null
+series b.y = y				# realizations
+series b.fc = fc			# forecasts
+b.nboot = 999				# 0=NO bootstrap, nboot>0 --> use nboot replications
+b.robust = 1				# 1=robust HAC robust VCV
+b.verb = 1					# 1=print details
+applyFCtests(&b, "MZ")		# call the top-level function
+   
+#-------------------------
+# CG tests on unbiasedness
+#-------------------------
+applyFCtests(&b, "CG")
+printf "P-value Wilcoxon-type rank sign test = %.3f\n", b.CGWILCpval
+printf "P-value sign test = %.3f\n", b.CGSIGNpval
+
+#--------------------
+# HP (former KG) test
+#--------------------
+list b.z = fc(-1)		# use lagged forecast as conditional variable
+applyFCtests(&b, "HP")
+   
+#-------------------------
+# CG tests on efficiency
+#-------------------------
+b.k = 1
+series b.CGX = fc			# conditional on (lagged) forecasts
+applyFCtests(&b, "CG")
+printf "P-value Wilcoxon-type rank sign test = %.3f\n", b.CGWILCpval
+printf "P-value sign test = %.3f\n", b.CGSIGNpval
+
+#------------------------------------
+# Elliott, Komunjer, Timmermann
+# Example 1 using doEKTtest_series()
+#------------------------------------
+b.loss = 1					# Loss function (1=quad-quad, 2=lin-lin)
+series e = y - fc			# forecast error
+series e1 = e(-1)			# lagged forecast error
+b.z = e1 				# instrumental variable
+smpl e e1 --no-missing
+b.a0 = 0.5					# Initial value of shape parameter aT
+string b.lossdraw = "display"	# 'no=no draw, 'display'=immediate plot, 'Path+filename'
+applyFCtests(&b, "EKT")
+smpl full
+
+#------------------
+# Diebold & Mariano
+#------------------
+b.f1 = fc			# FC 1 series
+b.f2 = y(-1)		# FC 2 series: naive pre-year realization
+b.loss = 2			# 1="U-shape", 2="V-shape" 
+applyFCtests(&b, "DM")
+
+#---------------
+# Kuipers Score
+#---------------
+series b.yup = (diff(y) > 0)
+series b.fcup = (diff(fc) > 0)
+applyFCtests(&b, "KS")	# could also use doKS(&b)
+
+#-----------------
+# Diebold & Lopez
+#-----------------
+bundle bDL = null
+bDL.verb = 1
+series bDL.yup = (diff(y) > 0)
+series bDL.fcup = (diff(fc) > 0)
+applyFCtests(&bDL, "DL")
+

@@ -1,0 +1,618 @@
+## FEP_tests.inp
+
+function void doEKTtest (bundle *b)
+    # Reference paper: Elliott, Komunjer, and Timmermann, 2005,
+      # Estimation and Testing of Forecast Rationality under Flexible Loss,
+      # Review of Economic Studies, 72, 1107 - 1125.
+  
+    # compatibility treatment of loss type
+    if inbundle(b, "p0")	# 2: quad shape, 1: V shape 
+        if b.p0 == 1 || b.p0 == 2
+            scalar b.loss = 3 - b.p0
+        endif
+    endif       
+    
+    # compatibility handling of non-harmonized earlier input 
+    if inbundle(b, "fcerrors") # new internal interface for wrapper func 
+        matrix Y = b.fcerrors
+    
+    elif inbundle(b, "y")
+        if typestr(typeof(b.y)) = "matrix"	# old interface
+            matrix Y = b.y # expects matrix / see help text (Sven) 
+        else
+            funcerr "Suitable input missing."
+        endif
+    endif
+      
+    # apply default values
+    if !inbundle(b, "loss")
+        scalar b.loss = 1	# U-shape
+    endif
+    if !inbundle(b, "lossdraw")
+        string b.lossdraw = "no"
+    endif 
+    if !inbundle(b, "verb")
+        b.verb = 0
+    endif
+    if !inbundle(b, "a0")
+        scalar b.a0 = 0.5 
+    endif  
+      
+    # infer loss shape parameter  
+    scalar p0 = (b.loss == 1) ? 2 : 1
+  
+    matrix X = b.x # dito (matrix)
+    a0 = b.a0
+  
+    scalar diffmax = 1000
+    scalar convcrit = 0.00001
+    # --------------------------------------
+    # Compute alpha
+    # --------------------------------------
+    # Define the instruments
+    matrix iv = ones(rows(X), 1) ~ X
+    # a1 is an element used to compute aT
+    matrix vMod = abs(Y) .^ (p0-1)
+    matrix a1 = meanc( iv .* vMod )'			# k by 1
+    # a2 is an element used to compute aT
+    matrix a2 = meanc( iv .* (Y .< 0) .* vMod )'	# k by 1
+    # Initial value of S
+    matrix sOLD = I(cols(iv))				# k by k
+    scalar niter = 0
+    nfail = 0
+    failed = 0
+    loop while diffmax > convcrit -q
+        scalar err1 = 0
+        try_invert(sOLD, &err1)
+        if !err1
+            IsOLD = inv(sOLD)
+    
+            Nom = a1'IsOLD * a2
+            Den = qform(a1', IsOLD)
+            scalar aNEW = Nom / Den
+            diffmax = abs(a0 - aNEW)
+            C = (iv .* ((Y .< 0) - aNEW) .* vMod)
+            sNEW = (C'C) ./ rows(iv)
+            sOLD = sNEW
+            a0 = aNEW
+            niter++
+        else
+            if b.verb
+                printf "Matrix inversion in EKT_RatTest failed!\n"
+                printf "Problem with IsOLD = inv(sOLD)\n"
+            endif
+            nfail++
+        endif
+        if nfail > 3000
+            failed = 999
+            break
+        endif
+    endloop
+    if !failed
+        if b.verb
+            printf "\nNumber of iterations before convergence = %d\n", niter
+        endif
+        # Pre-checks for matrix inversion
+        scalar err1 = 0
+        try_invert(sNEW, &err1)
+        if !err1
+            isNEW = inv(sNEW)
+        else
+            scalar err1 = 0
+            try_ginvert(sNEW, &err1)
+            if !err1
+                isNEW = ginv(sNEW)
+            endif
+        endif
+        if !err1
+            err2 = 0
+            try_invert(qform(a1', isNEW), &err2)
+            if !err2
+                # Compute the limiting variance of alfa #
+                V = inv( qform(a1', isNEW) ) / rows(iv)
+            else
+                err2 = 0
+                try_ginvert(qform(a1', isNEW), &err2)
+                if !err2
+                    # Compute the limiting variance of alfa #
+                    V = ginv( qform(a1', isNEW) ) / rows(iv)
+                endif
+            endif
+            if !err2
+                # Test the null hypothesis of symmetry: alfa = 0.5 #
+                b.V = V
+                mat = symtest(aNEW, sqrt(V), b.verb)
+                b.SymTest = mat[1]
+                b.SymPval = mat[2]
+                # Rationality test #
+                mat0 = rattest(Y, iv, vMod, aNEW, sNEW, 0, b.verb)
+                b.RatTest = mat0[1]
+                b.RatPv = mat0[2]
+                mat1 = rattest(Y, iv, vMod, aNEW, sNEW, 1, b.verb)
+                b.RatTest05 = mat1[1]
+                b.RatPv05 = mat1[2]
+                # Draw implied loss function #
+                if b.lossdraw != "no"
+                    DrawLoss(p0, aNEW, V, b.lossdraw)
+                endif
+       
+                b.alpha = aNEW	# shape parameter alpha
+                b.niter = niter
+            endif
+        endif
+    else
+        b.alpha = NA	# shape parameter alpha
+        b.niter = NA
+        b.SymTest = NA
+        b.SymPval = NA
+        b.RatTest = NA
+        b.RatPv = NA
+        b.RatTest05 = NA
+        b.RatPv05 = NA
+        b.V = NA
+    endif
+end function
+
+################
+
+function void doHPtest (bundle *b)
+    # renamed from KG (Kirchgaessner) at v2.0    
+
+    # apply defaults
+    if !inbundle(b, "robust")
+        scalar b.robust = 0
+    endif
+    if !inbundle(b, "nboot")
+        b.nboot = 0
+    endif    
+    if !inbundle(b, "verb")
+        b.verb = 0
+    endif
+
+    # acommodate old variant
+    if inbundle(b, "strrob")
+        string strrob = b.strrob
+    else
+        string strrob = (b.robust == 1) ? "--robust" : ""
+    endif
+      
+    # compatibility for matrix input of z 
+    if typestr(typeof(b.z)) == "matrix"
+        matrix mz = b.z 
+        list Z = null
+        loop i = 1..cols(mz) -q
+            series S$i = mz[,i]
+            Z += S$i
+        endloop
+    elif typestr(typeof(b.z)) == "series" # workaround for apparent gretl bug
+        list Z = genseries("z", b.z)
+      
+    else	# standard list case
+        list Z = b.z 
+      
+    endif
+            
+    series fc = b.fc
+    series y = b.y
+    list lreg = fc
+    if nelem(Z)
+        lreg += Z
+    endif 
+        
+    scalar nv = 2 + nelem(Z)
+    matrix Rmat = I(nv)
+    matrix qvec = zeros(nv,1)
+    qvec[2] = 1
+    # nboot = b.nboot
+    if b.nboot > 0
+        set bootrep b.nboot
+        string strboot = "--bootstrap"
+    else
+        string strboot = ""
+    endif
+    ols y const lreg @strrob --quiet
+    catch restrict @strboot --silent
+        R = Rmat
+        q = qvec
+    end restrict
+    if $error
+        catch restrict --silent
+            R = Rmat
+            q = qvec
+        end restrict
+    endif
+    
+    if b.verb == 1
+        printf "\n***********************************************\n"
+        printf "*** Holden & Peel test\n"
+        printf "*** on forecast efficiency\n"
+        if !b.robust
+            printf "\nMethod: Approach using asymptotic VCV.\n"
+        elif b.robust == 1
+            printf "\nMethod: Approach using HAC robust VCV.\n"
+        endif
+        if b.nboot > 0
+            printf "Bootstrap p-value using %d iterations.\n", b.nboot
+        endif
+        printf "H0: forecasts are efficient\n"
+        printf "Test stat.: %.4f\n", $test
+        printf "p-value.:   %.4f\n", $pvalue
+        printf "***********************************************\n"
+    endif
+    b.HPstat = $test
+    b.HPpval = $pvalue
+end function
+
+#################
+
+function void doDLtest (bundle *b)
+    # compatibility handling
+    if inbundle(b, "y")		# Binary of var. of actual ups
+        series y = b.y
+    elif inbundle(b, "yup")
+        series y = b.yup
+    endif
+    if inbundle(b, "fc")	# Binary of var. of forecasted ups
+        series fc = b.fc
+    elif inbundle(b, "fcup")
+        series fc = b.fcup
+    endif
+    list L1 = y fc
+    smpl L1 --no-missing
+    if rows(values(y)) > 2 || rows(values(fc)) > 2
+        printf "*** Note: Running the DL test requires that ***\n"
+        printf "*** yup and fcup are both binary variables! Check again! *** \n"
+        funcerr "Check that y and fc are both binary variables!"
+    endif
+    if !inbundle(b, "verb")
+        b.verb = 0
+    endif
+    /* Artur's version
+       # M has the form:
+       # 		 | Up (Y=1) Down (Y=0)
+       # ------------------------------
+       # U (F=1)| o_ii		o_ij
+       # D (F=0)| o_ji		o_jj
+       matrix M = zeros(2,2)
+       M[1,1:2] = sum(y==1 && fc==1) ~ sum(y==0 && fc==1)
+       M[2,1:2] = sum(y==1 && fc==0) ~ sum(y==0 && fc==0)
+       scalar O_doti = sum(M[,1])
+       scalar O_dotj = sum(M[,2])
+       scalar O_idot = sum(M[1,])
+       scalar O_jdot = sum(M[2,])
+       scalar O = sum(M)
+       E_ii = O_idot*O_doti/O		# expected cell count 1,1
+       E_ij = O_idot*O_dotj/O		# expected cell count 1,2
+       E_ji = O_jdot*O_doti/O		# expected cell count 2,1
+       E_jj = O_jdot*O_dotj/O		# expected cell count 2,2
+       scalar chi_fc = (M[1,1]-E_ii)^2/E_ii + (M[1,2]-E_ij)^2/E_ij + (M[2,1]-E_ji)^2/E_ji + (M[2,2]-E_jj)^2/E_jj
+       scalar b.DLstat = chi_fc
+       scalar info_fc = M[1,1]/O_doti + M[2,2]/O_dotj	# > 1 indicates some positive information content
+    */
+    # Jack's version
+    matrix M = mxtab(y,fc)
+    matrix c = sumr(M)
+    matrix r = sumc(M)
+    scalar n = sumc(c)
+    matrix E = c*r/n
+    P = (M - E).^2 ./ E
+    chi_fc = sumc(vec(P))
+    scalar info_fc = M[1,1]/r[1] + M[2,2]/r[2]	# > 1 indicates some positive information content
+    scalar b.DLstat = chi_fc
+    scalar b.DLinfo = info_fc		# Information value
+    scalar b.DLpval = pvalue(x,1,chi_fc)    
+    if b.verb == 1
+        printf "\n***********************************************\n"
+        printf "*** Diebold & Lopez test\n"
+        printf "*** on directional change\n"
+        printf "\nH0: y(t) and fc(t) are independent \n"
+        printf "Info-value: %.4f\n", b.DLinfo
+        printf "Test stat.: %.4f\n", b.DLstat
+        printf "p-value.:   %.4f\n", b.DLpval
+        printf "***********************************************\n"
+    endif
+end function
+
+################
+
+function void doDMtest (bundle *b)
+    
+    # apply defaults
+    if !inbundle(b, "verb")
+        b.verb = 0
+    endif
+    if !inbundle(b, "loss")
+        b.loss = 1	# U-shape
+    endif
+    if !inbundle(b, "fhor")
+        b.fhor = 1
+    endif
+    
+    series e1 = b.y - b.f1
+    series e2 = b.y - b.f2
+    smpl e1 e2 --no-missing
+  
+    # Construct loss differential
+    if b.loss == 1		# U-shape quadratic loss
+        series L = e1^2 - e2^2
+    elif b.loss == 2		# V-shape
+        series L = abs(e1) - abs(e2)
+    else
+        printf "\n*** You can choose only between loss=1 (U-shape) and loss=2 (V-shape). ***\n"
+        printf "*** Please re-specify b.loss.\n"
+        funcerr "Loss can only be 1 or 2."
+    endif				# Todo: further loss functions could be introduced
+  
+    # Run regression based HAC robust DM test
+    ols L 0 --robust --quiet
+    # Return test statistics and p-value
+    b.L = L										# series of loss differentials
+    scalar tstat = $coeff/$stderr
+    b.DMstat = tstat
+    b.pvaln = 2 * pvalue(z, abs(tstat))			# stand. normal
+    b.pvalt = 2 * pvalue(t, ($T-1), abs(tstat))	# t-distribution
+    b.DMpvalssc = HLN(tstat, $T, b.fhor)		# small-sample correction
+    
+    if b.verb == 1
+        printf "\n***********************************************\n"
+        printf "*** Diebold & Mariano (1995) test\n"
+        printf "*** on equal forecast accuracy\n"
+        if b.loss==1
+            printf "\nLoss: U-shape quadratic.\n"
+        elif b.loss==2
+            printf "\nLoss: V-shape linear.\n"
+        endif
+        printf "Forecast horizon: %d \n", b.fhor
+        printf "H0: forecasts are equally accurate\n"
+        printf "Test stat.: %.4f\n", b.DMstat        
+        printf "p-value (stand. normal): %.4f\n", b.pvaln
+        printf "p-value (t-distributed): %.4f\n", b.pvalt
+        printf "p-value (small-sample):  %.4f\n", b.DMpvalssc
+        printf "***********************************************\n"
+    endif
+
+end function
+
+#############
+
+function void doMZtest (bundle *b)
+    # Intercept automatically added
+    # series y = actual realizations
+    # series fc = forecast values
+  
+    # apply default
+    if !inbundle(b, nboot)
+        b.nboot = 0
+    endif
+    if !inbundle(b, "robust")
+        scalar b.robust = 0
+    endif
+    if !inbundle(b, "verb")
+        b.verb = 0
+    endif    
+    
+    # acommodate old variant
+    if inbundle(b, "strrob")
+        string strrob = b.strrob
+    else
+        string strrob = (b.robust == 1) ? "--robust" : ""
+    endif
+  
+    series fc = b.fc
+    series y = b.y
+    Rmat = {1,0;0,1}
+    qvec = {0,1}'
+  
+    if b.nboot > 0
+        set bootrep b.nboot
+        string strboot = "--bootstrap"
+    else
+        string strboot = ""
+    endif
+    ols y const fc @strrob --quiet
+    catch restrict @strboot --silent
+        R = Rmat
+        q = qvec
+    end restrict
+    if $error
+        catch restrict --silent
+            R = Rmat
+            q = qvec
+        end restrict
+    endif
+
+    if b.verb == 1
+        printf "\n***********************************************\n"
+        printf "*** Mincer & Zarnowitz test\n"
+        printf "*** on forecast unbiasedness\n"
+        if !b.robust
+            printf "\nMethod: Approach using asymptotic VCV.\n"
+        elif b.robust == 1
+            printf "\nMethod: Approach using HAC robust VCV.\n"
+        endif
+        if b.nboot > 0
+            printf "Bootstrap p-value using %d iterations.\n", b.nboot
+        endif
+        printf "H0: forecasts are unbiased\n"
+        printf "Test stat.: %.4f\n", $test
+        printf "p-value.:   %.4f\n", $pvalue
+        printf "***********************************************\n"
+    endif
+    
+    b.MZstat = $test
+    b.MZpval = $pvalue
+end function
+
+###############
+
+function void doPTtest (bundle *b)
+    # compatibility treatment:
+    # PTmeth was old code for what is actually robustness: 1: not robust, 2: robust
+    if inbundle(b, "PTmeth")
+        print "Warning: PTmeth is deprecated, use 'robust' (0/1)"
+    
+        if b.PTmeth == 1 || b.PTmeth == 2
+            scalar b.robust = b.PTmeth - 1
+        else
+            funcerr "PTmeth can only be 1 or 2"
+        endif
+    endif
+  
+    # apply defaults
+    if !inbundle(b, "robust")
+        b.robust = 0
+    endif 
+    if !inbundle(b, "verb")
+        b.verb = 0
+    endif      
+
+    series y = b.yup		# Binary of var. of actual ups
+    series fc = b.fcup		# Binary of var. of forecasted ups
+    smpl y fc --no-missing
+    if rows(values(y)) > 2 || rows(values(fc)) > 2
+        printf "*** Note: Running the Pesaran & Timmermann test requires ***\n"
+        printf "*** that y and fc are both binary variables! Check again! *** \n"
+        funcerr "Check that y and fc are both binary variables."
+    endif
+    if !b.robust   # PTmeth == 1
+        scalar r = mcorr({y} ~ {fc})[1,2]
+        scalar T = nobs(y)
+        scalar test = sqrt(T) * r	# test stat. (Pesaran 2015, p. 399)
+        scalar pval = 2 * pvalue(z, abs(test))		# PT ~ N(0,1)
+    elif b.robust == 1  # PTmeth == 2
+        ols y const fc --robust --quiet
+        scalar test = $coeff[2] / $stderr[2]
+        scalar pval = 2 * pvalue(t, $df, abs(test))
+    else
+        print "Warning: Invalid PTmeth input"
+    endif
+
+    if b.verb == 1
+        printf "\n***********************************************\n"
+        printf "*** Pesaran & Timmermann (1992, 2006) test\n"
+        printf "*** on directional change\n"
+        if !b.robust    #  PTmeth == 1
+            printf "\nMethod: Correlation approach using asymptotic VCV.\n"
+        elif b.robust == 1  # PTmeth == 2
+            printf "\nMethod: Regression approach using HAC robust VCV.\n"
+        endif
+        printf "H0: y(t) and x(t) are distributed independently \n"
+        printf "Test stat.: %.4f\n", test
+        printf "p-value.:   %.4f\n", pval
+        printf "***********************************************\n"
+    endif
+    b.PTstat = test
+    b.PTpval = pval
+end function
+
+##############
+
+function void doCGtest (bundle *b)
+    # consolidating all CG test variants
+    
+    /* Computes both Campbell & Ghysels sign and signed rank 
+       (Wilcoxon-type) nonparam. statistics, 
+       going back to Campbell & Dufour who also showed that in 
+       general it's not exactly identical to a Wilcoxon test, 
+       but the distribution of the test stat is identical.
+    
+       # series E: series of forecast errors
+       # int k: Lag at which to construct the cross product
+       # series CGX: variables for orthogonality test (optional)  
+
+       # plain test: H0: Median of E = 0, H1: Median of E != 0
+       # other variants: substitute E with a cross-product 
+     
+       # Additional assumption that E is symmetric about 0 under the null
+    */
+    
+    # apply defaults     
+    if !inbundle(b, "k") 	# default: test unbiasedness
+        b.k = 0							# means no test for lag effects
+    elif b.k < 0 || (b.k != int(b.k))
+        funcerr "lag number k must be non-negative integer"    
+    endif
+    scalar k = b.k	 # (scalar treated by gretl as 1x1 matrix, should be OK)
+          
+    if !k && inbundle(b, "CGX")
+        funcerr "You provide X [CGX] but set k=0. Please set k>0 for running the orthogonality test."
+    endif
+  
+    if !inbundle(b, "verb")
+        b.verb = 0
+    endif
+    if inbundle(b, "y") && inbundle(b, "fc")
+        series E = b.y - b.fc
+        if !inbundle(b, "E")
+            series b.E = E # copy for use in backend functions
+        endif
+    elif inbundle(b, "E")
+        series E = b.E
+    else
+        funcerr "Suitable input missing."
+    endif
+    
+    # Either test on (a) unbiasedness, (b) serial correlation, 
+      # or (c) orthogonality
+    if !inbundle(b, "CGX")			
+        # no exogenous/orthogonality terms
+        matrices testout = CamDufStats({E}, k)
+    else 
+        # orthogonality test, with recursive median recentering  
+        matrices testout = CamDufStats({E} ~ {b.CGX}, k, 1)      
+    endif
+  
+    ### process results 
+    scalar T = testout[4][1]
+  
+    ## sign test
+    scalar b.CGSIGNstat = testout[1][1,1] 
+    
+    # Binomial dist
+    if b.CGSIGNstat < (T + 1) / 2 # left tail of the distribution
+      
+        temp = pvalue(B, 0.5, T, b.CGSIGNstat)  
+        # (gretl does > x, not >= x here!)
+        b.CGSIGNpval = 2 * (1 - temp) # because of symmetry under p=0.5
+      
+    else	# right tail 
+        # (force X >= x by passing x' = x-1, since gretl does > x)
+        b.CGSIGNpval = 2 * pvalue(B, 0.5, T, b.CGSIGNstat - 1)
+        # (again, because of symmetry)
+    endif
+  
+    ## signed rank test 
+    
+    if !inbundle(b, "CGX") # serial correlation, or unbiasedness
+        # here we can use the standard variant 
+        scalar b.CGWILCstat = testout[3][1,1]   
+      
+    else	# orthogonality test 
+        #... must use Campbell&Dufour's special signed-rank variant
+        # (we argue that strict exogeneity is very unrealistic)
+        scalar b.CGWILCstat = testout[2][1,1]  
+    endif
+    
+    ## p-value calc with functions from extra
+    err = loadextra()
+    if !err 
+        if b.CGWILCstat < (T * (T + 1) / 2 / 2) # left tail
+            # (force X > x by passing x' = x+1 since this func does >= x)
+            temp = WSRpvalue(T, b.CGWILCstat + 1)
+            b.CGWILCpval = 2 * (1 - temp) # because of symmetry 
+      
+        else # right tail
+            # (this func does X >= x)
+            b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry 
+      
+        endif
+  
+    else	# extra.gfn package not available/loadable
+        scalar b.CGWILCpval = NA
+    endif
+
+    if b.verb	
+        CGprint(&b)	# (lives in FEP_private.inp)
+    endif
+   
+end function # doCGtest

@@ -1,0 +1,48 @@
+# Euro Area, Real GDP, Average, Economist Poll of Forecasters, Estimate, Change Y/Y
+# Source Macrobond
+Date	eufcst0003
+01.01.2001	1,5
+01.01.2002	0,7
+01.01.2003	0,5
+01.01.2004	1,8
+01.01.2005	1,4
+01.01.2006	2,7
+01.01.2007	2,6
+01.01.2008	0,8
+01.01.2009	-3,9
+01.01.2010	1,7
+01.01.2011	1,5
+01.01.2012	-0,5
+01.01.2013	-0,4
+01.01.2014	0,8
+01.01.2015	1,5
+01.01.2016	1,7
+01.01.2017	2,4
+01.01.2018	2,4
+
+# Time series	Euro Area, Real GDP, Average, Economist Poll of Forecasters, Estimate, Change Y/Y
+# Name	eufcst0003
+# Series status	Active
+# Region	Euro Area
+# Category	Forecasts
+# Original frequency	Annual
+# Start date	2001
+# Unit	Percent
+# Series class	Stock
+# Percentage change type	Change Y/Y
+# Comment	Economist Poll of Forecasters
+# Monthly poll of forecasters. Covers percentage change and the highest/lowest forecast of real GDP, percentage change in CPI and the current account as a percentage of GDP. 
+# 
+# As of December 2010 participants were Bank of America, BNP Paribas, Citigroup, Commerzbank, Decision Economics, Deutsche Bank, EIU, Goldman Sachs, HSBC Securities, ING, JPMorgan Chase, KBC Bank, Morgan Stanley, RBS, Schroders, Scotiabank, Societé Générale, Standard Chartered & UBS.
+# Last value	2,4
+# Date	2018
+# Source	Economist
+# Region	World
+# Country of domicile	United Kingdom
+# 	http://www.stoxx.com/corporate/company/stoxx.html
+# 	http://www.economist.com/members/members.cfm?act=contactus#contact_us
+# 	mailto:letters@economist.com
+# Release	Economist Poll of Forecasters
+# Last release	08.02.2018 15:45
+# 	http://www.economist.com/printedition/
+# 	http://www.economist.com/markets-data

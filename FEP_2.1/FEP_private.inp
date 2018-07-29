@@ -1,0 +1,187 @@
+# private functions
+
+function scalar loadextra(void)
+  # (new v2.1) pull in the extra pkg for the Wilcoxon p-values
+  # needed in the doCGtest
+  
+  # (Until extra.gfn allows introspection for its version,
+  # we use this warning workaround).
+  string warn = "(FEP needs extra.gfn version 0.41 or higher."
+  warn = sprintf("%s\nOtherwise expect errors,", warn)
+  warn = sprintf("%s then install a newer version of 'extra'.)\n", warn)
+  
+  catch include extra.gfn
+  if $error # probably not installed
+    catch install extra
+    if $error 
+      print "Fatal problem getting the 'extra' package."
+      print "Please install it manually and try again."
+      print "(Tests except CG should still work,"
+      print "  otherwise expect more errors ahead...)"
+      return 2
+    
+    else
+      catch include extra.gfn
+      if $error 
+        print "Fatal error loading the 'extra' package."
+        print "(Tests except CG should still work,"
+        print "  otherwise expect more errors ahead...)"
+        return 1 
+      
+      else
+        print warn
+        return 0
+      endif
+      
+    endif
+  
+  else
+    print warn
+    return 0
+  endif
+end function
+
+
+function void CGprint(bundle *b)    
+    # helper function
+    # string sType = (b.CGmeth == 1) ? "sign test" : "signed-rank test"
+    printf "********************************************************\n"
+    if !b.k && !inbundle(b, "CGX")
+      printf "You selected the test(s) of unbiasedness.\n"
+      
+    elif !b.k && inbundle(b, "CGX")
+      funcerr "You set k=0 but provided CGX. Please set k>0, and re-run."
+    endif
+      
+    if b.k > 0 && !inbundle(b, "CGX")
+      printf "You selected the test(s) of (no) serial correlation at lag %d.\n", b.k
+      
+    elif inbundle(b, "CGX")
+        printf "You selected the test(s) of orthogonality at lag %d.\n", b.k
+    endif
+    printf "********************************************************\n"
+end function
+
+#################
+
+function string fullname(string scode)
+  strings codes = defarray("MZ","KG","DL","EKT","KS","PT", \
+    "CGRANK","CGWILC","DM", \
+    "HP", "PS", "CG")
+  strings fulls = defarray("Mincer-Zarnowitz (MZ)", 
+     "Holden-Peel-Kirchgaessner (KG)", 
+     "Diebold-Lopez (DL)", 
+     "Elliott-Komunjer-Timmermann (EKT)", 
+     "Kuiper score (KS)", 
+     "Pesaran-Timmermann (PT)",
+     "Campbell-Ghysels rank sign (CGRANK)",
+     "Campbell-Ghysels Wilcoxon sign (CGWILC)",
+     "Diebold-Mariano (DM)",
+     "Holden-Peel (HP)", 
+     "Probability Score (PS)",
+     "Campbell-Ghysels (CG)")
+     
+  loop i=1..nelem(codes) -q
+    if scode == codes[i]
+      return fulls[i]
+    endif
+  endloop
+   
+  # When we get here it's a problem
+  printf "Whoops, scode is %s\n", scode  
+  funcerr "Code scode didn't match anything"
+end function
+
+#################
+
+function matrix HLN (scalar DMstat "Diebold-Mariano test statistics",
+                     int T "No. of forecasts",
+                     int h "Forecast horizon")
+  matrix stat = DMstat / sqrt( (T+1-2*h+h*(h-1)/T)/T )
+  matrix pv = 2*pvalue(t,(T-1),abs(stat))
+  return pv #stat | pv
+end function
+
+function void try_invert (matrix m,
+                          scalar *err)
+  catch matrix ret = inv(m)
+  err = $error
+end function
+
+function void try_ginvert (matrix m,
+                           scalar *err)
+  catch matrix ret = ginv(m)
+  err = $error
+end function
+
+###############
+
+function matrix symtest (scalar aT "AlphaHat",
+                         scalar SE "S.D. of  Alpha",
+                         int verb)
+  # Test the null hypothesis of symmetry: alfa = 0.5 #
+  scalar TestSym = (aT - 0.5)/SE
+  scalar ProbSym = 2*(pvalue(z,abs(TestSym)))	# alfa is asymptotically normal
+  if verb==1
+    printf "\n*********************************************\n"
+    printf "Test for Symmetry: H0: aT=0.5 vs. H1: aT!=0.5\n"
+    printf "\nEstim. alpha = %12.3g\n", aT
+    printf "Test stat. = %12.3g\n", TestSym
+    printf "P-value = %12.3g\n", ProbSym
+    printf "\n*********************************************\n"
+  endif
+  return TestSym ~ ProbSym
+end function
+
+##############
+
+function matrix rattest (matrix Y,
+                         matrix iv,
+                         matrix vMod,
+                         scalar aT "AlphaHat",
+                         matrix s,
+                         int iSym[0:1:] "0=Use estimated aT, 1=Fix aT=0.5",
+                         int verb)
+  if iSym==0 && cols(s)==1
+    printf "Error: Rationality Test not applicable\n           as the no. of instruments equal the no. of parameters\n"
+    J = NA
+    pv = NA
+  elif cols(s)>1
+    if iSym==1
+      aT = 0.5
+      df = cols(s)
+    else
+      df = cols(s)-1
+    endif
+    A = sumc( iv.*((Y.<0)-aT).*vMod)
+    err = 0
+    try_invert(s,&err)
+    if err==0
+      J = qform(A,inv(s)) / rows(iv)
+    else
+      err = 0
+      try_ginvert(s,&err)
+      if err==0
+        J = qform(A,ginv(s)) / rows(iv)
+      endif
+    endif
+  endif
+  if cols(s)>1 && err==0
+    pv = pvalue(X,df,J)
+    if cols(s)>1 && verb==1
+      printf "\n*********************************************\n"
+      printf "Rationality Test\n"
+      if iSym==1
+        printf "\nAlpha fixed to 0.5\n"
+      else
+        printf "\nEstim. alpha = %12.3g\n", aT
+      endif
+      printf "J-statistics = %12.3g\n", J
+      printf "P-value = %12.3g\n", pv
+      printf "\n*********************************************\n"
+    endif
+    return J~pv
+  else
+    return {NA}~{NA}
+  endif
+end function

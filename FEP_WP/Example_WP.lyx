@@ -1,0 +1,841 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package auto
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 11
+\spacing onehalf
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2.5cm
+\topmargin 2.5cm
+\rightmargin 2.5cm
+\bottommargin 2.5cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Illustrative example
+\end_layout
+
+\begin_layout Standard
+In the following an applied example using survey-based forecasts for annual
+ growth of Euro Area (EA) real GDP is presented.
+ Forecasts are averages based on surveys among professional forecasts, 
+\begin_inset Formula $f_{t}$
+\end_inset
+
+, made by the Economist and obtained through the Macrobond database.
+ The realizations, 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+, are from the AMECO database provided by the European Commission.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Forecast-error-for"
+
+\end_inset
+
+ depicts the forecast errors, 
+\begin_inset Formula $e_{t}=y_{t}-fc_{t}$
+\end_inset
+
+.
+ In the following some major functions are applied but not all which we
+ have described before.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename ForecastError_Polldata.png
+	scale 50
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Forecast-error-for"
+
+\end_inset
+
+Forecast error for EA growth of real GDP
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Tests on unbiasedness
+\end_layout
+
+\begin_layout Standard
+We run the parametric Mincer-Zarnowitz test on forecast unbiasedness using
+ (
+\emph on
+iid
+\emph default
+) bootstrap (999 iterations) p-values and HAC standard errors.
+ First an empty bundle is defined, before the series and parameters are
+ added:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+bundle b = null
+\end_layout
+
+\begin_layout Plain Layout
+b.y = y # realizations
+\end_layout
+
+\begin_layout Plain Layout
+b.fc = fc # forecasts
+\end_layout
+
+\begin_layout Plain Layout
+b.nboot = 999
+\end_layout
+
+\begin_layout Plain Layout
+b.robust = 1 # 1=robust HAC robust VCV
+\end_layout
+
+\begin_layout Plain Layout
+b.verb = 1 # 1=print details
+\end_layout
+
+\begin_layout Plain Layout
+applyFCtests(&b, "MZ") # call the top-level function
+\end_layout
+
+\begin_layout Plain Layout
+*** OUTPUT Mincer & Zarnowitz test on forecast unbiasedness ***
+\end_layout
+
+\begin_layout Plain Layout
+Method: Approach using HAC robust VCV.
+\end_layout
+
+\begin_layout Plain Layout
+Bootstrap p-value using 999 iterations.
+\end_layout
+
+\begin_layout Plain Layout
+H0: forecasts are unbiased
+\end_layout
+
+\begin_layout Plain Layout
+Test stat.: 5.6758
+\end_layout
+
+\begin_layout Plain Layout
+p-value.: 0.3874
+\end_layout
+
+\end_inset
+
+As can be seen, the null hypothesis cannot be rejected at standard levels
+ which indicates that the forecast errors are unbiased.
+\end_layout
+
+\begin_layout Standard
+A non-parametric alternative on forecast unbiasedness was proposed by Campbell-G
+hysels.
+ The CG test can be called by:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+bundle b = null
+\end_layout
+
+\begin_layout Plain Layout
+b.y = y
+\end_layout
+
+\begin_layout Plain Layout
+b.fc = fc
+\end_layout
+
+\begin_layout Plain Layout
+b.verb = 1
+\end_layout
+
+\begin_layout Plain Layout
+applyFCtests(&b, "CG")
+\end_layout
+
+\begin_layout Plain Layout
+printf "P-value Wilcoxon rank sign test = %.3f
+\backslash
+n", b.CGWILCpval
+\end_layout
+
+\begin_layout Plain Layout
+printf "P-value sign test = %.3f
+\backslash
+n", b.CGSIGNpval
+\end_layout
+
+\begin_layout Plain Layout
+*** OUTPUT ***
+\end_layout
+
+\begin_layout Plain Layout
+P-value Wilcoxon rank sign test = 0.122
+\end_layout
+
+\begin_layout Plain Layout
+P-value sign test = 0.096
+\end_layout
+
+\end_inset
+
+In contrast to the parametric MZ test, there may be weak tendency for unbiased
+ forecast errors—at least according to the sign test approach which can
+ be rejected at the 10% level.
+\end_layout
+
+\begin_layout Subsection
+Tests on efficiency
+\end_layout
+
+\begin_layout Standard
+The Holden-Peel test is a parametric test on efficient forecasts.
+ We simply use lagged forecasts, 
+\begin_inset Formula $fc_{t-1}$
+\end_inset
+
+, as the conditional variable.
+ The HP test with bootstrap HAC standard errors is easily called by:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+bundle b = null
+\end_layout
+
+\begin_layout Plain Layout
+b.y = y
+\end_layout
+
+\begin_layout Plain Layout
+b.fc = fc
+\end_layout
+
+\begin_layout Plain Layout
+b.z = fc(-1) # use lagged forecast as conditional variable
+\end_layout
+
+\begin_layout Plain Layout
+b.nboot = 999
+\end_layout
+
+\begin_layout Plain Layout
+b.robust = 1
+\end_layout
+
+\begin_layout Plain Layout
+b.verb = 1
+\end_layout
+
+\begin_layout Plain Layout
+applyFCtests(&b, "HP")
+\end_layout
+
+\begin_layout Plain Layout
+*** OUTPUT Holden & Peel test on forecast efficiency ***
+\end_layout
+
+\begin_layout Plain Layout
+Method: Approach using HAC robust VCV.
+\end_layout
+
+\begin_layout Plain Layout
+Bootstrap p-value using 999 iterations.
+\end_layout
+
+\begin_layout Plain Layout
+H0: forecasts are efficient
+\end_layout
+
+\begin_layout Plain Layout
+Test stat.: 8.1013
+\end_layout
+
+\begin_layout Plain Layout
+p-value.: 0.2853
+\end_layout
+
+\end_inset
+
+Hence, this parametric test result does not indicate any issue with forecast
+ efficiency conditional on 
+\begin_inset Formula $fc_{t-1}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A non-parametric version is also provided by the CG-test approach which
+ is called by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+bundle b = null
+\end_layout
+
+\begin_layout Plain Layout
+b.y = y
+\end_layout
+
+\begin_layout Plain Layout
+b.fc = fc
+\end_layout
+
+\begin_layout Plain Layout
+b.k = 1
+\end_layout
+
+\begin_layout Plain Layout
+b.CGX = fc(-1)
+\end_layout
+
+\begin_layout Plain Layout
+smpl fc(-1) --no-missing # avoid NAs in the sample
+\end_layout
+
+\begin_layout Plain Layout
+b.verb = 1
+\end_layout
+
+\begin_layout Plain Layout
+applyFCtests(&b, "CG")
+\end_layout
+
+\begin_layout Plain Layout
+printf "P-value Wilcoxon rank sign test = %.3f
+\backslash
+n", b.CGWILCpval
+\end_layout
+
+\begin_layout Plain Layout
+printf "P-value sign test = %.3f
+\backslash
+n", b.CGSIGNpval
+\end_layout
+
+\begin_layout Plain Layout
+*** OUTPUT ***
+\end_layout
+
+\begin_layout Plain Layout
+P-value Wilcoxon rank sign test = 0.008
+\end_layout
+
+\begin_layout Plain Layout
+P-value sign test = 0.001
+\end_layout
+
+\end_inset
+
+Thus, the non-parametric test raises doubts that the forecasts have made
+ efficient use of available information as the null can be safely rejected
+ at the 1% level.
+\end_layout
+
+\begin_layout Subsection
+Tests on asymmetric loss and forecast rationality
+\end_layout
+
+\begin_layout Standard
+The framework proposed by Elliot et al.
+ (2005) extends parts of the previous analysis to the case of asymmetric
+ loss functions.
+ We will use lagged forecast errors as an additional instrument apart from
+ an intercept for illustration and assume a quad-quad loss function.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+bundle b = null
+\end_layout
+
+\begin_layout Plain Layout
+b.p0 = 2 # Loss function (lin-lin = 1, quad-quad = 2)
+\end_layout
+
+\begin_layout Plain Layout
+series fcerr = y-fc
+\end_layout
+
+\begin_layout Plain Layout
+series fcerr1 = fcerr(-1) # additional instrument (intercept included per
+ default)
+\end_layout
+
+\begin_layout Plain Layout
+b.y = y
+\end_layout
+
+\begin_layout Plain Layout
+b.fc = fc
+\end_layout
+
+\begin_layout Plain Layout
+b.z = fcerr # instrumental variable
+\end_layout
+
+\begin_layout Plain Layout
+smpl fcerr fcerr1 --no-missing
+\end_layout
+
+\begin_layout Plain Layout
+b.a0 = 0.5 # Initial value of shape parameter aT
+\end_layout
+
+\begin_layout Plain Layout
+b.lossdraw = "display"
+\end_layout
+
+\begin_layout Plain Layout
+applyFCtests(&b, "EKT")
+\end_layout
+
+\begin_layout Plain Layout
+*** OUTPUT ***
+\end_layout
+
+\begin_layout Plain Layout
+* Test for Symmetry: H0: aT=0.5 vs.
+ H1: aT!=0.5
+\end_layout
+
+\begin_layout Plain Layout
+Estim.
+ alpha = 0.236, Test stat.
+ = -2.41, P-value = 0.0158
+\end_layout
+
+\begin_layout Plain Layout
+* Rationality Test
+\end_layout
+
+\begin_layout Plain Layout
+Estim.
+ alpha = 0.236, J-statistics = 1.46, P-value = 0.227
+\end_layout
+
+\begin_layout Plain Layout
+* Rationality Test
+\end_layout
+
+\begin_layout Plain Layout
+Alpha fixed to 0.5, J-statistics = 7.28, P-value = 0.0262
+\end_layout
+
+\end_inset
+
+Apart from test results, a drawing of the estimated loss function is returned
+ (see Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Estimated-loss-function"
+
+\end_inset
+
+).
+ The estimated 
+\begin_inset Formula $\hat{\alpha}$
+\end_inset
+
+ is 0.236 which indicates greater aversion to negative forecast errors.
+ The null on symmetric loss can be rejected at the 5% level.
+ Furthermore, under the estimated loss function one cannot reject the null
+ of forecast rationality.
+ However, after imposing the restriction of symmetric loss, one could indeed
+ reject the null of forecast rationality at the 5% level.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename EKTLoss_Polldata.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Estimated loss function using the EKT approach
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Estimated-loss-function"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Forecast comparison
+\end_layout
+
+\begin_layout Standard
+The Diebold-Mariano approach tests for equal predictive accuracy of two
+ competing forecasts.
+ We compare the current forecast for simplicity with the pre-year (naive)
+ forecast assuming linear loss.
+ The test is called by:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+bundle b = null
+\end_layout
+
+\begin_layout Plain Layout
+b.y = y
+\end_layout
+
+\begin_layout Plain Layout
+b.f1 = fc # FC 1 series
+\end_layout
+
+\begin_layout Plain Layout
+b.f2 = y(-1) # FC 2 series: naive pre-year realization
+\end_layout
+
+\begin_layout Plain Layout
+b.loss = 2 # 1="U-shape", 2="V-shape"
+\end_layout
+
+\begin_layout Plain Layout
+b.verb = 1
+\end_layout
+
+\begin_layout Plain Layout
+applyFCtests(&b, "DM")
+\end_layout
+
+\begin_layout Plain Layout
+*** OUTPUT Diebold & Mariano (1995) test on equal forecast accuracy ***
+\end_layout
+
+\begin_layout Plain Layout
+Loss: V-shape linear.
+\end_layout
+
+\begin_layout Plain Layout
+Forecast horizon: 1
+\end_layout
+
+\begin_layout Plain Layout
+H0: forecasts are equally accurate
+\end_layout
+
+\begin_layout Plain Layout
+Test stat.: -2.5611
+\end_layout
+
+\begin_layout Plain Layout
+p-value (stand.
+ normal): 0.0104
+\end_layout
+
+\begin_layout Plain Layout
+p-value (t-distributed): 0.0209
+\end_layout
+
+\begin_layout Plain Layout
+p-value (small-sample): 0.0178
+\end_layout
+
+\end_inset
+
+The null of the test can be rejected at least at the 5% significance level
+ for all three versions computed.
+ The negative test statistics (-2.56) indicates that the current year forecast
+ is more accurate compared to the naive one.
+\end_layout
+
+\begin_layout Subsection
+Directional forecast
+\end_layout
+
+\begin_layout Standard
+Apart from point forecasts, directional forecasts may be of interest.
+ The Kuipers score (KS) is a widly-applied simple statistics to summarize
+ directional forecasts.
+ The following lines first compute the dummy variables yup (fcup) which
+ take the value of one if the period-change in realized (forecast) values
+ is positive, and otherwise zero.
+ Next, the KS statistics is called.
+ 
+\begin_inset Float algorithm
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+bundle b = null
+\end_layout
+
+\begin_layout Plain Layout
+b.yup = (diff(y) > 0)
+\end_layout
+
+\begin_layout Plain Layout
+b.fcup = (diff(fc) > 0)
+\end_layout
+
+\begin_layout Plain Layout
+b.verb = 1
+\end_layout
+
+\begin_layout Plain Layout
+applyFCtests(&b, "KS")
+\end_layout
+
+\begin_layout Plain Layout
+*** OUTPUT Kuipers Score ***
+\end_layout
+
+\begin_layout Plain Layout
+Hit Rate = 1.000
+\end_layout
+
+\begin_layout Plain Layout
+False Alarm Rate = 0.100
+\end_layout
+
+\begin_layout Plain Layout
+Kuipers Score = 0.900
+\end_layout
+
+\end_inset
+
+Accordingly, the forecasts have a perfect hit rate of 1 meaning that all
+ 
+\begin_inset Quotes eld
+\end_inset
+
+ups
+\begin_inset Quotes erd
+\end_inset
+
+ are correctly predicted.
+ The false alarm rate is only 10% such that the KS statistics is 0.9 which
+ indicates a good directional forecast performance.
+\end_layout
+
+\begin_layout Standard
+Lastly, the Diebold-Lopez test tests whether a directional forecast is significa
+ntly different from a coin flip.
+ The relevant script is provided in the listing below.
+ The positive test statistics of 1.87 indicates that the actual forecast
+ outperforms a pure coin flip which is statistically confirmed by the p-value.
+ The Pesaran-Timmermann test may be seen as an alternative test for directional
+ forecasts.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+bundle b = null
+\end_layout
+
+\begin_layout Plain Layout
+b.yup = (diff(y) > 0)
+\end_layout
+
+\begin_layout Plain Layout
+b.fcup = (diff(fc) > 0)
+\end_layout
+
+\begin_layout Plain Layout
+b.verb = 1
+\end_layout
+
+\begin_layout Plain Layout
+applyFCtests(&b, "DL")
+\end_layout
+
+\begin_layout Plain Layout
+*** OUTPUT Diebold & Lopez test on directional change ***
+\end_layout
+
+\begin_layout Plain Layout
+H0: y(t) and fc(t) are independent
+\end_layout
+
+\begin_layout Plain Layout
+Info-value: 1.8750
+\end_layout
+
+\begin_layout Plain Layout
+Test stat.: 13.3875
+\end_layout
+
+\begin_layout Plain Layout
+p-value.: 0.0003
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
