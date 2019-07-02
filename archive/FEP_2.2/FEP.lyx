@@ -10539,7 +10539,7 @@ where
 \begin_inset Formula $t+h$
 \end_inset
 
- forecast enters the information set.
+ forecast, enters the information set.
  Additional conditioning variables may be included into the list 'z'.
 \end_layout
 
