@@ -1,0 +1,1912 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gretl-functions>
+<gretl-function-package name="FEP" no-data-ok="true" minver="2017a" lives-in-subdir="true">
+<author email="atecon@cryptolab.net">Artur Tarassow and Sven Schreiber</author>
+<version>2.3</version>
+<date>2018-07-02</date>
+<description>Forecast Evaluation Package</description>
+<tags>C12 C52 C53</tags>
+<label>Forecast evaluations</label>
+<menu-attachment>MAINWIN/View</menu-attachment>
+<help>
+pdfdoc:FEP.pdf
+</help>
+<data-files count="1">
+FEPdata.gdt </data-files>
+<gretl-function name="doKS" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># FIXME: change this to use scores2x2 from extra.gfn once it's ready!
+# apply defaults
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+series y = b.yup		# Binary of var. of actual ups
+series fc = b.fcup		# Binary of var. of forecasted ups
+smpl y fc --no-missing
+if rows(values(y)) &gt; 2 || rows(values(fc)) &gt; 2
+  printf &quot;*** Note: Running the Kuipers score requires that ***\n&quot;
+  printf &quot;*** y and fc are both binary variables! Check again! *** \n&quot;
+  funcerr &quot;Check that y and fc are both binary variables!&quot;
+endif
+# M has the form:
+# 		 | Up (Y=1) Down (Y=0)
+# ------------------------------
+# U (F=1)| Hits		False alarms
+# D (F=0)| Misses	Correct reject.
+matrix M = zeros(2,2)
+M[1,1:2] = sum(y==1 &amp;&amp; fc==1) ~ sum(y==0 &amp;&amp; fc==1)
+M[2,1:2] = sum(y==1 &amp;&amp; fc==0) ~ sum(y==0 &amp;&amp; fc==0)
+scalar hi = M[1,1] / sumc(M[,1])	# hit rate
+scalar fa = M[1,2] / sumc(M[,2])	# false alarm rate
+if b.verb == 1
+  printf &quot;\n*************************\n&quot;
+  printf &quot;*** Kuipers Score ***\n&quot;
+  printf &quot;Hit Rate        = %.3f\n&quot;, hi
+  printf &quot;False Alarm Rate = %.3f\n&quot;, fa
+  printf &quot;Kuipers Score   = %.3f\n&quot;, hi-fa
+  printf &quot;\n*************************\n&quot;
+endif
+b.KShit = hi
+b.KSfalse = fa
+b.KSstat = hi-fa
+colnames(M, &quot;Y=1 Y=0&quot;)
+rownames(M, &quot;Yhat=1 Yhat=0&quot;)
+b.KSmat = M
+</code>
+</gretl-function>
+<gretl-function name="doEKTtest_series" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># A wrapper that turns some series elements into matrices,
+# as expected by doEKTtest.
+# Since the matrix x for doEKTtest can be n-dim (I think),
+# the corresponding input will be a list.
+# apply default value
+if !inbundle(b, &quot;lossdraw&quot;)
+  string b.lossdraw = &quot;no&quot;
+endif
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+if inbundle(b, &quot;E&quot;)
+  if typestr(typeof(b.E)) == &quot;series&quot;
+    series sertemp = b.E  # fc error, series
+  endif
+elif inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;)
+  series sertemp = b.y - b.fc # again fc error
+else
+  funcerr &quot;Suitable input missing.&quot;
+endif
+matrix b.fcerrors = {sertemp}	# new interface (Nov 2017)
+matrix b.x = {b.z}	# z should be a list
+if rows(b.fcerrors) != rows(b.x)
+  funcerr &quot;Obs of forecasts and instruments don't match.&quot;
+endif
+doEKTtest(&amp;b)
+</code>
+</gretl-function>
+<gretl-function name="doHPtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># renamed from KG (Kirchgaessner) at v2.0
+# apply defaults
+if !inbundle(b, &quot;robust&quot;)
+  scalar b.robust = 0
+endif
+if !inbundle(b, &quot;nboot&quot;)
+  b.nboot = 0
+endif
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+# acommodate old variant
+if inbundle(b, &quot;strrob&quot;)
+  string strrob = b.strrob
+else
+  string strrob = (b.robust == 1) ? &quot;--robust&quot; : &quot;&quot;
+endif
+# compatibility for matrix input of z
+if typestr(typeof(b.z)) == &quot;matrix&quot;
+  matrix mz = b.z
+  list Z = null
+  loop i = 1..cols(mz) -q
+    series S$i = mz[,i]
+    Z += S$i
+  endloop
+elif typestr(typeof(b.z)) == &quot;series&quot; # workaround for apparent gretl bug
+  list Z = genseries(&quot;z&quot;, b.z)
+else	# standard list case
+  list Z = b.z
+endif
+series fc = b.fc
+series y = b.y
+list lreg = fc
+if nelem(Z)
+  lreg += Z
+endif
+scalar nv = 2 + nelem(Z)
+matrix Rmat = I(nv)
+matrix qvec = zeros(nv,1)
+qvec[2] = 1
+# nboot = b.nboot
+if b.nboot &gt; 0
+  set bootrep b.nboot
+  string strboot = &quot;--bootstrap&quot;
+else
+  string strboot = &quot;&quot;
+endif
+ols y const lreg @strrob --quiet
+catch restrict @strboot --silent
+  R = Rmat
+  q = qvec
+end restrict
+if $error
+  catch restrict --silent
+    R = Rmat
+    q = qvec
+  end restrict
+endif
+if b.verb == 1
+  printf &quot;\n***********************************************\n&quot;
+  printf &quot;*** Holden &amp; Peel test\n&quot;
+  printf &quot;*** on forecast efficiency\n&quot;
+  if !b.robust
+    printf &quot;\nMethod: Approach using asymptotic VCV.\n&quot;
+  elif b.robust == 1
+    printf &quot;\nMethod: Approach using HAC robust VCV.\n&quot;
+  endif
+  if b.nboot &gt; 0
+    printf &quot;Bootstrap p-value using %d iterations.\n&quot;, b.nboot
+  endif
+  printf &quot;H0: forecasts are efficient\n&quot;
+  printf &quot;Test stat.: %.4f\n&quot;, $test
+  printf &quot;p-value:   %.4f\n&quot;, $pvalue
+  printf &quot;***********************************************\n&quot;
+endif
+b.HPstat = $test
+b.HPpval = $pvalue
+</code>
+</gretl-function>
+<gretl-function name="applyFCtests" type="void">
+ <params count="2">
+  <param name="b" type="bundleref"/>
+  <param name="which" type="string"/>
+ </params>
+<code>strings testcodes = strsplit(strstrip(which))
+loop i = 1..nelem(testcodes) --quiet
+  # I hope no earlier test overwrites bundle elements
+  # that would confuse the later tests...?
+  which = testcodes[i]
+  if which == &quot;DM&quot;
+    doDMtest(&amp;b)	# Diebold &amp; Mariano
+  elif which == &quot;GW&quot;
+    doGWtest(&amp;b)	# Giacomini &amp; White
+  elif which == &quot;MZ&quot;
+    doMZtest(&amp;b)	# Mincer &amp; Zarnowitz
+  elif which == &quot;HP&quot;
+    doHPtest(&amp;b)	# Holden-Peel (ex-Kirchgässner)
+  elif which == &quot;CG&quot;
+    doCGtest(&amp;b)	# Campbell &amp; Ghysels
+  elif which == &quot;EKT&quot;
+    alreadyEKT = 0
+    if inbundle(b, &quot;y&quot;)
+      # accomodate old-style interface with matrix
+      if typestr(typeof(b.y)) == &quot;matrix&quot;
+        matrix b.fcerrors = b.y
+        doEKTtest(&amp;b)	# Elliott, Komunjer, Timmermann
+        alreadyEKT = 1
+      endif
+    endif
+    if !alreadyEKT
+      doEKTtest_series(&amp;b)
+    endif
+  elif which == &quot;DL&quot;
+    doDLtest(&amp;b)	# Diebold &amp; Lopez
+  elif which == &quot;KS&quot;
+    doKS(&amp;b)	# Kuipers Score
+  elif which == &quot;PT&quot;
+    doPTtest(&amp;b)	# Pesaran &amp; Timmermann (1992)
+  elif which == &quot;PS&quot;
+    doPS(&amp;b)	# probability score
+    # Now comes a compatibility layer with deprecated codes
+  elif which == &quot;KG&quot; # ex Kirchgaessner, now HP
+    print &quot;KG deprecated... switch to HP soon...&quot;
+    doKGtest(&amp;b)	# call the wrapper to activate old bundle names
+  elif which == &quot;CGWILC&quot;
+    print &quot;CGWILC deprecated, switch to CG&quot;
+    doCGWILCtest(&amp;b)
+  elif which == &quot;CGRANK&quot;
+    print &quot;CGRANK deprecated, switch to CG&quot;
+    doCGRANKtest(&amp;b)
+  endif
+endloop
+</code>
+</gretl-function>
+<gretl-function name="doDLtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># compatibility handling
+if inbundle(b, &quot;y&quot;)		# Binary of var. of actual ups
+  series y = b.y
+elif inbundle(b, &quot;yup&quot;)
+  series y = b.yup
+endif
+if inbundle(b, &quot;fc&quot;)	# Binary of var. of forecasted ups
+  series fc = b.fc
+elif inbundle(b, &quot;fcup&quot;)
+  series fc = b.fcup
+endif
+list L1 = y fc
+smpl L1 --no-missing
+if rows(values(y)) &gt; 2 || rows(values(fc)) &gt; 2
+  printf &quot;*** Note: Running the DL test requires that ***\n&quot;
+  printf &quot;*** yup and fcup are both binary variables! Check again! *** \n&quot;
+  funcerr &quot;Check that y and fc are both binary variables!&quot;
+endif
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+/* Artur's version
+# M has the form:
+# 		 | Up (Y=1) Down (Y=0)
+# ------------------------------
+# U (F=1)| o_ii		o_ij
+# D (F=0)| o_ji		o_jj
+matrix M = zeros(2,2)
+M[1,1:2] = sum(y==1 &amp;&amp; fc==1) ~ sum(y==0 &amp;&amp; fc==1)
+M[2,1:2] = sum(y==1 &amp;&amp; fc==0) ~ sum(y==0 &amp;&amp; fc==0)
+scalar O_doti = sum(M[,1])
+scalar O_dotj = sum(M[,2])
+scalar O_idot = sum(M[1,])
+scalar O_jdot = sum(M[2,])
+scalar O = sum(M)
+E_ii = O_idot*O_doti/O		# expected cell count 1,1
+E_ij = O_idot*O_dotj/O		# expected cell count 1,2
+E_ji = O_jdot*O_doti/O		# expected cell count 2,1
+E_jj = O_jdot*O_dotj/O		# expected cell count 2,2
+scalar chi_fc = (M[1,1]-E_ii)^2/E_ii + (M[1,2]-E_ij)^2/E_ij + (M[2,1]-E_ji)^2/E_ji + (M[2,2]-E_jj)^2/E_jj
+scalar b.DLstat = chi_fc
+scalar info_fc = M[1,1]/O_doti + M[2,2]/O_dotj	# &gt; 1 indicates some positive information content
+*/
+# Jack's version
+matrix M = mxtab(y,fc)
+matrix c = sumr(M)
+matrix r = sumc(M)
+scalar n = sumc(c)
+matrix E = c*r/n
+P = (M - E).^2 ./ E
+chi_fc = sumc(vec(P))
+scalar info_fc = M[1,1]/r[1] + M[2,2]/r[2]	# &gt; 1 indicates some positive information content
+scalar b.DLstat = chi_fc
+scalar b.DLinfo = info_fc		# Information value
+scalar b.DLpval = pvalue(x,1,chi_fc)
+if b.verb == 1
+  printf &quot;\n***********************************************\n&quot;
+  printf &quot;*** Diebold &amp; Lopez test\n&quot;
+  printf &quot;*** on directional change\n&quot;
+  printf &quot;\nH0: y(t) and fc(t) are independent \n&quot;
+  printf &quot;Info-value: %.4f\n&quot;, b.DLinfo
+  printf &quot;Test stat.: %.4f\n&quot;, b.DLstat
+  printf &quot;p-value:   %.4f\n&quot;, b.DLpval
+  printf &quot;***********************************************\n&quot;
+endif
+</code>
+</gretl-function>
+<gretl-function name="getLoss" type="matrix">
+ <params count="4">
+  <param name="fce" type="matrix">
+<description>FC (errors)</description>
+  </param>
+  <param name="LF" type="string" optional="true">
+<description>Loss function</description>
+  </param>
+  <param name="param" type="matrix" optional="true">
+<description>Loss func parameter(s)</description>
+  </param>
+  <param name="realiz" type="matrix" optional="true" const="true">
+<description>Realizations</description>
+  </param>
+ </params>
+<code>/*
+Returns a matrix with forecast error losses, of the same (T x k)
+dimension as the input matrix fce.
+'LF' can be:
+&quot;ll&quot; (or &quot;linlin&quot;), &quot;qq&quot; (or &quot;quadquad&quot;), &quot;square&quot; (or &quot;sq&quot;), &quot;abs&quot;, &quot;linex&quot; (Varian 1975), &quot;dlinex&quot; (or &quot;dle&quot;) for double linex (Granger 1999).
+default: squared errors
+'fce' is understood to be a matrix (Txk) of forecast errors, except if 'realiz' is also given: then 'fce' must be the
+forecasts themselves, and the errors are calculated as realiz - fce.
+'param' must be a 1-element or 2-element vector. Note: where only
+one input parameter is needed, gretl accepts a scalar as a 1x1 matrix.
+The default parameters (if param is left as null) are 0.5.
+(Also for the two-param case: {0.5; 0.5}.)
+For comparability between asymmetric linlin and symmetric abs on the
+one hand, and between asymm. quadquad and symm. square on the other
+hand, the symmetric losses are multiplied with 0.5 by default.
+(Such that for example getLoss(fce, &quot;linlin&quot;) and getLoss(fce, &quot;abs&quot;)
+give the same result.)
+To override this set param==1 explicitly, e.g. to get the pure squared
+error loss use getLoss(fce, &quot;sq&quot;, 1), or use 2 * getLoss(fce)
+-- hey, in those simple cases you could also do fce.^2 yourself!
+*/
+# calculate FC errors if realiz are given
+if exists(realiz)
+  if rows(realiz) != rows(fce)
+    funcerr &quot;Length of forecasts and realizations unmatched.&quot;
+  elif cols(realiz) &gt; 1
+    funcerr &quot;Realizations must be a column vector.&quot;
+  endif
+  # repeat realizations if several FCs are given
+  fce = mshape(realiz, rows(fce), cols(fce)) - fce
+endif
+# process user choice / internal notation
+if !exists(LF)
+  string LF = &quot;sq&quot;	# default
+elif strlen(strstr(&quot;square&quot;, LF)) # includes sq
+  LF = &quot;sq&quot;
+elif strlen(strstr(&quot;ll linlin&quot;, LF))
+  LF = &quot;ll&quot;
+elif strlen(strstr(&quot;qq quadquad&quot;, LF))
+  LF = &quot;qq&quot;
+elif strlen(strstr(&quot;abs linex&quot;, LF))
+  # OK, no action needed, use &quot;abs&quot; or &quot;linex&quot; directly
+elif strlen(strstr(&quot;dlinex dle&quot;, LF)) # attention, must come after linex
+  LF = &quot;dle&quot;	# double linex
+else
+  funcerr &quot;Loss function choice not recognized.&quot;
+endif
+# process parameters
+if strlen(strstr(&quot;sq abs ll qq linex&quot;, LF))
+  if exists(param)
+    param = param[1,1] # only one parameter
+    if (LF != &quot;linex&quot;) &amp;&amp; ( param[1] &lt; 0 )
+      funcerr &quot;Parameter must be non-negative.&quot;
+    elif strlen(strstr(&quot;ll qq&quot;, LF)) &amp;&amp; ( param[1] &gt; 1 )
+      funcerr &quot;Parameter too large (&gt;1) for linlin or quadquad.&quot;
+    endif
+  else
+    matrix param = {0.5}	# default
+  endif
+elif LF == &quot;dle&quot;
+  if exists(param)
+    if nelem(param) &lt; 2
+      funcerr &quot;Need 2-elem param vector for double linex.&quot;
+    elif sum(param .&lt; 0)
+      funcerr &quot;Parameters must be positive for double linex.&quot;
+    endif
+    param = vec(param)[1:2]	# two params for double linex
+  else
+    matrix param = {0.5; 0.5}
+  endif
+endif
+# actual calculation
+matrix loss
+if LF == &quot;sq&quot;
+  loss = param * (fce .^2)	# trivial except for scaling
+elif LF == &quot;abs&quot;
+  loss = param * abs(fce)	# also trivial
+elif LF == &quot;ll&quot;
+  loss = fce .* ( param - (fce .&lt; 0) )
+  # old: loss = abs(fce) .* ( param + (1 - 2 * param) * (fce .&lt; 0) )
+elif LF == &quot;qq&quot;
+  loss = (fce .^2) .* ( param + (1 - 2 * param) * (fce .&lt; 0) )
+elif LF == &quot;linex&quot;
+  loss = exp(param .* fce) - param .* fce - 1
+elif LF == &quot;dle&quot;
+  loss = exp(param[1] .* fce) + exp(-param[2] .* fce) - (param[1] - param[2]) .* fce - 2
+else
+  funcerr &quot;shouldn't happen&quot;
+endif
+return loss
+</code>
+</gretl-function>
+<gretl-function name="doDMtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># apply defaults
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+if !inbundle(b, &quot;loss&quot;)
+  b.loss = 1	# U-shape
+endif
+if !inbundle(b, &quot;fhor&quot;)
+  b.fhor = 1
+endif
+series e1 = b.y - b.f1
+series e2 = b.y - b.f2
+smpl e1 e2 --no-missing
+# Construct loss differential
+# TODO: Allow for further loss functions in future
+if b.loss == 1		# U-shape quadratic loss
+  series L = e1^2 - e2^2
+elif b.loss == 2		# V-shape
+  series L = abs(e1) - abs(e2)
+else
+  printf &quot;\n*** You can choose only between loss=1 (U-shape) and loss=2 (V-shape). ***\n&quot;
+  printf &quot;*** Please re-specify b.loss.\n&quot;
+  funcerr &quot;Loss can only be 1 or 2.&quot;
+endif
+# Run regression based HAC robust DM test
+ols L 0 --robust --quiet
+# Return test statistics and p-value
+b.L = L										# series of loss differentials
+scalar tstat = $coeff/$stderr
+b.DMstat = tstat
+b.pvaln = 2 * pvalue(z, abs(tstat))			# stand. normal
+b.pvalt = 2 * pvalue(t, ($T-1), abs(tstat))	# t-distribution
+b.DMpvalssc = HLN(tstat, $T, b.fhor)		# small-sample correction
+if b.verb == 1
+  printf &quot;\n***********************************************\n&quot;
+  printf &quot;*** Diebold &amp; Mariano (1995) test\n&quot;
+  printf &quot;*** on equal forecast accuracy\n&quot;
+  if b.fhor==0 &amp;&amp; b.verb==1
+    printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
+  endif
+  if b.loss==1
+    printf &quot;\nLoss: U-shape quadratic.\n&quot;
+  elif b.loss==2
+    printf &quot;\nLoss: V-shape linear.\n&quot;
+  endif
+  printf &quot;Forecast horizon: %d \n&quot;, b.fhor
+  printf &quot;H0: forecasts are equally accurate\n&quot;
+  printf &quot;Test stat.: %.4f\n&quot;, b.DMstat
+  printf &quot;p-value (stand. normal): %.4f\n&quot;, b.pvaln
+  printf &quot;p-value (t-distributed): %.4f\n&quot;, b.pvalt
+  printf &quot;p-value (small-sample):  %.4f\n&quot;, b.DMpvalssc
+  printf &quot;***********************************************\n&quot;
+endif
+</code>
+</gretl-function>
+<gretl-function name="doGWtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code>/*
+This function performs the asymptotic Conditional Predictive Ability Test
+Raffaella Giacomini &amp; Halbert White, 2006. &quot;Tests of Conditional Predictive
+Ability,&quot; Econometrica, Econometric Society, vol. 74(6), pages 1545-1578, November.
+&lt;https://ideas.repec.org/a/ecm/emetrp/v74y2006i6p1545-1578.html&gt;
+Diebold-Mariano and West (1996) type tests rather test which of two models better approximates the DGP
+&quot;As a result, whereas the unconditional tests restrict attention to the forecast model, the conditional
+approach allows evaluation of the forecasting method, which includes the model, the estimation
+procedure and the possible cond of estimation window.&quot;
+*/
+# apply defaults
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+if !inbundle(b, &quot;loss&quot;)
+  b.loss = 1	# U-shape
+endif
+if !inbundle(b, &quot;fhor&quot;)
+  b.fhor = 1
+endif
+if !inbundle(b, &quot;cond&quot;)
+  b.cond = 0	# 0: unconditional test
+endif
+series e1 = b.y - b.f1
+series e2 = b.y - b.f2
+smpl e1 e2 --no-missing
+# Construct loss differential
+# TODO: Allow for further loss functions in future
+if b.loss == 1			# U-shape quadratic loss
+  series L = e1^2 - e2^2
+elif b.loss == 2		# V-shape
+  series L = abs(e1) - abs(e2)
+endif
+scalar T = nobs(L) - b.fhor
+list z = const
+# set up the instruments for a conditional analysis
+if b.cond
+  # add lagged loss values -- information set available in period t for the t+h forecast
+  z += L(-b.fhor to -b.fhor)
+  # add additional regressor
+  if inbundle(b, &quot;z&quot;)
+    # compatibility for matrix input of z
+    if typestr(typeof(b.z)) == &quot;matrix&quot;
+      matrix mz = b.z
+      loop i = 1..cols(mz) -q
+        series S$i = mz[,i]
+        z += S$i
+      endloop
+    elif typestr(typeof(b.z)) == &quot;series&quot; # workaround for apparent gretl bug
+      list z += genseries(&quot;z&quot;, b.z)
+    else	# standard list case
+      list z += b.z
+    endif
+  endif
+endif
+# create the regressor matrix given by L*ht', where ht is the matrix of instruments
+list reg = null
+loop foreach i z -q
+  series r$i = z.$i * L
+  reg += r$i
+endloop
+df = nelem(reg)
+# Run regression
+if b.fhor == 1
+  # calculate the test stat as n*R^2 from the regression of one on L*ht
+  ols 0 reg -q
+  scalar tstat = $T*$rsq			# this only works for hor=1!
+else
+  matrix zbar = meanc({reg})'
+  matrix omega = NeweyWest({reg},(b.fhor-1))
+  scalar tstat = T*zbar'*inv(omega)*zbar
+endif
+# Return test statistics and p-value
+b.L = L										# series of loss differentials
+b.GWstat = tstat
+b.GWpval = pvalue(c,df,abs(tstat))     		# Chi^2 distributed
+b.sign = mean(L)
+if b.verb == 1
+  printf &quot;\n*********************************************\n&quot;
+  printf &quot;*** Giacomini &amp; White (2006) test\n&quot;
+  printf &quot;*** of conditional predictive ability\n&quot;
+  if b.fhor==0 &amp;&amp; b.verb==1
+    printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
+  endif
+  if b.loss==1
+    printf &quot;\nLoss: U-shape quadratic.\n&quot;
+  elif b.loss==2
+    printf &quot;\nLoss: V-shape linear.\n&quot;
+  endif
+  if b.cond==0
+    printf &quot;Your choice: \tUnconditional Test\n&quot;
+    if inbundle(b, &quot;z&quot;)
+      printf &quot;Additional variables in element 'z' are thus not considered.\n&quot;
+    endif
+  else
+    printf &quot;Your choice: \tConditional Test\n&quot;
+  endif
+  printf &quot;Forecast horizon: %d \n&quot;, b.fhor
+  printf &quot;H0: forecasts are equally accurate\n&quot;
+  printf &quot;Test stat.: %.4f\n&quot;, b.GWstat
+  printf &quot;p-value (chi^2): %.4f\n&quot;, b.GWpval
+  if b.sign&lt;0
+    printf &quot;Sign of the mean of the loss is (-) -- 1st model dominates\n&quot;
+  else
+    printf &quot;Sign of the mean of the loss is (+) -- 2nd model dominates\n&quot;
+  endif
+  printf &quot;***********************************************\n&quot;
+endif
+</code>
+</gretl-function>
+<gretl-function name="doMZtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># Intercept automatically added
+# series y = actual realizations
+# series fc = forecast values
+# apply default
+if !inbundle(b, nboot)
+  b.nboot = 0
+endif
+if !inbundle(b, &quot;robust&quot;)
+  scalar b.robust = 0
+endif
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+# acommodate old variant
+if inbundle(b, &quot;strrob&quot;)
+  string strrob = b.strrob
+else
+  string strrob = (b.robust == 1) ? &quot;--robust&quot; : &quot;&quot;
+endif
+series fc = b.fc
+series y = b.y
+Rmat = {1,0;0,1}
+qvec = {0,1}'
+if b.nboot &gt; 0
+  set bootrep b.nboot
+  string strboot = &quot;--bootstrap&quot;
+else
+  string strboot = &quot;&quot;
+endif
+ols y const fc @strrob --quiet
+catch restrict @strboot --silent
+  R = Rmat
+  q = qvec
+end restrict
+if $error
+  catch restrict --silent
+    R = Rmat
+    q = qvec
+  end restrict
+endif
+if b.verb == 1
+  printf &quot;\n***********************************************\n&quot;
+  printf &quot;*** Mincer &amp; Zarnowitz test\n&quot;
+  printf &quot;*** on forecast unbiasedness\n&quot;
+  if !b.robust
+    printf &quot;\nMethod: Approach using asymptotic VCV.\n&quot;
+  elif b.robust == 1
+    printf &quot;\nMethod: Approach using HAC robust VCV.\n&quot;
+  endif
+  if b.nboot &gt; 0
+    printf &quot;Bootstrap p-value using %d iterations.\n&quot;, b.nboot
+  endif
+  printf &quot;H0: forecasts are unbiased\n&quot;
+  printf &quot;Test stat.: %.4f\n&quot;, $test
+  printf &quot;p-value:   %.4f\n&quot;, $pvalue
+  printf &quot;***********************************************\n&quot;
+endif
+b.MZstat = $test
+b.MZpval = $pvalue
+</code>
+</gretl-function>
+<gretl-function name="doPTtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># compatibility treatment:
+# PTmeth was old code for what is actually robustness: 1: not robust, 2: robust
+if inbundle(b, &quot;PTmeth&quot;)
+  print &quot;Warning: PTmeth is deprecated, use 'robust' (0/1)&quot;
+  if b.PTmeth == 1 || b.PTmeth == 2
+    scalar b.robust = b.PTmeth - 1
+  else
+    funcerr &quot;PTmeth can only be 1 or 2&quot;
+  endif
+endif
+# apply defaults
+if !inbundle(b, &quot;robust&quot;)
+  b.robust = 0
+endif
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+series y = b.yup		# Binary of var. of actual ups
+series fc = b.fcup		# Binary of var. of forecasted ups
+smpl y fc --no-missing
+if rows(values(y)) &gt; 2 || rows(values(fc)) &gt; 2
+  printf &quot;*** Note: Running the Pesaran &amp; Timmermann test requires ***\n&quot;
+  printf &quot;*** that y and fc are both binary variables! Check again! *** \n&quot;
+  funcerr &quot;Check that y and fc are both binary variables.&quot;
+endif
+if !b.robust   # PTmeth == 1
+  scalar r = mcorr({y} ~ {fc})[1,2]
+  scalar T = nobs(y)
+  scalar test = sqrt(T) * r	# test stat. (Pesaran 2015, p. 399)
+  scalar pval = 2 * pvalue(z, abs(test))		# PT ~ N(0,1)
+elif b.robust == 1  # PTmeth == 2
+  ols y const fc --robust --quiet
+  scalar test = $coeff[2] / $stderr[2]
+  scalar pval = 2 * pvalue(t, $df, abs(test))
+else
+  print &quot;Warning: Invalid PTmeth input&quot;
+endif
+if b.verb == 1
+  printf &quot;\n***********************************************\n&quot;
+  printf &quot;*** Pesaran &amp; Timmermann (1992, 2006) test\n&quot;
+  printf &quot;*** on directional change\n&quot;
+  if !b.robust    #  PTmeth == 1
+    printf &quot;\nMethod: Correlation approach using asymptotic VCV.\n&quot;
+  elif b.robust == 1  # PTmeth == 2
+    printf &quot;\nMethod: Regression approach using HAC robust VCV.\n&quot;
+  endif
+  printf &quot;H0: y(t) and x(t) are distributed independently \n&quot;
+  printf &quot;Test stat.: %.4f\n&quot;, test
+  printf &quot;p-value:   %.4f\n&quot;, pval
+  printf &quot;***********************************************\n&quot;
+endif
+b.PTstat = test
+b.PTpval = pval
+</code>
+</gretl-function>
+<gretl-function name="doCGtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># consolidating all CG test variants
+/* Computes both Campbell &amp; Ghysels sign and signed rank
+(Wilcoxon-type) nonparam. statistics, going back to Campbell &amp; Dufour who also showed that in
+general it's not exactly identical to a Wilcoxon test, but the distribution of the test stat is identical.
+# series E: series of forecast errors
+# int k: Lag at which to construct the cross product
+# series CGX: variables for orthogonality test (optional)
+# plain test: H0: Median of E = 0, H1: Median of E != 0
+# other variants: substitute E with a cross-product
+# Additional assumption that E is symmetric about 0 under the null
+*/
+# apply defaults
+if !inbundle(b, &quot;k&quot;) 	# default: test unbiasedness
+  b.k = 0							# means no test for lag effects
+elif b.k &lt; 0 || (b.k != int(b.k))
+  funcerr &quot;lag number k must be non-negative integer&quot;
+endif
+scalar k = b.k	 # (scalar treated by gretl as 1x1 matrix, should be OK)
+if !k &amp;&amp; inbundle(b, &quot;CGX&quot;)
+  funcerr &quot;You provide X [CGX] but set k=0. Please set k&gt;0 for running the orthogonality test.&quot;
+endif
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+if inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;)
+  series E = b.y - b.fc
+  if !inbundle(b, &quot;E&quot;)
+    series b.E = E # copy for use in backend functions
+  endif
+elif inbundle(b, &quot;E&quot;)
+  series E = b.E
+else
+  funcerr &quot;Suitable input missing.&quot;
+endif
+# Either test on (a) unbiasedness, (b) serial correlation,
+# or (c) orthogonality
+if !inbundle(b, &quot;CGX&quot;)
+  # no exogenous/orthogonality terms
+  matrices testout = CamDufStats({E}, k)
+else
+  # orthogonality test, with recursive median recentering
+  matrices testout = CamDufStats({E} ~ {b.CGX}, k, 1)
+endif
+### process results
+scalar T = testout[4][1]
+## sign test
+scalar b.CGSIGNstat = testout[1][1,1]
+# Binomial dist
+if b.CGSIGNstat &lt; (T + 1) / 2 # left tail of the distribution
+  temp = pvalue(B, 0.5, T, b.CGSIGNstat)
+  # (gretl does &gt; x, not &gt;= x here!)
+  b.CGSIGNpval = 2 * (1 - temp) # because of symmetry under p=0.5
+else	# right tail
+  # (force X &gt;= x by passing x' = x-1, since gretl does &gt; x)
+  b.CGSIGNpval = 2 * pvalue(B, 0.5, T, b.CGSIGNstat - 1)
+  # (again, because of symmetry)
+endif
+## signed rank test
+if !inbundle(b, &quot;CGX&quot;) # serial correlation, or unbiasedness
+  # here we can use the standard variant
+  scalar b.CGWILCstat = testout[3][1,1]
+else	# orthogonality test
+  #... must use Campbell&amp;Dufour's special signed-rank variant
+  # (we argue that strict exogeneity is very unrealistic)
+  scalar b.CGWILCstat = testout[2][1,1]
+endif
+## p-value calc with functions from extra
+err = loadextra()
+if !err
+  if b.CGWILCstat &lt; (T * (T + 1) / 2 / 2) # left tail
+    # (force X &gt; x by passing x' = x+1 since this func does &gt;= x)
+    temp = WSRpvalue(T, b.CGWILCstat + 1)
+    b.CGWILCpval = 2 * (1 - temp) # because of symmetry
+  else # right tail
+    # (this func does X &gt;= x)
+    b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
+  endif
+else	# extra.gfn package not available/loadable
+  scalar b.CGWILCpval = NA
+endif
+if b.verb
+  CGprint(&amp;b)	# (lives in FEP_private.inp)
+endif
+</code>
+</gretl-function>
+<gretl-function name="doPS" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># wrap the probscore(function) for bundle/series use
+if !inbundle(b, yup) || !inbundle(b, pfc)
+  funcerr &quot;Suitable input missing&quot;
+endif
+matrix ps = probscore({b.yup}, {b.pfc})
+# transfer results
+scalar b.qps = ps[1]
+scalar b.lps = ps[2]
+</code>
+</gretl-function>
+<gretl-function name="probscore" type="matrix">
+ <params count="2">
+  <param name="y" type="matrix">
+<description>Binary of actuals</description>
+  </param>
+  <param name="Pr" type="matrix">
+<description>Estimated probability</description>
+  </param>
+ </params>
+<code># By Artur
+# Returns a 1x2 vector with QPS, LPS
+# check for vector
+if xmin(rows(y), cols(y)) &gt; 1 || xmin(rows(Pr), cols(Pr)) &gt; 1
+  funcerr &quot;Need vector inputs!&quot;
+endif
+# work with column vector
+y = vec(y)
+Pr = vec(Pr)
+if rows(Pr) == rows(y)
+  matrix B = ok(Pr)						# Check for NAs
+  matrix Pr2 = (Pr .&gt; 0.9999) ? 0.999 : Pr	# relevant for comp. log(1-Pr2) for LPS-comput.
+  if sumc(B ? Pr : 0) &gt; 0
+    scalar T = sumc(B)					# Valid obs.
+    # OLD: matrix QPS =  T^-1 * sumc( (Pr-y).^2 )
+    matrix QPS = sumc(B ? ((Pr-y).^2) : 0) ./ T
+    # OLD: matrix LPS = -T^-1 * sumc( (1-y) .* log(1-Pr) + y .* log(Pr) )
+    matrix LPS = -sumc( B ? ((1-y) .* log(1-Pr2) + y .* log(Pr2)) : 0 ) ./ T
+  else
+    matrix QPS = zeros(1,1)
+    matrix LPS = zeros(1,1)
+  endif
+  matrix mout = QPS ~ LPS
+  colnames(mout, &quot;QPS LPS&quot;)
+else
+  printf &quot;\nError probscore function:\n&quot;
+  printf &quot;The series are not of the same length.\n&quot;
+  return {}
+endif
+return mout
+</code>
+</gretl-function>
+<gretl-function name="DrawLoss" type="void">
+ <params count="4">
+  <param name="p" type="int" min="1" max="2" default="1">
+<description>Loss type</description>
+  </param>
+  <param name="aT" type="scalar" min="0" max="1" default="0.5">
+<description>AlphaHat</description>
+  </param>
+  <param name="V" type="scalar">
+<description>Variance of aT</description>
+  </param>
+  <param name="fpath" type="string" optional="true">
+<description>Path ...</description>
+  </param>
+ </params>
+<code>if !exists(fpath)
+  fpath = &quot;display&quot;
+endif
+string S = (fpath == &quot;display&quot;) ? &quot;png&quot; : &quot;pdf&quot;
+string ltype = (p == 1) ? &quot;Lin.-Lin.&quot; : &quot;Quad.-Quad.&quot;
+matrix vE = seq(-1,1,0.01)'
+matrix vBin = (vE .&lt; 0)
+matrix LF = (p == 1) ? abs(vE) : vE .^2 # spart Berechnungen
+if aT == 0.5
+  LF = LF*0.5
+else
+  LF = LF.* (aT + (1 - 2 * aT) * (vE .&lt; 0) )
+endif
+if V!=0
+  scalar aTlow = aT-2*sqrt(V)		# -2 S.E.
+  matrix LFlow = (aTlow + vBin.*(1-aTlow*2)).*abs(vE).^p
+  scalar aTup = aT+2*sqrt(V)		# +2 S.E.
+  matrix LFup = (aTup + vBin.*(1-aTup*2)).*abs(vE).^p
+  matrix mplot = LF~LFlow~LFup~vE
+  sprintf optt &quot;set title '%s, alpha-hat=%.3g (±2 S.E.)&quot;, ltype, aT
+else
+  matrix mplot = LF~vE
+  sprintf optt &quot;set title '%s, alpha-hat=%.3g&quot;, ltype, aT
+endif
+plot mplot
+  options with-lines fit=none --single-yaxis
+  literal set nokey
+  #printf &quot;set term @S font 'Helvetica,15' lw 1.5&quot;
+  printf &quot;%s&quot;, optt
+  printf &quot;set ylabel 'Loss' font ',15'&quot;
+  printf &quot;set xlabel 'Forecast Error' offset 0,0.75 font ',15'&quot;
+  literal set y2tics
+  #add a slight grid to make it easier to follow the exact position of the curves
+  literal set style line 12 lc rgb &quot;#808080&quot; lt 0 lw 1	# light grey color
+  literal set grid back ls 12
+  #literal set for [i=2:3] linetype i dashtype i
+  literal set linetype 1 lc rgb 'black' lw 2.5
+  literal set linetype 2 lc rgb 'black' lw 1.5
+  literal set linetype 3 lc rgb 'black' lw 1.5
+end plot --output=&quot;@fpath&quot;
+</code>
+</gretl-function>
+<gretl-function name="DrawLoss2" type="void">
+ <params count="6">
+  <param name="p" type="int" min="1" max="2" default="1">
+<description>Loss type</description>
+  </param>
+  <param name="aT1" type="scalar" min="0" max="1" default="0.5">
+<description>AlphaHat(1)</description>
+  </param>
+  <param name="V1" type="scalar">
+<description>Variance of aT(1)</description>
+  </param>
+  <param name="aT2" type="scalar" min="0" max="1" default="0.5">
+<description>AlphaHat(2)</description>
+  </param>
+  <param name="V2" type="scalar">
+<description>Variance of aT(2)</description>
+  </param>
+  <param name="fpath" type="string" optional="true">
+<description>Path ...</description>
+  </param>
+ </params>
+<code>if !exists(fpath)
+  fpath = &quot;display&quot;
+endif
+string S = (fpath == &quot;display&quot;) ? &quot;png&quot; : &quot;pdf&quot;
+string ltype = (p == 1) ? &quot;Lin.-Lin.&quot; : &quot;Quad.-Quad.&quot;
+matrix vE = seq(-1,1,0.01)'
+matrix vBin = (vE .&lt; 0)
+loop i=1..2 -q
+  #matrix LF$i  = (aT$i + vBin.*(1-aT$i*2)).*abs(vE).^p
+  matrix LF$i = (p == 1) ? abs(vE) : vE .^2
+endloop
+loop i=1..2 -q
+  if aT$i == 0.5
+    LF$i = LF$i*0.5
+  else
+    LF$i = LF$i.* (aT$i + (1 - 2 * aT$i) * (vE .&lt; 0) )
+  endif
+endloop
+if V1!=0 &amp;&amp; V2!=0
+  matrix mplot = {}
+  loop i=1..2 -q
+    scalar aTlow$i = aT$i-2*sqrt(V$i) 	# -2 S.E.
+    matrix LFlow$i = (aTlow$i + vBin.*(1-aTlow$i*2)).*abs(vE).^p
+    scalar aTup$i = aT$i+2*sqrt(V$i)		# +2 S.E.
+    matrix LFup$i = (aTup$i + vBin.*(1-aTup$i*2)).*abs(vE).^p
+    matrix mplot ~= LF$i~LFlow$i~LFup$i
+  endloop
+endif
+if V1!=0 &amp;&amp; V2!=0
+  mplot~=vE
+  sprintf optt &quot;set title '%s, a1=%.3g, a2=%.3g (±2 S.E.)&quot;, ltype, aT1, aT2
+else
+  matrix mplot = LF~vE
+  sprintf optt &quot;set title '%s, a1=%.3g, a2=%.3g&quot;, ltype, aT1, aT2
+endif
+plot mplot
+  options with-lp fit=none --single-yaxis
+  #options band=B,2 band-style=fill
+  literal set nokey
+  #printf &quot;set term @S font 'Helvetica,15' lw 1.5&quot;
+  printf &quot;%s&quot;, optt
+  printf &quot;set ylabel 'Loss' font ',15'&quot;
+  printf &quot;set xlabel 'Forecast Error' offset 0,0.75 font ',15'&quot;
+  literal set y2tics
+  #add a slight grid to make it easier to follow the exact position of the curves
+  literal set style line 12 lc rgb &quot;#808080&quot; lt 0 lw 1	# light grey color
+  literal set grid back ls 12
+  #literal set for [i=2:3] linetype i dashtype i
+  literal set linetype 1 lc rgb 'black' lw 2.5 pt 1 ps 1.0 pointinterval 5
+  literal set linetype 2 lc rgb 'black' lw 0.75 pt 1 ps 0.5 pointinterval 5
+  literal set linetype 3 lc rgb 'black' lw 0.75 pt 1 ps 0.5 pointinterval 5
+  literal set linetype 4 lc rgb 'grey' lw 2.5 pt 7 ps 1.0 pointinterval 20
+  literal set linetype 5 lc rgb 'grey' lw 1.5 pt 7 ps 0.5 pointinterval 20
+  literal set linetype 6 lc rgb 'grey' lw 1.5 pt 7 ps 0.5 pointinterval 20
+end plot --output=&quot;@fpath&quot;
+</code>
+</gretl-function>
+<gretl-function name="GUI_FEP_print" type="void" pkg-role="bundle-print">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># This refers to the bundle returned by GUI_FEP.
+printf &quot;Your choice: %s test\n&quot;, fullname(b.code)
+if b.code == &quot;KS&quot;
+  # printf &quot;*** Kuipers Score ***\n&quot;
+  printf &quot;Hit Rate        = %.3f\n&quot;, b.KShit
+  printf &quot;False Alarm Rate = %.3f\n&quot;, b.KSfalse
+  printf &quot;Kuipers Score   = %.3f\n&quot;, b.KSstat
+  matrix mtemp = b.KSmat
+  print mtemp
+elif b.code == &quot;EKT&quot;
+  print &quot;Test the null hypothesis of symmetry (alfa = 0.5):&quot;
+  printf &quot;  test stat %g (p-value %g)\n&quot;, b.SymTest, b.SymPval
+  print &quot;Rationality test:&quot;
+  printf &quot;  test stat %g (p-value %g)\n&quot;, b.RatTest, b.RatPv
+  print &quot;Rationality test (under symmetry):&quot;
+  printf &quot;  test stat %g (p-value %g)\n&quot;, b.RatTest05, b.RatPv05
+elif b.code == &quot;HP&quot;
+  if b.nboot
+    printf &quot;(bootstrapped) &quot;
+  endif
+  if b.robust
+    printf &quot;(robust SE)&quot;
+  endif
+  printf &quot;\nTest stat %g (p-value %g)\n&quot;, b.HPstat, b.HPpval
+elif b.code == &quot;DL&quot;
+  printf &quot;Test stat %g (p-value %g)\n&quot;, b.DLstat, b.DLpval
+  printf &quot; (additional info better/worse: %g)\n&quot;, b.DLinfo
+elif b.code == &quot;DM&quot;
+  if b.loss == 1
+    string shape = &quot;U&quot;
+  elif b.loss == 2
+    string shape = &quot;V&quot;
+  endif
+  printf &quot;(Loss function shape: %s)\n&quot;, shape
+  printf &quot;Test stat %g, p-value %g (t-dist based)\n&quot;, b.DMstat, b.pvalt
+  printf &quot;  (small-sample corrected p-value %g)\n&quot;, b.DMpvalssc
+elif b.code == &quot;GW&quot;
+  if b.loss == 1
+    string shape = &quot;U&quot;
+  elif b.loss == 2
+    string shape = &quot;V&quot;
+  endif
+  printf &quot;(Loss function shape: %s)\n&quot;, shape
+  printf &quot;Test stat %g, p-value %g (chi^2-dist based)\n&quot;, b.GWstat, b.GWpval
+  if b.sign&lt;0
+    printf &quot;Sign of the mean of the loss is (-) -- 1st model dominates\n&quot;
+  else
+    printf &quot;Sign of the mean of the loss is (+) -- 2nd model dominates\n&quot;
+  endif
+elif b.code == &quot;MZ&quot;
+  if b.nboot
+    printf &quot;(bootstrapped) &quot;
+  endif
+  if b.robust
+    printf &quot;(robust SE)&quot;
+  endif
+  printf &quot;Test stat %g (p-value %g)\n&quot;, b.MZstat, b.MZpval
+elif b.code == &quot;PT&quot;
+  if !b.robust
+    print &quot;(Regression approach using asymptotic VCV.)&quot;
+  elif b.robust
+    print &quot;(Regression approach using HAC robust VCV.)&quot;
+  endif
+  print &quot;H0: y(t) and x(t) are distributed independently&quot;
+  printf &quot;Test stat %.4f (p-value: %.4f)\n&quot;, b.PTstat, b.PTpval
+elif b.code == &quot;CG&quot;
+  print &quot;Signed rank test (Wilcoxon-type)&quot;
+  print &quot;H0: Median = 0, H1: Median != 0&quot;
+  print &quot;(Additional assumption of symmetry around 0 under H0.)&quot;
+  printf &quot;Test stat %g (p-value %g)\n&quot;, b.CGWILCstat, b.CGWILCpval
+  print &quot;---&quot;
+  print &quot;Sign test&quot;
+  print &quot;H0: Median = 0, H1: Median != 0&quot;
+  printf &quot;Test stat %g (p-value %g)\n&quot;, b.CGSIGNstat, b.CGSIGNpval
+else
+  funcerr &quot;The choice in b.code didn't match anything&quot;
+endif
+</code>
+</gretl-function>
+<gretl-function name="GUI_FEP" type="bundle" pkg-role="gui-main">
+ <params count="11">
+  <param name="which" type="int" min="1" max="9">
+<description>Choose test</description>
+<labels count="9">
+"Mincer-Zarnowitz (MZ)" "Holden-Peel (HP)" "Diebold-Lopez (DL)" "Elliott-Komunjer-Timmermann (EKT)" "(Hanssen-) Kuiper score (KS)" "Pesaran-Timmermann (PT)" "Campbell-Ghysels (CG)" "Diebold-Mariano (DM)" "Giacomini-White (GW)" </labels>
+  </param>
+  <param name="realiz" type="series">
+<description>Realizations</description>
+  </param>
+  <param name="fc" type="series" optional="true">
+<description>Forecasts</description>
+  </param>
+  <param name="flexarg" type="int" min="0" default="0">
+<description>bootrep (MZ,HP) / horizon (DM,GW) / lag (CG)</description>
+  </param>
+  <param name="robortype" type="int" min="0" max="1" default="0">
+<description>robust (MZ,HP,PT) / loss (DM,GW,EKT)</description>
+<labels count="2">
+"standard /U-shape" "robust /V-shape" </labels>
+  </param>
+  <param name="cond" type="int" min="0" max="1" default="0">
+<description>conditional predictive ability (GW)</description>
+<labels count="2">
+"unconditional" "conditional" </labels>
+  </param>
+  <param name="verbosity" type="int" min="0" max="1" default="0">
+<description>Verbosity</description>
+<labels count="2">
+"no details" "print details" </labels>
+  </param>
+  <param name="fc2" type="series" optional="true">
+<description>Alternative forecasts (DM,GW)</description>
+  </param>
+  <param name="shape" type="scalar" min="0" max="1" default="0.5">
+<description>Shape param (EKT)</description>
+  </param>
+  <param name="zli" type="list" optional="true">
+<description>info set (HP,GW), instr (EKT), further (CG)</description>
+  </param>
+  <param name="lossdraw" type="string" optional="true">
+<description>Actual path, or 'no' or 'display' (EKT)</description>
+  </param>
+ </params>
+<code>###
+# copy the choice to string code
+strings sarr = defarray(&quot;MZ&quot;,&quot;HP&quot;,&quot;DL&quot;,&quot;EKT&quot;,&quot;KS&quot;,&quot;PT&quot;,&quot;CG&quot;,&quot;DM&quot;,&quot;GW&quot;)
+bundle b
+## process args
+string b.code = sarr[which]
+# process realiz
+if b.code == &quot;KS&quot; || b.code == &quot;PT&quot;
+  series b.yup = realiz
+elif strlen(strstr(&quot;CG EKT&quot; , b.code))
+  if exists(fc)	# expected case
+    series b.E = realiz - fc # calculate FC errors, input for CG*/EKT
+  else
+    print &quot;No forecasts given, treating single input as errors.&quot;
+    series b.E = realiz
+  endif
+else
+  series b.y = realiz
+endif
+# process fc (and also fc2)
+if exists(fc)
+  if b.code == &quot;KS&quot; || b.code == &quot;PT&quot;
+    series b.fcup = fc
+  elif b.code == &quot;DM&quot; || b.code == &quot;GW&quot;
+    if exists(fc2)
+      series b.f1 = fc
+      series b.f2 = fc2
+    else
+      funcerr &quot;Need 2nd forecast (fc2) input!&quot;
+    endif
+  else
+    series b.fc = fc
+  endif
+elif strlen(strstr(&quot;DL HP MZ KS PT DM GW&quot;, b.code))	# and here: fc is null
+  funcerr &quot;Need forecast (fc) input!&quot;
+endif
+# process flexarg
+if b.code == &quot;MZ&quot; || b.code == &quot;HP&quot;
+  b.nboot = flexarg	# bootstrap replications
+elif b.code == &quot;CG&quot;
+  b.k = flexarg	# lag at which to test
+elif b.code == &quot;DM&quot; || b.code == &quot;GW&quot;
+  b.fhor = flexarg	# horizon
+endif
+# process robortype
+if b.code == &quot;MZ&quot; || b.code == &quot;HP&quot; || b.code == &quot;PT&quot;
+  scalar b.robust = robortype
+elif b.code == &quot;DM&quot; || b.code == &quot;EKT&quot;
+  b.loss = robortype + 1
+  # for EKT we had: q-q-shape (p0=2) / lin-lin-shape (p0=1)
+endif
+# conditional test argument
+if b.code == &quot;GW&quot;
+  scalar b.cond = cond
+endif
+# copy verbosity setting
+scalar b.verb = verbosity
+# process zli
+if b.code == &quot;HP&quot;
+  list b.z = zli
+elif b.code == &quot;CG&quot; # needs series
+  if !nelem(zli) || nelem(zli) &gt; 1
+    funcerr &quot;CG needs one-element zli list input&quot;
+  else
+    series b.CGX = zli[1]
+  endif
+elif b.code == &quot;EKT&quot;
+  if !nelem(zli)
+    funcerr &quot;EKT needs some instruments (zli)&quot;
+  endif
+  list b.z = zli
+endif
+# process other args
+if exists(lossdraw)
+  string b.lossdraw = lossdraw # EKT
+else
+  string b.lossdraw = &quot;no&quot; # default
+endif
+b.a0 = shape # EKT only
+# call the function
+applyFCtests(&amp;b, b.code)
+GUI_FEP_print(&amp;b)	# new to accommodate removal of no-print
+return b
+</code>
+</gretl-function>
+<gretl-function name="doCGWILCtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code>print &quot;Warning: The name doCGWILCtest is deprecated, use doCGtest&quot;
+doCGtest(&amp;b)
+# (old names b.CGWILCstat and b.CGWILCpval are still OK)
+</code>
+</gretl-function>
+<gretl-function name="doCGRANKtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># This name was misleading, despite &quot;RANK&quot; it was actually
+# calculating the sign test!
+print &quot;Warning: The name doCGRANKtest is deprecated, use doCGtest&quot;
+doCGtest(&amp;b)
+# add old names for backwards compatibility:
+scalar b.CGRANKstat = b.CGSIGNstat
+scalar b.CGRANKpval = b.CGSIGNpval
+</code>
+</gretl-function>
+<gretl-function name="doKStest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code>print &quot;Warning: The name doKStest is deprecated, use doKS.&quot;
+doKS(&amp;b)
+</code>
+</gretl-function>
+<gretl-function name="doEKTtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># Reference paper: Elliott, Komunjer, and Timmermann, 2005,
+# Estimation and Testing of Forecast Rationality under Flexible Loss,
+# Review of Economic Studies, 72, 1107 - 1125.
+# compatibility treatment of loss type
+if inbundle(b, &quot;p0&quot;)	# 2: quad shape, 1: V shape
+  if b.p0 == 1 || b.p0 == 2
+    scalar b.loss = 3 - b.p0
+  endif
+endif
+# compatibility handling of non-harmonized earlier input
+if inbundle(b, &quot;fcerrors&quot;) # new internal interface for wrapper func
+  matrix Y = b.fcerrors
+elif inbundle(b, &quot;y&quot;)
+  if typestr(typeof(b.y)) = &quot;matrix&quot;	# old interface
+    matrix Y = b.y # expects matrix / see help text (Sven)
+  else
+    funcerr &quot;Suitable input missing.&quot;
+  endif
+endif
+# apply default values
+if !inbundle(b, &quot;loss&quot;)
+  scalar b.loss = 1	# U-shape
+endif
+if !inbundle(b, &quot;lossdraw&quot;)
+  string b.lossdraw = &quot;no&quot;
+endif
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+if !inbundle(b, &quot;a0&quot;)
+  scalar b.a0 = 0.5
+endif
+# infer loss shape parameter
+scalar p0 = (b.loss == 1) ? 2 : 1
+matrix X = b.x # dito (matrix)
+a0 = b.a0
+scalar diffmax = 1000
+scalar convcrit = 0.00001
+# --------------------------------------
+# Compute alpha
+# --------------------------------------
+# Define the instruments
+matrix iv = ones(rows(X), 1) ~ X
+# a1 is an element used to compute aT
+matrix vMod = abs(Y) .^ (p0-1)
+matrix a1 = meanc( iv .* vMod )'			# k by 1
+# a2 is an element used to compute aT
+matrix a2 = meanc( iv .* (Y .&lt; 0) .* vMod )'	# k by 1
+# Initial value of S
+matrix sOLD = I(cols(iv))				# k by k
+scalar niter = 0
+nfail = 0
+failed = 0
+loop while diffmax &gt; convcrit -q
+  scalar err1 = 0
+  try_invert(sOLD, &amp;err1)
+  if !err1
+    IsOLD = inv(sOLD)
+    Nom = a1'IsOLD * a2
+    Den = qform(a1', IsOLD)
+    scalar aNEW = Nom / Den
+    diffmax = abs(a0 - aNEW)
+    C = (iv .* ((Y .&lt; 0) - aNEW) .* vMod)
+    sNEW = (C'C) ./ rows(iv)
+    sOLD = sNEW
+    a0 = aNEW
+    niter++
+  else
+    if b.verb
+      printf &quot;Matrix inversion in EKT_RatTest failed!\n&quot;
+      printf &quot;Problem with IsOLD = inv(sOLD)\n&quot;
+    endif
+    nfail++
+  endif
+  if nfail &gt; 3000
+    failed = 999
+    break
+  endif
+endloop
+if !failed
+  if b.verb
+    printf &quot;\nNumber of iterations before convergence = %d\n&quot;, niter
+  endif
+  # Pre-checks for matrix inversion
+  scalar err1 = 0
+  try_invert(sNEW, &amp;err1)
+  if !err1
+    isNEW = inv(sNEW)
+  else
+    scalar err1 = 0
+    try_ginvert(sNEW, &amp;err1)
+    if !err1
+      isNEW = ginv(sNEW)
+    endif
+  endif
+  if !err1
+    err2 = 0
+    try_invert(qform(a1', isNEW), &amp;err2)
+    if !err2
+      # Compute the limiting variance of alfa #
+      V = inv( qform(a1', isNEW) ) / rows(iv)
+    else
+      err2 = 0
+      try_ginvert(qform(a1', isNEW), &amp;err2)
+      if !err2
+        # Compute the limiting variance of alfa #
+        V = ginv( qform(a1', isNEW) ) / rows(iv)
+      endif
+    endif
+    if !err2
+      # Test the null hypothesis of symmetry: alfa = 0.5 #
+      b.V = V
+      mat = symtest(aNEW, sqrt(V), b.verb)
+      b.SymTest = mat[1]
+      b.SymPval = mat[2]
+      # Rationality test #
+      mat0 = rattest(Y, iv, vMod, aNEW, sNEW, 0, b.verb)
+      b.RatTest = mat0[1]
+      b.RatPv = mat0[2]
+      mat1 = rattest(Y, iv, vMod, aNEW, sNEW, 1, b.verb)
+      b.RatTest05 = mat1[1]
+      b.RatPv05 = mat1[2]
+      # Draw implied loss function #
+      if b.lossdraw != &quot;no&quot;
+        DrawLoss(p0, aNEW, V, b.lossdraw)
+      endif
+      b.alpha = aNEW	# shape parameter alpha
+      b.niter = niter
+    endif
+  endif
+else
+  b.alpha = NA	# shape parameter alpha
+  b.niter = NA
+  b.SymTest = NA
+  b.SymPval = NA
+  b.RatTest = NA
+  b.RatPv = NA
+  b.RatTest05 = NA
+  b.RatPv05 = NA
+  b.V = NA
+endif
+</code>
+</gretl-function>
+<gretl-function name="doKGtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code>print &quot;Warning: The name doKGtest is deprecated, use doHPtest.&quot;
+doHPtest(&amp;b)
+# add old names for backwards compatibility:
+scalar b.KGstat = b.HPstat
+scalar b.KGpval = b.HPpval
+</code>
+</gretl-function>
+<gretl-function name="CamDufStats" type="matrices">
+ <params count="3">
+  <param name="mdat" type="matrix"/>
+  <param name="whichlags" type="matrix" optional="true"/>
+  <param name="recenter" type="int" min="0" max="2" default="0"/>
+ </params>
+<code># (switched the arg ordering ...)
+/*
+Function to calculate the test statistics from
+Campbell &amp; Dufour 1995 (C&amp;D), which are sign statistics
+and related --but not all identical-- to
+Wilcoxon test statistics.
+'mdat': The first column is Y_t in C&amp;D, the remaining columns are different X_t 's (or g_t 's).
+(If only a single column exists in mdat, then it is assumed
+that g_t = Y_t; effectively Y_t is tested against its own lags.)
+'whichlags': Specify which lags for the X_t (g_t) should be
+used. The lags apply to all the X_t (g_t)'s. Negative lags
+are an error. Each lags needs to be given separately, e.g. {1,2,3}.
+Optional; the default is to use just the first lag.
+Special convenience case for unbiasedness test:
+Put a single column in 'mdat' and set 'whichlags' to {0}
+(gretl also accepts scalar 0), then:
+The sign and signed-rank statistics then refer directly to Y_t.
+'recenter': If 1, then subtracts a recursively calculated
+median from the X_t (g_t)'s;
+If 2, a mean.
+If 3 (not yet implemented), some trend
+For a single set of test statistics, only 2 columns (or 1)
+and a one-element matrix 'whichlags' are needed.
+With more columns or more lags, this is not a joint test, but just several tests in one go. (The first column against
+all others.)
+Output are 3 matrices in an array:
+(L: number of chosen lag specs in whichlags, K: number of X_t (g_t)'s, i.e. max(cols(mdat)-1, 1) )
+First: L x K matrix of sign stats Sg
+Second: L x K matrix of special signed rank stats SRg
+Third: L x K matrix of standard Wilcoxon signed rank stats Wg
+Fourth: L x 1 vector of effective sample lengths used
+*/
+# basic choices
+if !exists(whichlags)
+  matrix whichlags = {1} # the default
+else
+  whichlags = vec(whichlags)	# ensure vector
+endif
+# some checks
+r = rows(mdat)
+if max(whichlags) &gt;= r - 1
+  funcerr &quot;lag is too large for sample length&quot;
+elif min(whichlags) &lt; 0
+  funcerr &quot;lags must not be negative&quot;
+elif min(whichlags) == 0 &amp;&amp; cols(mdat) &gt; 1
+  funcerr &quot;unbiasedness test on itself only valid for single variable&quot;
+endif
+# handle special case unbiasedness of Y_t
+if !min(whichlags)
+  whichlags = {0}	# just to be on the safe side
+  if recenter
+    funcerr &quot;unbiasedness test incompatible with recentering&quot;
+  endif
+  # handle the convenience case of own lags
+elif cols(mdat) == 1
+  mdat = mdat ~ mdat # copy 1st col to 2nd col
+endif
+matrix X = (cols(mdat) &gt; 1) ? mdat[, 2:] : mdat[, 1]
+## recursive recentering, at least 2 obs. required
+# cf. C&amp;G97 p. 9
+if recenter
+  matrix Xc = zeros(rows(X) -  1, cols(X))	# hold re-centered values
+  loop i = 2..rows(X) -q	# at least 2 obs., re-centering procedure
+    if recenter == 1
+      Xc[i - 1,] = X[i, ] - quantile(X[1:i, ], 0.5)
+    elif recenter == 2
+      Xc[i - 1,] = X[i, ] - meanc( X[1:i, ] )
+      # elif recenter == 3	# linear trend
+      # TODO: could be implemented by running a simple regression
+    endif
+  endloop
+endif	# recentering
+# go over all lags
+matrix effTs = {} # to hold effective sample lengths
+matrix Sg = {} 	# will hold the sign stats (eq (7))
+matrix SRg = {} 	# to hold their own sign-rank stat (eq (9))
+# (empty for convenience case)
+matrix Wg = {} 	# Wilcoxon, eq(8)
+loop lix = 1..nelem(whichlags) -q
+  lag = int(whichlags[lix])
+  # do it for all g_t 's in parallel
+  if lag
+    matrix temp = recenter ? Xc : X
+    matrix glag = mlag(temp, lag)[1 + lag : ,]
+    # adjust the common sample length
+    delta = rows(mdat) - rows(glag)
+    matrix ycut = mdat[1 + delta :, 1]
+    effTs |= rows(ycut)
+    matrix prod = ycut .* glag
+  else # the convenience case, do it on itself!
+    effTs |= rows(mdat)
+    matrix prod = mdat
+  endif
+  matrix prodsigns = (prod .&gt; 0)
+  # stack the new sign stats vertically
+  Sg |= sumc(prodsigns)
+  if lag # not for unbiasedness
+    # the ranking of abs Y, i.e. R+2
+    matrix Rplus2 = ranking(abs(ycut))
+    # stack the new signed-rank stats vertically
+    SRg |= sumc( prodsigns .* Rplus2 )
+  endif
+  # the ranking of the products, i.e. R+1
+  matrix Rplus1 = {}
+  loop i=1..cols(prod) -q
+    Rplus1 ~= ranking( abs(prod[, i]) )
+  endloop
+  Wg |= sumc( prodsigns .* Rplus1 )
+endloop # through the lag indices
+return defarray(Sg, SRg, Wg, effTs)
+</code>
+</gretl-function>
+<gretl-function name="loadextra" type="scalar" private="1">
+<code># (new v2.1) pull in the extra pkg for the Wilcoxon p-values
+# needed in the doCGtest
+# (Until extra.gfn allows introspection for its version,
+# we use this warning workaround).
+string warn = &quot;(FEP needs extra.gfn version 0.41 or higher.&quot;
+warn = sprintf(&quot;%s\nOtherwise expect errors,&quot;, warn)
+warn = sprintf(&quot;%s then install a newer version of 'extra'.)\n&quot;, warn)
+catch include extra.gfn
+if $error # probably not installed
+  catch install extra
+  if $error
+    print &quot;Fatal problem getting the 'extra' package.&quot;
+    print &quot;Please install it manually and try again.&quot;
+    print &quot;(Tests except CG should still work,&quot;
+    print &quot;  otherwise expect more errors ahead...)&quot;
+    return 2
+  else
+    catch include extra.gfn
+    if $error
+      print &quot;Fatal error loading the 'extra' package.&quot;
+      print &quot;(Tests except CG should still work,&quot;
+      print &quot;  otherwise expect more errors ahead...)&quot;
+      return 1
+    else
+      print warn
+      return 0
+    endif
+  endif
+else
+  print warn
+  return 0
+endif
+</code>
+</gretl-function>
+<gretl-function name="CGprint" type="void" private="1">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># helper function
+# string sType = (b.CGmeth == 1) ? &quot;sign test&quot; : &quot;signed-rank test&quot;
+printf &quot;********************************************************\n&quot;
+if !b.k &amp;&amp; !inbundle(b, &quot;CGX&quot;)
+  printf &quot;You selected the test(s) of unbiasedness.\n&quot;
+elif !b.k &amp;&amp; inbundle(b, &quot;CGX&quot;)
+  funcerr &quot;You set k=0 but provided CGX. Please set k&gt;0, and re-run.&quot;
+endif
+if b.k &gt; 0 &amp;&amp; !inbundle(b, &quot;CGX&quot;)
+  printf &quot;You selected the test(s) of (no) serial correlation at lag %d.\n&quot;, b.k
+elif inbundle(b, &quot;CGX&quot;)
+  printf &quot;You selected the test(s) of orthogonality at lag %d.\n&quot;, b.k
+endif
+printf &quot;********************************************************\n&quot;
+</code>
+</gretl-function>
+<gretl-function name="fullname" type="string" private="1">
+ <params count="1">
+  <param name="scode" type="string"/>
+ </params>
+<code>strings codes = defarray(&quot;MZ&quot;,&quot;KG&quot;,&quot;DL&quot;,&quot;EKT&quot;,&quot;KS&quot;,&quot;PT&quot;, &quot;CGRANK&quot;,&quot;CGWILC&quot;,&quot;DM&quot;,&quot;GW&quot;, &quot;HP&quot;, &quot;PS&quot;, &quot;CG&quot;)
+strings fulls = defarray(&quot;Mincer-Zarnowitz (MZ)&quot;, &quot;Holden-Peel-Kirchgaessner (KG)&quot;, &quot;Diebold-Lopez (DL)&quot;, &quot;Elliott-Komunjer-Timmermann (EKT)&quot;, &quot;Kuiper score (KS)&quot;, &quot;Pesaran-Timmermann (PT)&quot;, &quot;Campbell-Ghysels rank sign (CGRANK)&quot;, &quot;Campbell-Ghysels Wilcoxon sign (CGWILC)&quot;, &quot;Diebold-Mariano (DM)&quot;, &quot;Giacomini-White (GW)&quot;, &quot;Holden-Peel (HP)&quot;, &quot;Probability Score (PS)&quot;, &quot;Campbell-Ghysels (CG)&quot;)
+loop i=1..nelem(codes) -q
+  if scode == codes[i]
+    return fulls[i]
+  endif
+endloop
+# When we get here it's a problem
+printf &quot;Whoops, scode is %s\n&quot;, scode
+funcerr &quot;Code scode didn't match anything&quot;
+</code>
+</gretl-function>
+<gretl-function name="HLN" type="matrix" private="1">
+ <params count="3">
+  <param name="DMstat" type="scalar">
+<description>Diebold-Mariano test statistics</description>
+  </param>
+  <param name="T" type="int">
+<description>No. of forecasts</description>
+  </param>
+  <param name="h" type="int">
+<description>Forecast horizon</description>
+  </param>
+ </params>
+<code>matrix stat = DMstat / sqrt( (T+1-2*h+h*(h-1)/T)/T )
+matrix pv = 2*pvalue(t,(T-1),abs(stat))
+return pv #stat | pv
+</code>
+</gretl-function>
+<gretl-function name="try_invert" type="void" private="1">
+ <params count="2">
+  <param name="m" type="matrix"/>
+  <param name="err" type="scalarref"/>
+ </params>
+<code>catch matrix ret = inv(m)
+err = $error
+</code>
+</gretl-function>
+<gretl-function name="try_ginvert" type="void" private="1">
+ <params count="2">
+  <param name="m" type="matrix"/>
+  <param name="err" type="scalarref"/>
+ </params>
+<code>catch matrix ret = ginv(m)
+err = $error
+</code>
+</gretl-function>
+<gretl-function name="symtest" type="matrix" private="1">
+ <params count="3">
+  <param name="aT" type="scalar">
+<description>AlphaHat</description>
+  </param>
+  <param name="SE" type="scalar">
+<description>S.D. of  Alpha</description>
+  </param>
+  <param name="verb" type="int"/>
+ </params>
+<code># Test the null hypothesis of symmetry: alfa = 0.5 #
+scalar TestSym = (aT - 0.5)/SE
+scalar ProbSym = 2*(pvalue(z,abs(TestSym)))	# alfa is asymptotically normal
+if verb==1
+  printf &quot;\n*********************************************\n&quot;
+  printf &quot;Test for Symmetry: H0: aT=0.5 vs. H1: aT!=0.5\n&quot;
+  printf &quot;\nEstim. alpha = %12.3g\n&quot;, aT
+  printf &quot;Test stat. = %12.3g\n&quot;, TestSym
+  printf &quot;P-value = %12.3g\n&quot;, ProbSym
+  printf &quot;\n*********************************************\n&quot;
+endif
+return TestSym ~ ProbSym
+</code>
+</gretl-function>
+<gretl-function name="rattest" type="matrix" private="1">
+ <params count="7">
+  <param name="Y" type="matrix"/>
+  <param name="iv" type="matrix"/>
+  <param name="vMod" type="matrix"/>
+  <param name="aT" type="scalar">
+<description>AlphaHat</description>
+  </param>
+  <param name="s" type="matrix"/>
+  <param name="iSym" type="int" min="0" max="1">
+<description>0=Use estimated aT, 1=Fix aT=0.5</description>
+  </param>
+  <param name="verb" type="int"/>
+ </params>
+<code>if iSym==0 &amp;&amp; cols(s)==1
+  printf &quot;Error: Rationality Test not applicable\n           as the no. of instruments equal the no. of parameters\n&quot;
+  J = NA
+  pv = NA
+elif cols(s)&gt;1
+  if iSym==1
+    aT = 0.5
+    df = cols(s)
+  else
+    df = cols(s)-1
+  endif
+  A = sumc( iv.*((Y.&lt;0)-aT).*vMod)
+  err = 0
+  try_invert(s,&amp;err)
+  if err==0
+    J = qform(A,inv(s)) / rows(iv)
+  else
+    err = 0
+    try_ginvert(s,&amp;err)
+    if err==0
+      J = qform(A,ginv(s)) / rows(iv)
+    endif
+  endif
+endif
+if cols(s)&gt;1 &amp;&amp; err==0
+  pv = pvalue(X,df,J)
+  if cols(s)&gt;1 &amp;&amp; verb==1
+    printf &quot;\n*********************************************\n&quot;
+    printf &quot;Rationality Test\n&quot;
+    if iSym==1
+      printf &quot;\nAlpha fixed to 0.5\n&quot;
+    else
+      printf &quot;\nEstim. alpha = %12.3g\n&quot;, aT
+    endif
+    printf &quot;J-statistics = %12.3g\n&quot;, J
+    printf &quot;P-value = %12.3g\n&quot;, pv
+    printf &quot;\n*********************************************\n&quot;
+  endif
+  return J~pv
+else
+  return {NA}~{NA}
+endif
+</code>
+</gretl-function>
+<gretl-function name="NeweyWest" type="matrix" private="1">
+ <params count="2">
+  <param name="Z" type="matrix"/>
+  <param name="nlags" type="int"/>
+ </params>
+<code># For Giacomini-White test
+# Returns the Newey-West estimator of the asymptotic variance matrix
+# INPUTS: Z, a nxk matrix with rows the vector zt'
+#         nlags, the number of lags
+#
+# OUTPUTS: omegahat, the Newey-West estimator of the covariance matrix
+scalar n = rows(Z)
+scalar k = cols(Z)
+Z = cdemean(Z)    		# de-mean the variables
+if nlags&gt;0
+  matrix gamma = zeros(nlags,k)
+endif
+matrix omegahat = Z'Z/n		# sample variance
+if nlags &gt; 0
+  #sample autocovariances
+  loop for ii=1..nlags -q
+    Zlag = zeros(ii,k) | Z[1:n-ii,]
+    gamma = (Z'Zlag +Zlag'Z)/n
+    w = 1 - (ii/(nlags+1))
+    omegahat = omegahat + w*gamma
+  endloop
+endif
+return omegahat
+</code>
+</gretl-function>
+<sample-script>
+clear
+set verbose off
+include FEP.gfn --force
+open FEPdata.gdt --frompkg=FEP
+
+#--------
+# MZ test
+#--------
+bundle b = null
+b.y = y						# realizations
+b.fc = fc					# forecasts
+b.nboot = 999				# 0=NO bootstrap, nboot&gt;0 --&gt; use nboot replications
+b.robust = 1				# 1=robust HAC robust VCV
+b.verb = 1					# 1=print details
+applyFCtests(&amp;b, &quot;MZ&quot;)		# call the top-level function
+print b						# print bundle input
+   
+#--------------------
+# HP (former KG) test
+#--------------------
+bundle b = null
+b.y = y
+b.fc = fc
+list z = time
+b.z = z
+b.nboot = 999
+b.robust = 1
+b.verb = 1
+applyFCtests(&amp;b, &quot;HP&quot;)
+print b
+   
+#------------------
+# CG tests
+#------------------
+bundle b = null
+scalar variant = 1			# for illustration only
+if variant == 1				# let FEP compute the forecast errors
+    b.y = y
+    b.fc = fc
+else
+    series E = y - fc	# define on your own the forecast errors
+    b.E = E
+endif
+b.k = 0						# k=0--&gt;Test on unbiasedness (default); k&gt;0 for efficiency test (serial correlation)
+# b.CGX = time				# add conditional regressor -- will call the orthogonality test iff k&gt;0
+b.verb = 1					# 1=print details
+applyFCtests(&amp;b, &quot;CG&quot;)
+print b
+
+#-----------------
+# Diebold &amp; Lopez
+#-----------------
+bundle b = null
+b.yup = (diff(y) &gt; 0)
+b.fcup = (diff(fc) &gt; 0)
+b.verb = 1					# 1=print details
+applyFCtests(&amp;b, &quot;DL&quot;)
+print b
+
+#---------------
+# Kuipers Score
+#---------------
+bundle b = null
+b.yup = (diff(y) &gt; 0)
+b.fcup = (diff(fc) &gt; 0)
+b.verb = 1					# 1=print details
+applyFCtests(&amp;b, &quot;KS&quot;)
+print b
+
+#----------------------------
+# Pesaran &amp; Timmermann (1992)
+#----------------------------
+bundle b = null
+b.yup = (diff(y) &gt; 0)
+b.fcup = (diff(fc) &gt; 0)
+# b.PTmeth = 2				# 1=correlation based, 2=regression based with HAC VCV
+b.robust = 1
+b.verb = 1					# 1=print details
+applyFCtests(&amp;b, &quot;PT&quot;)
+print b
+
+#------------------
+# Diebold &amp; Mariano
+#------------------
+bundle b = null
+b.y = y
+b.f1 = fc		# FC 1 series
+b.f2 = fc(-1)	# FC 2 series
+b.loss = 2			# 1=&quot;U-shape&quot;, 2=&quot;V-shape&quot; 
+b.verb = 1
+#b.fhor = 1			# for small-sample corrected critical values (default=1)
+applyFCtests(&amp;b, &quot;DM&quot;)
+print b
+
+#------------------
+# Giacomini &amp; White
+#------------------
+bundle b = null
+b.y = y
+b.f1 = fc			# FC 1 series
+b.f2 = fc(-1)		# FC 2 series
+b.loss = 2			# 1=&quot;U-shape&quot; (default), 2=&quot;V-shape&quot; 
+b.verb = 1
+b.cond = 1			# 0=un-, 1=conditional
+list b.z = fc(-2)	# conditioning variables
+#b.fhor = 1			# forecast horizon (default=1)
+applyFCtests(&amp;b, &quot;GW&quot;)
+print b
+
+#------------------------------------
+# Elliott, Komunjer, Timmermann
+# Example 1 using doEKTtest_series()
+#------------------------------------
+bundle b = null
+b.p0 = 2					# Loss function (lin-lin = 1, quad-quad = 2)
+scalar variant = 1			# for illustration only
+series fcerr = y-fc
+series fcerr1 = fcerr(-1)	# additional instrument (intercept included per default)
+if variant == 1				# let the function compute the forecast error
+    b.y = y
+    b.fc = fc
+elif variant == 2
+    b.E = fcerr				# Forecast Error
+endif
+b.z = fcerr1  
+smpl fcerr fcerr1 --no-missing
+b.a0 = 0.5					# Initial value of shape parameter aT
+b.verb = 0
+b.lossdraw = &quot;display&quot;	# 'no=no draw, 'display'=immediate plot, 'Path+filename'
+applyFCtests(&amp;b, &quot;EKT&quot;)
+print b
+scalar a1 = b.alpha		# store a-symmetry parameter
+scalar V1 = b.V			# store variance of a1
+print a1 V1
+smpl full
+#------------
+# Example 2
+#------------
+bundle b = null
+b.p0 = 2
+smpl fcerr fcerr1 --no-missing
+b.E = fcerr
+b.z = fcerr1
+b.a0 = 0.5
+b.verb = 1
+b.lossdraw = &quot;no&quot;
+applyFCtests(&amp;b, &quot;EKT&quot;)
+print b
+scalar a2 = b.alpha
+scalar V2 = b.V
+# Draw both loss functions jointly #
+DrawLoss2 (b.p0, a1, V1, a2, V2, &quot;display&quot;)
+smpl full
+
+#---------------------------------
+# doPS(): evaluate binary outcomes
+#---------------------------------
+series UP = (diff(y) &gt; 0)
+logit UP 0 fc --quiet	# Estimate probabilities using a logit model for illustration
+series pr = $yhat			# estimated probabilities that Pr(UP|I)=1
+# use directly probscore()
+probscore({UP},{pr})
+# alternatively use the wrapper doPS() using the bundle expression
+bundle b = null
+b.yup = UP
+b.pfc = pr
+doPS(&amp;b)
+print b
+
+#-----------------------------------------------
+# Compute forecast error losses using getLoss()
+#-----------------------------------------------
+matrix m = mnormal(25, 3)
+matrix result = getLoss(m)
+print result
+result = getLoss(m, &quot;sq&quot;, 1)
+print result
+result = getLoss(m, &quot;linlin&quot;)
+print result
+result = getLoss(m, &quot;linlin&quot;, 0.3)
+print result
+result = getLoss(m, &quot;qq&quot;, 0)
+print result
+result = getLoss(m, &quot;linex&quot;, {-3})
+print result
+matrix prm = {0.1, 0.2}
+result = getLoss(m, &quot;dlinex&quot;, prm)
+print result
+result = getLoss(m, &quot;sq&quot;, 0.5, ones(25,1))
+print result
+</sample-script>
+</gretl-function-package>
+</gretl-functions>
