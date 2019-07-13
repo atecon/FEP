@@ -1,5 +1,5 @@
 author = Artur Tarassow and Sven Schreiber
-email = atecon@cryptolab.net
+email = atecon@posteo.de
 version = 2.3
 date = 2018-07-02
 description = Forecast Evaluation Package
