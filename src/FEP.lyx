@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.3, July 2019
+ version 2.21, July 2019
 \end_layout
 
 \begin_layout Abstract
@@ -5849,7 +5849,6 @@ reference "tab:doMZtest"
 \end_inset
 
  for a synopsis.
- 
 \end_layout
 
 \begin_layout Standard
@@ -8827,7 +8826,6 @@ reference "tab:doPTtest"
 \end_inset
 
  for a synopsis.
- 
 \end_layout
 
 \begin_layout Standard
@@ -9298,7 +9296,6 @@ reference "tab:doDLtest"
 \end_inset
 
  for a synopsis.
- 
 \end_layout
 
 \begin_layout Standard
@@ -9891,7 +9888,6 @@ reference "tab:doDMtest"
 \end_inset
 
  for a synopsis.
- 
 \end_layout
 
 \begin_layout Standard
@@ -12520,7 +12516,7 @@ Changelog
 \end_layout
 
 \begin_layout Itemize
-version 2.3 (July 2019)
+version 2.21 (July 2019)
 \end_layout
 
 \begin_deeper
