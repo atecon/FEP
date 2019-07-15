@@ -1,5 +1,80 @@
 # private functions
 
+function void check_for_y_series (bundle *b, const string which)
+    if which=="DM" || which=="GW" || which=="HP" || which=="MZ"        
+        if !inbundle(b, "y")
+            funcerr "Series of realizations 'y' is missing."
+        endif
+    endif
+end function
+
+function void check_for_fc_series (bundle *b, const string which)
+    if which=="HP" || which=="MZ"
+        if !inbundle(b, "fc")
+            funcerr "Series of forecasts values 'fc' is missing."
+        endif
+    endif
+end function
+
+function void check_for_y_and fc_series (bundle *b, const string which)
+    if which=="CG" || which=="EKT"
+        if !inbundle(b, "E") && ( (inbundle(b, "y") \
+          && !inbundle(b, "fc")) || (!inbundle(b, "y") && inbundle(b, "fc")) )
+            funcerr "Both series of realizations 'y' and of forecasts 'fc' must be passed."
+        endif
+    endif
+end function
+
+function void check_for_f1_and_f2_series (bundle *b, const string which)
+    if which=="DM" || which=="GW"
+        scalar error = 0
+        if !inbundle(b, "f1")
+            printf "\nError: Series of forecast values 'f1' is missing.\n"
+            error++
+        endif
+        if !inbundle(b, "f2")
+            printf "\nError: Series of forecast values 'f2' is missing.\n"
+            error++
+        endif
+        if error>0
+            funcerr "Add missing series of forecast values."
+        endif        
+    endif
+end function
+
+function void check_for_yup_series (bundle *b, const string which)
+    if which=="DL" || which=="KS" || which=="PT" || which=="PS"
+        if !inbundle(b, "yup")
+            funcerr "Binary indicator series of realizations 'yup' is missing."
+        endif
+    endif
+end function
+
+function void check_for_fcup_series (bundle *b, const string which)
+    if which=="DL" || which=="KS" || which=="PT"
+        if !inbundle(b, "yup")
+            funcerr "Binary indicator series of forecasts 'fcup' is missing."
+        endif
+    endif
+end function
+
+function void check_for_pfc_series (bundle *b, const string which)
+    if which=="PS"
+        if !inbundle(b, "pfc")
+            funcerr "Probability forecast series 'pfc' is missing."
+        endif
+    endif
+end function
+
+function void check_for_z_list (bundle *b, const string which)
+    if which=="EKT" || which=="HP"
+        if !inbundle(b, "z")
+            funcerr "List of exogenous/ instruments 'z' is missing."
+        endif
+    endif
+end function
+
+
 function scalar loadextra(void)
   # (new v2.1) pull in the extra pkg for the Wilcoxon p-values
   # needed in the doCGtest
@@ -11,7 +86,7 @@ function scalar loadextra(void)
   warn = sprintf("%s then install a newer version of 'extra'.)\n", warn)
   
   catch include extra.gfn
-  if $error # probably not installed
+  if $error
     catch install extra
     if $error 
       print "Fatal problem getting the 'extra' package."
@@ -76,8 +151,8 @@ function string fullname(string scode)
      "Pesaran-Timmermann (PT)",
      "Campbell-Ghysels rank sign (CGRANK)",
      "Campbell-Ghysels Wilcoxon sign (CGWILC)",
-    "Diebold-Mariano (DM)",
-    "Giacomini-White (GW)",
+     "Diebold-Mariano (DM)",
+     "Giacomini-White (GW)",
      "Holden-Peel (HP)", 
      "Probability Score (PS)",
      "Campbell-Ghysels (CG)")

@@ -181,6 +181,13 @@ loop i = 1..nelem(testcodes) --quiet
   # I hope no earlier test overwrites bundle elements
   # that would confuse the later tests...?
   which = testcodes[i]
+  check_for_y_series(&amp;b, which)
+  check_for_fc_series(&amp;b, which)
+  check_for_f1_and_f2_series(&amp;b, which)
+  check_for_yup_series(&amp;b, which)
+  check_for_fcup_series(&amp;b, which)
+  check_for_pfc_series(&amp;b, which)
+  check_for_z_list(&amp;b, which)
   if which == &quot;DM&quot;
     doDMtest(&amp;b)	# Diebold &amp; Mariano
   elif which == &quot;GW&quot;
@@ -1498,6 +1505,111 @@ endloop # through the lag indices
 return defarray(Sg, SRg, Wg, effTs)
 </code>
 </gretl-function>
+<gretl-function name="check_for_y_series" type="void" private="1">
+ <params count="2">
+  <param name="b" type="bundleref"/>
+  <param name="which" type="string" const="true"/>
+ </params>
+<code>if which==&quot;DM&quot; || which==&quot;GW&quot; || which==&quot;HP&quot; || which==&quot;MZ&quot;
+  if !inbundle(b, &quot;y&quot;)
+    funcerr &quot;Series of realizations 'y' is missing.&quot;
+  endif
+endif
+</code>
+</gretl-function>
+<gretl-function name="check_for_fc_series" type="void" private="1">
+ <params count="2">
+  <param name="b" type="bundleref"/>
+  <param name="which" type="string" const="true"/>
+ </params>
+<code>if which==&quot;HP&quot; || which==&quot;MZ&quot;
+  if !inbundle(b, &quot;fc&quot;)
+    funcerr &quot;Series of forecasts values 'fc' is missing.&quot;
+  endif
+endif
+</code>
+</gretl-function>
+<gretl-function name="check_for_y_and" type="void" private="1">
+ <params count="2">
+  <param name="b" type="bundleref"/>
+  <param name="which" type="string" const="true"/>
+ </params>
+<code>if which==&quot;CG&quot; || which==&quot;EKT&quot;
+  if !inbundle(b, &quot;E&quot;) &amp;&amp; ( (inbundle(b, &quot;y&quot;) &amp;&amp; !inbundle(b, &quot;fc&quot;)) || (!inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;)) )
+    funcerr &quot;Both series of realizations 'y' and of forecasts 'fc' must be passed.&quot;
+  endif
+endif
+</code>
+</gretl-function>
+<gretl-function name="check_for_f1_and_f2_series" type="void" private="1">
+ <params count="2">
+  <param name="b" type="bundleref"/>
+  <param name="which" type="string" const="true"/>
+ </params>
+<code>if which==&quot;DM&quot; || which==&quot;GW&quot;
+  scalar error = 0
+  if !inbundle(b, &quot;f1&quot;)
+    printf &quot;\nError: Series of forecast values 'f1' is missing.\n&quot;
+    error++
+  endif
+  if !inbundle(b, &quot;f2&quot;)
+    printf &quot;\nError: Series of forecast values 'f2' is missing.\n&quot;
+    error++
+  endif
+  if error&gt;0
+    funcerr &quot;Add missing series of forecast values.&quot;
+  endif
+endif
+</code>
+</gretl-function>
+<gretl-function name="check_for_yup_series" type="void" private="1">
+ <params count="2">
+  <param name="b" type="bundleref"/>
+  <param name="which" type="string" const="true"/>
+ </params>
+<code>if which==&quot;DL&quot; || which==&quot;KS&quot; || which==&quot;PT&quot; || which==&quot;PS&quot;
+  if !inbundle(b, &quot;yup&quot;)
+    funcerr &quot;Binary indicator series of realizations 'yup' is missing.&quot;
+  endif
+endif
+</code>
+</gretl-function>
+<gretl-function name="check_for_fcup_series" type="void" private="1">
+ <params count="2">
+  <param name="b" type="bundleref"/>
+  <param name="which" type="string" const="true"/>
+ </params>
+<code>if which==&quot;DL&quot; || which==&quot;KS&quot; || which==&quot;PT&quot;
+  if !inbundle(b, &quot;yup&quot;)
+    funcerr &quot;Binary indicator series of forecasts 'fcup' is missing.&quot;
+  endif
+endif
+</code>
+</gretl-function>
+<gretl-function name="check_for_pfc_series" type="void" private="1">
+ <params count="2">
+  <param name="b" type="bundleref"/>
+  <param name="which" type="string" const="true"/>
+ </params>
+<code>if which==&quot;PS&quot;
+  if !inbundle(b, &quot;pfc&quot;)
+    funcerr &quot;Probability forecast series 'pfc' is missing.&quot;
+  endif
+endif
+</code>
+</gretl-function>
+<gretl-function name="check_for_z_list" type="void" private="1">
+ <params count="2">
+  <param name="b" type="bundleref"/>
+  <param name="which" type="string" const="true"/>
+ </params>
+<code>if which==&quot;EKT&quot; || which==&quot;HP&quot;
+  if !inbundle(b, &quot;z&quot;)
+    funcerr &quot;List of exogenous/ instruments 'z' is missing.&quot;
+  endif
+endif
+</code>
+</gretl-function>
 <gretl-function name="loadextra" type="scalar" private="1">
 <code># (new v2.1) pull in the extra pkg for the Wilcoxon p-values
 # needed in the doCGtest
@@ -1507,7 +1619,7 @@ string warn = &quot;(FEP needs extra.gfn version 0.41 or higher.&quot;
 warn = sprintf(&quot;%s\nOtherwise expect errors,&quot;, warn)
 warn = sprintf(&quot;%s then install a newer version of 'extra'.)\n&quot;, warn)
 catch include extra.gfn
-if $error # probably not installed
+if $error
   catch install extra
   if $error
     print &quot;Fatal problem getting the 'extra' package.&quot;
