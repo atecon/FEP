@@ -7,15 +7,7 @@ function void applyFCtests (bundle *b, string which)
         # that would confuse the later tests...?
     
         which = testcodes[i]
-    
-        check_for_y_series(&b, which)
-        check_for_fc_series(&b, which)
-        check_for_f1_and_f2_series(&b, which)
-        check_for_yup_series(&b, which)
-        check_for_fcup_series(&b, which)
-        check_for_pfc_series(&b, which)
-        check_for_z_list(&b, which)
-        
+        check_for_series_in_b(b, which)
 
         if which == "DM"
             doDMtest(&b)	# Diebold & Mariano
