@@ -1,79 +1,65 @@
 # private functions
 
-function void check_for_y_series (bundle *b, const string which)
-    if which=="DM" || which=="GW" || which=="HP" || which=="MZ"        
-        if !inbundle(b, "y")
-            funcerr "Series of realizations 'y' is missing."
-        endif
+function void check_series_in_b (const bundle b, const string which)
+    printf "Test choice: %s\n", which
+    
+    if (which=="DM" || which=="GW" || which=="HP" || which=="MZ") && !inbundle(b, "y")
+        funcerr "Series of realizations 'y' is missing."
+        # Strictly speaking: also need to check type of y
+        
+    elif (which=="HP" || which=="MZ") && !inbundle(b, "fc")
+        funcerr "Series of forecasts values 'fc' is missing."
+        
+    elif (which=="CG" || which=="EKT") &&  !inbundle(b, "E") && ( \
+            ( inbundle(b, "y") && !inbundle(b, "fc") ) || ( !inbundle(b, "y") && inbundle(b, "fc") ) \
+        ) 
+        funcerr "Both series of realizations 'y' and of forecasts 'fc' must be passed."
+        
+    elif (which=="DM" || which=="GW") && !inbundle(b, "f1")
+        funcerr "Series of forecast values 'f1' is missing."
+        
+    elif (which=="DM" || which=="GW") && !inbundle(b, "f2")
+        funcerr "Series of forecast values 'f1' is missing."
+        
+    elif (which=="DL" || which=="KS" || which=="PT" || which=="PS") && !inbundle(b, "yup")
+        funcerr "Binary indicator series of realizations 'yup' is missing."
+        
+    elif (which=="DL" || which=="KS" || which=="PT") && !inbundle(b, "fcup") 
+        funcerr "Binary indicator series of forecasts 'fcup' is missing."
+        
+    elif which=="PS" && !inbundle(b, "pfc")
+        funcerr "Probability forecast series 'pfc' is missing." 
+        
+    elif (which=="EKT" || which=="HP") && !inbundle(b, "z")
+        funcerr "List of exogenous / instruments 'z' is missing."
+        
     endif
 end function
 
-function void check_for_fc_series (bundle *b, const string which)
-    if which=="HP" || which=="MZ"
-        if !inbundle(b, "fc")
-            funcerr "Series of forecasts values 'fc' is missing."
-        endif
-    endif
-end function
+## functions replaced by check_series_in_b
+# function void check_for_y_series (bundle *b, const string which)
+#    if which=="DM" || which=="GW" || which=="HP" || which=="MZ"        
 
-function void check_for_y_and fc_series (bundle *b, const string which)
-    if which=="CG" || which=="EKT"
-        if !inbundle(b, "E") && ( (inbundle(b, "y") \
-          && !inbundle(b, "fc")) || (!inbundle(b, "y") && inbundle(b, "fc")) )
-            funcerr "Both series of realizations 'y' and of forecasts 'fc' must be passed."
-        endif
-    endif
-end function
+# function void check_for_fc_series (bundle *b, const string which)
+#    if which=="HP" || which=="MZ"
+     
+# function void check_for_y_and fc_series (bundle *b, const string which)
+#    if which=="CG" || which=="EKT"
 
-function void check_for_f1_and_f2_series (bundle *b, const string which)
-    if which=="DM" || which=="GW"
-        scalar error = 0
-        if !inbundle(b, "f1")
-            printf "\nError: Series of forecast values 'f1' is missing.\n"
-            error++
-        endif
-        if !inbundle(b, "f2")
-            printf "\nError: Series of forecast values 'f2' is missing.\n"
-            error++
-        endif
-        if error>0
-            funcerr "Add missing series of forecast values."
-        endif        
-    endif
-end function
+# function void check_for_f1_and_f2_series (bundle *b, const string which)
+#    if which=="DM" || which=="GW"
 
-function void check_for_yup_series (bundle *b, const string which)
-    if which=="DL" || which=="KS" || which=="PT" || which=="PS"
-        if !inbundle(b, "yup")
-            funcerr "Binary indicator series of realizations 'yup' is missing."
-        endif
-    endif
-end function
+# function void check_for_yup_series (bundle *b, const string which)
+#    if which=="DL" || which=="KS" || which=="PT" || which=="PS"
 
-function void check_for_fcup_series (bundle *b, const string which)
-    if which=="DL" || which=="KS" || which=="PT"
-        if !inbundle(b, "yup")
-            funcerr "Binary indicator series of forecasts 'fcup' is missing."
-        endif
-    endif
-end function
+# function void check_for_fcup_series (bundle *b, const string which)
+#    if which=="DL" || which=="KS" || which=="PT"
 
-function void check_for_pfc_series (bundle *b, const string which)
-    if which=="PS"
-        if !inbundle(b, "pfc")
-            funcerr "Probability forecast series 'pfc' is missing."
-        endif
-    endif
-end function
+# function void check_for_pfc_series (bundle *b, const string which)
+#    if which=="PS"
 
-function void check_for_z_list (bundle *b, const string which)
-    if which=="EKT" || which=="HP"
-        if !inbundle(b, "z")
-            funcerr "List of exogenous/ instruments 'z' is missing."
-        endif
-    endif
-end function
-
+# function void check_for_z_list (bundle *b, const string which)
+#    if which=="EKT" || which=="HP"
 
 function scalar loadextra(void)
   # (new v2.1) pull in the extra pkg for the Wilcoxon p-values
