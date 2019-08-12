@@ -1510,8 +1510,8 @@ if (which==&quot;DM&quot; || which==&quot;GW&quot; || which==&quot;HP&quot; || w
   # Strictly speaking: also need to check type of y
 elif (which==&quot;HP&quot; || which==&quot;MZ&quot;) &amp;&amp; !inbundle(b, &quot;fc&quot;)
   funcerr &quot;Series of forecasts values 'fc' is missing.&quot;
-elif (which==&quot;CG&quot; || which==&quot;EKT&quot;) &amp;&amp; !inbundle(b, &quot;E&quot;) ( ( inbundle(b, &quot;y&quot;) &amp;&amp; !inbundle(b, &quot;fc&quot;) ) || ( !inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;) ) )
-  funcerr &quot;Both series of realizations 'y' and of forecasts 'fc' must be passed.&quot;
+elif (which==&quot;CG&quot; || which==&quot;EKT&quot;) &amp;&amp; !inbundle(b, &quot;E&quot;) &amp;&amp; ( !inbundle(b, &quot;y&quot;) || !inbundle(b, &quot;fc&quot;) )
+  funcerr &quot;Both series of realizations 'y' and of forecasts 'fc' must be passed. (Or errors 'E'.)&quot;
 elif (which==&quot;DM&quot; || which==&quot;GW&quot;) &amp;&amp; !inbundle(b, &quot;f1&quot;)
   funcerr &quot;Series of forecast values 'f1' is missing.&quot;
 elif (which==&quot;DM&quot; || which==&quot;GW&quot;) &amp;&amp; !inbundle(b, &quot;f2&quot;)
