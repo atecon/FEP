@@ -10,10 +10,9 @@ function void check_series_in_b (const bundle b, const string which)
     elif (which=="HP" || which=="MZ") && !inbundle(b, "fc")
         funcerr "Series of forecasts values 'fc' is missing."
 
-    elif (which=="CG" || which=="EKT") &&  !inbundle(b, "E") \
-          ( ( inbundle(b, "y") && !inbundle(b, "fc") ) \
-          || ( !inbundle(b, "y") && inbundle(b, "fc") ) )
-        funcerr "Both series of realizations 'y' and of forecasts 'fc' must be passed."
+    elif (which=="CG" || which=="EKT") && !inbundle(b, "E") && \
+          ( !inbundle(b, "y") || !inbundle(b, "fc") ) 
+        funcerr "Both series of realizations 'y' and of forecasts 'fc' must be passed. (Or errors 'E'.)"
 
     elif (which=="DM" || which=="GW") && !inbundle(b, "f1")
         funcerr "Series of forecast values 'f1' is missing."
