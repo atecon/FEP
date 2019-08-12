@@ -3,7 +3,7 @@
 <gretl-function-package name="FEP" no-data-ok="true" minver="2017a" lives-in-subdir="true">
 <author email="atecon@posteo.de">Artur Tarassow and Sven Schreiber</author>
 <version>2.21</version>
-<date>2019-07-14</date>
+<date>2019-08-12</date>
 <description>Forecast Evaluation Package</description>
 <tags>C12 C52 C53</tags>
 <label>Forecast evaluations</label>
@@ -181,6 +181,7 @@ loop i = 1..nelem(testcodes) --quiet
   # I hope no earlier test overwrites bundle elements
   # that would confuse the later tests...?
   which = testcodes[i]
+  check_series_in_b(b, which)
   if which == &quot;DM&quot;
     doDMtest(&amp;b)	# Diebold &amp; Mariano
   elif which == &quot;GW&quot;
@@ -1498,8 +1499,36 @@ endloop # through the lag indices
 return defarray(Sg, SRg, Wg, effTs)
 </code>
 </gretl-function>
+<gretl-function name="check_series_in_b" type="void" private="1">
+ <params count="2">
+  <param name="b" type="bundle" const="true"/>
+  <param name="which" type="string" const="true"/>
+ </params>
+<code>printf &quot;Test choice: %s\n&quot;, which
+if (which==&quot;DM&quot; || which==&quot;GW&quot; || which==&quot;HP&quot; || which==&quot;MZ&quot;) &amp;&amp; !inbundle(b, &quot;y&quot;)
+  funcerr &quot;Series of realizations 'y' is missing.&quot;
+  # Strictly speaking: also need to check type of y
+elif (which==&quot;HP&quot; || which==&quot;MZ&quot;) &amp;&amp; !inbundle(b, &quot;fc&quot;)
+  funcerr &quot;Series of forecasts values 'fc' is missing.&quot;
+elif (which==&quot;CG&quot; || which==&quot;EKT&quot;) &amp;&amp; !inbundle(b, &quot;E&quot;) &amp;&amp; ( !inbundle(b, &quot;y&quot;) || !inbundle(b, &quot;fc&quot;) )
+  funcerr &quot;Both series of realizations 'y' and of forecasts 'fc' must be passed. (Or errors 'E'.)&quot;
+elif (which==&quot;DM&quot; || which==&quot;GW&quot;) &amp;&amp; !inbundle(b, &quot;f1&quot;)
+  funcerr &quot;Series of forecast values 'f1' is missing.&quot;
+elif (which==&quot;DM&quot; || which==&quot;GW&quot;) &amp;&amp; !inbundle(b, &quot;f2&quot;)
+  funcerr &quot;Series of forecast values 'f1' is missing.&quot;
+elif (which==&quot;DL&quot; || which==&quot;KS&quot; || which==&quot;PT&quot; || which==&quot;PS&quot;) &amp;&amp; !inbundle(b, &quot;yup&quot;)
+  funcerr &quot;Binary indicator series of realizations 'yup' is missing.&quot;
+elif (which==&quot;DL&quot; || which==&quot;KS&quot; || which==&quot;PT&quot;) &amp;&amp; !inbundle(b, &quot;fcup&quot;)
+  funcerr &quot;Binary indicator series of forecasts 'fcup' is missing.&quot;
+elif which==&quot;PS&quot; &amp;&amp; !inbundle(b, &quot;pfc&quot;)
+  funcerr &quot;Probability forecast series 'pfc' is missing.&quot;
+elif (which==&quot;EKT&quot; || which==&quot;HP&quot;) &amp;&amp; !inbundle(b, &quot;z&quot;)
+  funcerr &quot;List of exogenous / instruments 'z' is missing.&quot;
+endif
+</code>
+</gretl-function>
 <gretl-function name="loadextra" type="scalar" private="1">
-<code># (new v2.1) pull in the extra pkg for the Wilcoxon p-values
+<code># Pull in the extra pkg for the Wilcoxon p-values
 # needed in the doCGtest
 # (Until extra.gfn allows introspection for its version,
 # we use this warning workaround).
@@ -1507,7 +1536,7 @@ string warn = &quot;(FEP needs extra.gfn version 0.41 or higher.&quot;
 warn = sprintf(&quot;%s\nOtherwise expect errors,&quot;, warn)
 warn = sprintf(&quot;%s then install a newer version of 'extra'.)\n&quot;, warn)
 catch include extra.gfn
-if $error # probably not installed
+if $error
   catch install extra
   if $error
     print &quot;Fatal problem getting the 'extra' package.&quot;

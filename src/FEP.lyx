@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.21, July 2019
+ version 2.21, August 2019
 \end_layout
 
 \begin_layout Abstract
@@ -12516,12 +12516,16 @@ Changelog
 \end_layout
 
 \begin_layout Itemize
-version 2.21 (July 2019)
+version 2.21 (August 2019)
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 replace deprecated isnull() function
+\end_layout
+
+\begin_layout Itemize
+refactoring code
 \end_layout
 
 \end_deeper

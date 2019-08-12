@@ -1,5 +1,4 @@
 # public functions
-
 function void applyFCtests (bundle *b, string which)
   
     strings testcodes = strsplit(strstrip(which))
@@ -8,7 +7,8 @@ function void applyFCtests (bundle *b, string which)
         # that would confuse the later tests...?
     
         which = testcodes[i]
-    
+        check_series_in_b(b, which)
+
         if which == "DM"
             doDMtest(&b)	# Diebold & Mariano
         elif which == "GW"
