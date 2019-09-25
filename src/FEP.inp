@@ -8,7 +8,8 @@
 
 include FEP_private.inp
 include FEP_public.inp
-include FEP_tests.inp # also public functions in there
+include FEP_tests_individual.inp # also public functions in there
+include FEP_tests_other.inp
 include FEP_wrappers.inp # also public functions in there
 
 
