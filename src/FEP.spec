@@ -12,9 +12,7 @@ public = doKS doEKTtest_series doHPtest applyFCtests doDLtest \
   doPS probscore \
   DrawLoss DrawLoss2 \
   GUI_FEP_print GUI_FEP \
-  doCGWILCtest doCGRANKtest \
-  doKStest doEKTtest doKGtest \
-  CamDufStats
+  doEKTtest  CamDufStats
 help = FEP.pdf
 sample-script = FEP_sample.inp
 data-files = FEPdata.gdt

@@ -1,6 +1,6 @@
 ## FEP_tests.inp
 
-function void doEKTtest (bundle *b)
+function void doEKTtest_matrix (bundle *b) # was doEKTtest
     # Reference paper: Elliott, Komunjer, and Timmermann, 2005,
     # Estimation and Testing of Forecast Rationality under Flexible Loss,
     # Review of Economic Studies, 72, 1107 - 1125.
@@ -245,15 +245,11 @@ end function
 #################
 
 function void doDLtest (bundle *b)
-    # compatibility handling
-    if inbundle(b, "y")		# Binary of var. of actual ups
-        series y = b.y
-    elif inbundle(b, "yup")
+    # (compatibility handling with y and fc removed in 2.3)
+    if inbundle(b, "yup")
         series y = b.yup
     endif
-    if inbundle(b, "fc")	# Binary of var. of forecasted ups
-        series fc = b.fc
-    elif inbundle(b, "fcup")
+    if inbundle(b, "fcup")
         series fc = b.fcup
     endif
     list L1 = y fc
@@ -655,16 +651,31 @@ function void doCGtest (bundle *b)
        # Additional assumption that E is symmetric about 0 under the null
     */
 
+	matrix mE = {E}
+
     # apply defaults
     if !inbundle(b, "k") 	# default: test unbiasedness
-        b.k = 0							# means no test for lag effects
+        b.k = 0				# means no test for lag effects
+
     elif b.k < 0 || (b.k != int(b.k))
         funcerr "lag number k must be non-negative integer"
     endif
     scalar k = b.k	 # (scalar treated by gretl as 1x1 matrix, should be OK)
 
     if !k && inbundle(b, "CGX")
-        funcerr "You provide X [CGX] but set k=0. Please set k>0 for running the orthogonality test."
+		print "You provide X [CGX] but set k=0 (lag order)."
+		print "Please set k>0 for running the orthogonality test."
+		print "(And make sure the CGX themselves are given without lags.)"
+
+        funcerr "X [CGX] together with k == 0 impossible."
+
+	elif inbundle(b, "CGX")
+		matrix mCGX = {b.CGX}
+		if rows(mE) != rows(mCGX)
+			print " (Error, possible reason: give CGX directly"
+			print "  and use k for lag specification.)"
+			funcerr "sample mismatch X (CGX)"
+		endif
     endif
 
     if !inbundle(b, "verb")
@@ -685,10 +696,10 @@ function void doCGtest (bundle *b)
     # or (c) orthogonality
     if !inbundle(b, "CGX")
         # no exogenous/orthogonality terms
-        matrices testout = CamDufStats({E}, k)
+        matrices testout = CamDufStats(mE, k)
     else
         # orthogonality test, with recursive median recentering
-        matrices testout = CamDufStats({E} ~ {b.CGX}, k, 1)
+        matrices testout = CamDufStats(mE ~ mCGX, k, 1)
     endif
 
     ### process results

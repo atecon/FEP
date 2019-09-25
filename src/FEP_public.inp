@@ -26,12 +26,12 @@ function void applyFCtests (bundle *b, string which)
                 # accomodate old-style interface with matrix
                 if typestr(typeof(b.y)) == "matrix"
                   matrix b.fcerrors = b.y	
-                  doEKTtest(&b)	# Elliott, Komunjer, Timmermann
+                  doEKTtest_matrix(&b)	# Elliott, Komunjer, Timmermann
                   alreadyEKT = 1
                 endif
             endif
             if !alreadyEKT 
-                doEKTtest_series(&b)
+                doEKTtest(&b)
             endif
       
         elif which == "DL"
@@ -45,6 +45,7 @@ function void applyFCtests (bundle *b, string which)
           
 
         # Now comes a compatibility layer with deprecated codes
+		/*
         elif which == "KG" # ex Kirchgaessner, now HP
           print "KG deprecated... switch to HP soon..."
           doKGtest(&b)	# call the wrapper to activate old bundle names 
@@ -56,7 +57,7 @@ function void applyFCtests (bundle *b, string which)
         elif which == "CGRANK"
           print "CGRANK deprecated, switch to CG"
           doCGRANKtest(&b)
-           
+        */   
         endif
   
     endloop

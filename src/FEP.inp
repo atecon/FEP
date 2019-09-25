@@ -47,7 +47,7 @@ function bundle GUI_FEP(
     ## process args
     string b.code = sarr[which]
     # process realiz
-    if b.code == "KS" || b.code == "PT"
+    if b.code == "KS" || b.code == "PT" || b.code == "DL"
         series b.yup = realiz
 
     elif strlen(strstr("CG EKT" , b.code))
@@ -64,7 +64,7 @@ function bundle GUI_FEP(
 
     # process fc (and also fc2)
     if exists(fc)
-        if b.code == "KS" || b.code == "PT"
+        if b.code == "KS" || b.code == "PT" || b.code == "DL"
             series b.fcup = fc
         elif b.code == "DM" || b.code == "GW"
             if exists(fc2)

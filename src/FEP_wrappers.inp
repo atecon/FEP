@@ -1,6 +1,6 @@
 # FEP_wrappers.inp
 
-function void doEKTtest_series(bundle *b)
+function void doEKTtest(bundle *b)	# was doEKTtest_series
   
     # A wrapper that turns some series elements into matrices,
       # as expected by doEKTtest.
@@ -32,12 +32,12 @@ function void doEKTtest_series(bundle *b)
         funcerr "Obs of forecasts and instruments don't match."
     endif
   
-    doEKTtest(&b)
+    doEKTtest_matrix(&b)
   
 end function
 
 ############
-
+/*
 function void doCGWILCtest (bundle *b)    
     print "Warning: The name doCGWILCtest is deprecated, use doCGtest"
     
@@ -75,7 +75,7 @@ function void doKGtest (bundle *b)
     scalar b.KGstat = b.HPstat
     scalar b.KGpval = b.HPpval
 end function 
-
+*/
 ############
 
 function void doPS (bundle *b)

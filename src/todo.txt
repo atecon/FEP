@@ -1,19 +1,20 @@
-To-Do FEP 2.2.
+To-Do FEP 2.2 ff.
 
 - DONE:
  JACK: "One small comment, for future reference. It would be nice if the
 packaged dataset, FEPdata.gdt, had descriptive strings for the variables
 and a substantive comment on the source under "Dataset info"."
-(Auﬂerdem, ist FEPdata.gdt "undated", es w‰re doch sinnvoller, wenn es als Zeitreihen gespeichert w¸rde.)
+(Au√üerdem, ist FEPdata.gdt "undated", es w√§re doch sinnvoller, wenn es als Zeitreihen gespeichert w√ºrde.)
 
 - Add bootstrap DM version using SB.gfn
 - Add block bootstrap to both MZ and HP tests using SB.gfn
+
 - DONE: Add Giacomini/White test
 
-- Bei CG (auch woanders?) gibt es Fehler "Matrizen nicht passend bei Operation", wenn man z.B. b.CGX = fc(-1) eingibt (statt b.CGX=fc zusammen mit b.k=1).
+- DONE (eigentlich wurde k=0 schon abgefangen): Bei CG (auch woanders?) gibt es Fehler "Matrizen nicht passend bei Operation", wenn man z.B. b.CGX = fc(-1) eingibt (statt b.CGX=fc zusammen mit b.k=1).
 
 - DONE: Output: "p-value.:" , Punkt weg
 
-- doDLtest: Verfeinere (oder entferne) die Behandlung des alten Interface (das y und fc intern benutzte). Denn im Moment gibt es einen Fehler, wenn im Bundle auch noch y und fc existieren, auch wenn diese gar nicht f¸r DL gedacht waren.
+- DONE: doDLtest: Verfeinere (oder entferne) die Behandlung des alten Interface (das y und fc intern benutzte). Denn im Moment gibt es einen Fehler, wenn im Bundle auch noch y und fc existieren, auch wenn diese gar nicht f√ºr DL gedacht waren.
 
-- Umbenennung von doEKTtest in doEKTtest_matrix, und dann doEKTtest_series in doEKTtest, zur Vereinfachung. 
+- DONE: Umbenennung von doEKTtest in doEKTtest_matrix, und dann doEKTtest_series in doEKTtest, zur Vereinfachung. 
