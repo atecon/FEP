@@ -206,8 +206,8 @@ function void doCWtest (bundle *b)
 	# Model 2: b.f2, larger nesting model 
 	
 	if !inbundle(b, "fhor")
-        b.fhor = 1	# default 1-step horizon (tau in CW)
-    endif
+		b.fhor = 1	# default 1-step horizon (tau in CW)
+	endif
 	series e1 = b.y - b.f1
     series e2 = b.y - b.f2
     smpl e1 e2 --no-missing
@@ -223,7 +223,7 @@ function void doCWtest (bundle *b)
 
 	omit const --silent	
 	b.CWstat = $test 
-	b.CWpval = $pvalue
+	b.CWpval = 0.5 * $pvalue # one-sided test 
 
 end function
 
