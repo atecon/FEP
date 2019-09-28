@@ -214,16 +214,17 @@ function void doCWtest (bundle *b)
 
 	series fhathalf = e1 * (e1 - e2) # equiv. to eq 2.1 hopefully
 
-	if fhor == 1
-		ols fhathalf const --silent
+	if b.fhor == 1
+		ols fhathalf const --quiet
 	else
 		set force_hc off	# ensure AC-consistency, not just HC
-		ols fhathalf const --robust --silent 
+		ols fhathalf const --robust --quiet
 	endif
 
-	omit const --silent	
-	b.CWstat = $test 
-	b.CWpval = 0.5 * $pvalue # one-sided test 
+	# omit const  # doesn't work in gretl
+	b.CWstat = $coeff(const) / $stderr(const)
+	dof = $T - 1
+	b.CWpval = pvalue(t, dof, b.CWstat) # one-sided test 
 
 end function
 

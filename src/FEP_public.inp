@@ -42,7 +42,9 @@ function void applyFCtests (bundle *b, string which)
             doPTtest(&b)	# Pesaran & Timmermann (1992)
         elif which == "PS"
           doPS(&b)	# probability score 
-          
+         
+		elif which == "CW"	# Clark-West
+			doCWtest(&b) 
 
         # Now comes a compatibility layer with deprecated codes
 		/*

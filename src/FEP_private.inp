@@ -3,7 +3,9 @@
 function void check_series_in_b (const bundle b, const string which)
     printf "Test choice: %s\n", which
 
-    if (which=="DM" || which=="GW" || which=="HP" || which=="MZ") && !inbundle(b, "y")
+    if (which=="DM" || which=="GW" || which=="HP" || which=="MZ" || which == "CW") \
+		&& !inbundle(b, "y")
+
         funcerr "Series of realizations 'y' is missing."
         # Strictly speaking: also need to check type of y
 
@@ -14,10 +16,10 @@ function void check_series_in_b (const bundle b, const string which)
           ( !inbundle(b, "y") || !inbundle(b, "fc") ) 
         funcerr "Both series of realizations 'y' and of forecasts 'fc' must be passed. (Or errors 'E'.)"
 
-    elif (which=="DM" || which=="GW") && !inbundle(b, "f1")
+    elif (which=="DM" || which=="GW" || which == "CW") && !inbundle(b, "f1")
         funcerr "Series of forecast values 'f1' is missing."
 
-    elif (which=="DM" || which=="GW") && !inbundle(b, "f2")
+    elif (which=="DM" || which=="GW" || which == "CW") && !inbundle(b, "f2")
         funcerr "Series of forecast values 'f1' is missing."
 
     elif (which=="DL" || which=="KS" || which=="PT" || which=="PS") && !inbundle(b, "yup")
@@ -103,7 +105,7 @@ end function
 function string fullname(string scode)
     strings codes = defarray("MZ","KG","DL","EKT","KS","PT", \
       "CGRANK","CGWILC","DM","GW", \
-      "HP", "PS", "CG")
+      "HP", "PS", "CG", "CW")
     strings fulls = defarray("Mincer-Zarnowitz (MZ)",
       "Holden-Peel-Kirchgaessner (KG)",
       "Diebold-Lopez (DL)",
@@ -116,7 +118,8 @@ function string fullname(string scode)
       "Giacomini-White (GW)",
       "Holden-Peel (HP)",
       "Probability Score (PS)",
-      "Campbell-Ghysels (CG)")
+      "Campbell-Ghysels (CG)",
+	  "Clark-West (CW)")
 
     loop i=1..nelem(codes) -q
         if scode == codes[i]
