@@ -49,7 +49,7 @@ function void doDMtest (bundle *b)
         printf "\n***********************************************\n"
         printf "*** Diebold & Mariano (1995) test\n"
         printf "*** on equal forecast accuracy\n"
-                if b.fhor==0 && b.verb==1
+        if b.fhor==0 && b.verb==1
             printf "\n*** Warning: You have set the forecast horizon to h=0.\n"
         endif
         if b.loss==1
@@ -72,7 +72,7 @@ end function
 ################
 
 function void doGWtest (bundle *b)
-    /*
+/*
    This function performs the asymptotic Conditional Predictive Ability Test
    Raffaella Giacomini & Halbert White, 2006. "Tests of Conditional Predictive
    Ability," Econometrica, Econometric Society, vol. 74(6), pages 1545-1578, November.
@@ -96,7 +96,7 @@ function void doGWtest (bundle *b)
     endif
     if !inbundle(b, "cond")
         b.cond = 0	# 0: unconditional test
-    endif    
+    endif
 
     series e1 = b.y - b.f1
     series e2 = b.y - b.f2
@@ -159,14 +159,14 @@ function void doGWtest (bundle *b)
     b.GWstat = tstat
     b.GWpval = pvalue(c,df,abs(tstat))     		# Chi^2 distributed
     b.sign = mean(L)
-    
+
     if b.verb == 1
         printf "\n*********************************************\n"
         printf "*** Giacomini & White (2006) test\n"
-        printf "*** of conditional predictive ability\n"        
+        printf "*** of conditional predictive ability\n"
         if b.fhor==0 && b.verb==1
             printf "\n*** Warning: You have set the forecast horizon to h=0.\n"
-        endif    
+        endif
         if b.loss==1
             printf "\nLoss: U-shape quadratic.\n"
         elif b.loss==2
@@ -190,41 +190,54 @@ function void doGWtest (bundle *b)
             printf "Sign of the mean of the loss is (+) -- 2nd model dominates\n"
         endif
         printf "***********************************************\n"
-    endif    
+    endif
 end function
 
 ###############
 
-# Clark & West: APPROXIMATELY NORMAL TEST FOR EQUALPREDICTIVE ACCURACY 
+# Clark & West: APPROXIMATELY NORMAL TEST FOR EQUALPREDICTIVE ACCURACY
 # IN NESTED MODELS (2006/2007)
 
 function void doCWtest (bundle *b)
-	# All: b.y, b.fhor
-	# (The horizon fhor is only needed to decide whether an 
-	#	[H]AC std. error should be used; for fhor > 1.)
-	# Model 1: b.f1, parsimonious model 
-	# Model 2: b.f2, larger nesting model 
-	
-	if !inbundle(b, "fhor")
-		b.fhor = 1	# default 1-step horizon (tau in CW)
-	endif
-	series e1 = b.y - b.f1
+    # All: b.y, b.fhor
+    # (The horizon fhor is only needed to decide whether an
+    #	[H]AC std. error should be used; for fhor > 1.)
+    # Model 1: b.f1, parsimonious model
+    # Model 2: b.f2, larger nesting model
+
+    if !inbundle(b, "fhor")
+        b.fhor = 1	# default 1-step horizon (tau in CW)
+    endif
+    series e1 = b.y - b.f1
     series e2 = b.y - b.f2
     smpl e1 e2 --no-missing
 
-	series fhathalf = e1 * (e1 - e2) # equiv. to eq 2.1 hopefully
+    series fhathalf = e1 * (e1 - e2) # equiv. to eq 2.1 hopefully
 
-	if b.fhor == 1
-		ols fhathalf const --quiet
-	else
-		set force_hc off	# ensure AC-consistency, not just HC
-		ols fhathalf const --robust --quiet
-	endif
+    if b.fhor == 1
+        ols fhathalf const --quiet
+    else
+        set force_hc off	# ensure AC-consistency, not just HC
+        ols fhathalf const --robust --quiet
+    endif
 
-	# omit const  # doesn't work in gretl
-	b.CWstat = $coeff(const) / $stderr(const)
-	dof = $T - 1
-	b.CWpval = pvalue(t, dof, b.CWstat) # one-sided test 
+    # omit const  # doesn't work in gretl
+    b.CWstat = $coeff(const) / $stderr(const)
+    b.CWpval = pvalue(t, $df, b.CWstat) # one-sided test
+
+    if b.verb
+        printf "\n***********************************************\n"
+        printf "*** Clark & West (2006) test\n"
+        printf "*** on equal forecast accuracy in nested models\n"
+        if b.fhor==0 && b.verb
+            printf "\n*** Warning: You have set the forecast horizon to h=0.\n"
+        endif
+        printf "Forecast horizon: %d \n", b.fhor
+        printf "H0: forecasts are equally accurate\n"
+        printf "Test stat.: %.4f\n", b.CWstat
+        printf "p-value (t-distributed): %.4f\n", b.CWpval
+        printf "***********************************************\n"
+    endif
 
 end function
 

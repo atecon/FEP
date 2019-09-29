@@ -107,6 +107,18 @@ list b.z = fc(-2)	# conditioning variables
 applyFCtests(&b, "GW")
 print b
 
+#-------------
+# Clark & West
+#-------------
+bundle b = null
+b.y = y
+b.f1 = fc			# Forecast from parsimonious model
+b.f2 = fc(-1)		# Forecast from the larger model that nests model 1
+b.verb = 1
+#b.fhor = 1			# forecast horizon (default=1)
+applyFCtests(&b, "CW")
+print b
+
 #------------------------------------
 # Elliott, Komunjer, Timmermann
 # Example 1 using doEKTtest_series()
