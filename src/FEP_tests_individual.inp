@@ -461,7 +461,7 @@ function void doCGtest (bundle *b)
        # Additional assumption that E is symmetric about 0 under the null
     */
 
-	matrix mE = {E}
+	matrix mE = {b.E}
 
     # apply defaults
     if !inbundle(b, "k") 	# default: test unbiasedness

@@ -2,8 +2,8 @@
 <gretl-functions>
 <gretl-function-package name="FEP" no-data-ok="true" minver="2017a" lives-in-subdir="true">
 <author email="atecon@posteo.de">Artur Tarassow and Sven Schreiber</author>
-<version>2.21</version>
-<date>2019-08-12</date>
+<version>2.3</version>
+<date>2019-09-28</date>
 <description>Forecast Evaluation Package</description>
 <tags>C12 C52 C53</tags>
 <label>Forecast evaluations</label>
@@ -56,7 +56,7 @@ rownames(M, &quot;Yhat=1 Yhat=0&quot;)
 b.KSmat = M
 </code>
 </gretl-function>
-<gretl-function name="doEKTtest_series" type="void">
+<gretl-function name="doEKTtest" type="void">
  <params count="1">
   <param name="b" type="bundleref"/>
  </params>
@@ -85,7 +85,7 @@ matrix b.x = {b.z}	# z should be a list
 if rows(b.fcerrors) != rows(b.x)
   funcerr &quot;Obs of forecasts and instruments don't match.&quot;
 endif
-doEKTtest(&amp;b)
+doEKTtest_matrix(&amp;b)
 </code>
 </gretl-function>
 <gretl-function name="doHPtest" type="void">
@@ -198,12 +198,12 @@ loop i = 1..nelem(testcodes) --quiet
       # accomodate old-style interface with matrix
       if typestr(typeof(b.y)) == &quot;matrix&quot;
         matrix b.fcerrors = b.y
-        doEKTtest(&amp;b)	# Elliott, Komunjer, Timmermann
+        doEKTtest_matrix(&amp;b)	# Elliott, Komunjer, Timmermann
         alreadyEKT = 1
       endif
     endif
     if !alreadyEKT
-      doEKTtest_series(&amp;b)
+      doEKTtest(&amp;b)
     endif
   elif which == &quot;DL&quot;
     doDLtest(&amp;b)	# Diebold &amp; Lopez
@@ -213,7 +213,10 @@ loop i = 1..nelem(testcodes) --quiet
     doPTtest(&amp;b)	# Pesaran &amp; Timmermann (1992)
   elif which == &quot;PS&quot;
     doPS(&amp;b)	# probability score
+  elif which == &quot;CW&quot;	# Clark-West
+    doCWtest(&amp;b)
     # Now comes a compatibility layer with deprecated codes
+    /*
   elif which == &quot;KG&quot; # ex Kirchgaessner, now HP
     print &quot;KG deprecated... switch to HP soon...&quot;
     doKGtest(&amp;b)	# call the wrapper to activate old bundle names
@@ -223,6 +226,7 @@ loop i = 1..nelem(testcodes) --quiet
   elif which == &quot;CGRANK&quot;
     print &quot;CGRANK deprecated, switch to CG&quot;
     doCGRANKtest(&amp;b)
+    */
   endif
 endloop
 </code>
@@ -231,15 +235,11 @@ endloop
  <params count="1">
   <param name="b" type="bundleref"/>
  </params>
-<code># compatibility handling
-if inbundle(b, &quot;y&quot;)		# Binary of var. of actual ups
-  series y = b.y
-elif inbundle(b, &quot;yup&quot;)
+<code># (compatibility handling with y and fc removed in 2.3)
+if inbundle(b, &quot;yup&quot;)
   series y = b.yup
 endif
-if inbundle(b, &quot;fc&quot;)	# Binary of var. of forecasted ups
-  series fc = b.fc
-elif inbundle(b, &quot;fcup&quot;)
+if inbundle(b, &quot;fcup&quot;)
   series fc = b.fcup
 endif
 list L1 = y fc
@@ -403,6 +403,230 @@ else
   funcerr &quot;shouldn't happen&quot;
 endif
 return loss
+</code>
+</gretl-function>
+<gretl-function name="doMZtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># Intercept automatically added
+# series y = actual realizations
+# series fc = forecast values
+# apply default
+if !inbundle(b, nboot)
+  b.nboot = 0
+endif
+if !inbundle(b, &quot;robust&quot;)
+  scalar b.robust = 0
+endif
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+# acommodate old variant
+if inbundle(b, &quot;strrob&quot;)
+  string strrob = b.strrob
+else
+  string strrob = (b.robust == 1) ? &quot;--robust&quot; : &quot;&quot;
+endif
+series fc = b.fc
+series y = b.y
+Rmat = {1,0;0,1}
+qvec = {0,1}'
+if b.nboot &gt; 0
+  set bootrep b.nboot
+  string strboot = &quot;--bootstrap&quot;
+else
+  string strboot = &quot;&quot;
+endif
+ols y const fc @strrob --quiet
+catch restrict @strboot --silent
+  R = Rmat
+  q = qvec
+end restrict
+if $error
+  catch restrict --silent
+    R = Rmat
+    q = qvec
+  end restrict
+endif
+if b.verb == 1
+  printf &quot;\n***********************************************\n&quot;
+  printf &quot;*** Mincer &amp; Zarnowitz test\n&quot;
+  printf &quot;*** on forecast unbiasedness\n&quot;
+  if !b.robust
+    printf &quot;\nMethod: Approach using asymptotic VCV.\n&quot;
+  elif b.robust == 1
+    printf &quot;\nMethod: Approach using HAC robust VCV.\n&quot;
+  endif
+  if b.nboot &gt; 0
+    printf &quot;Bootstrap p-value using %d iterations.\n&quot;, b.nboot
+  endif
+  printf &quot;H0: forecasts are unbiased\n&quot;
+  printf &quot;Test stat.: %.4f\n&quot;, $test
+  printf &quot;p-value:   %.4f\n&quot;, $pvalue
+  printf &quot;***********************************************\n&quot;
+endif
+b.MZstat = $test
+b.MZpval = $pvalue
+</code>
+</gretl-function>
+<gretl-function name="doPTtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># compatibility treatment:
+# PTmeth was old code for what is actually robustness: 1: not robust, 2: robust
+if inbundle(b, &quot;PTmeth&quot;)
+  print &quot;Warning: PTmeth is deprecated, use 'robust' (0/1)&quot;
+  if b.PTmeth == 1 || b.PTmeth == 2
+    scalar b.robust = b.PTmeth - 1
+  else
+    funcerr &quot;PTmeth can only be 1 or 2&quot;
+  endif
+endif
+# apply defaults
+if !inbundle(b, &quot;robust&quot;)
+  b.robust = 0
+endif
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+series y = b.yup		# Binary of var. of actual ups
+series fc = b.fcup		# Binary of var. of forecasted ups
+smpl y fc --no-missing
+if rows(values(y)) &gt; 2 || rows(values(fc)) &gt; 2
+  printf &quot;*** Note: Running the Pesaran &amp; Timmermann test requires ***\n&quot;
+  printf &quot;*** that y and fc are both binary variables! Check again! *** \n&quot;
+  funcerr &quot;Check that y and fc are both binary variables.&quot;
+endif
+if !b.robust   # PTmeth == 1
+  scalar r = mcorr({y} ~ {fc})[1,2]
+  scalar T = nobs(y)
+  scalar test = sqrt(T) * r	# test stat. (Pesaran 2015, p. 399)
+  scalar pval = 2 * pvalue(z, abs(test))		# PT ~ N(0,1)
+elif b.robust == 1  # PTmeth == 2
+  ols y const fc --robust --quiet
+  scalar test = $coeff[2] / $stderr[2]
+  scalar pval = 2 * pvalue(t, $df, abs(test))
+else
+  print &quot;Warning: Invalid PTmeth input&quot;
+endif
+if b.verb == 1
+  printf &quot;\n***********************************************\n&quot;
+  printf &quot;*** Pesaran &amp; Timmermann (1992, 2006) test\n&quot;
+  printf &quot;*** on directional change\n&quot;
+  if !b.robust    #  PTmeth == 1
+    printf &quot;\nMethod: Correlation approach using asymptotic VCV.\n&quot;
+  elif b.robust == 1  # PTmeth == 2
+    printf &quot;\nMethod: Regression approach using HAC robust VCV.\n&quot;
+  endif
+  printf &quot;H0: y(t) and x(t) are distributed independently \n&quot;
+  printf &quot;Test stat.: %.4f\n&quot;, test
+  printf &quot;p-value:   %.4f\n&quot;, pval
+  printf &quot;***********************************************\n&quot;
+endif
+b.PTstat = test
+b.PTpval = pval
+</code>
+</gretl-function>
+<gretl-function name="doCGtest" type="void">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code># consolidating all CG test variants
+/* Computes both Campbell &amp; Ghysels sign and signed rank
+(Wilcoxon-type) nonparam. statistics, going back to Campbell &amp; Dufour who also showed that in
+general it's not exactly identical to a Wilcoxon test, but the distribution of the test stat is identical.
+# series E: series of forecast errors
+# int k: Lag at which to construct the cross product
+# series CGX: variables for orthogonality test (optional)
+# plain test: H0: Median of E = 0, H1: Median of E != 0
+# other variants: substitute E with a cross-product
+# Additional assumption that E is symmetric about 0 under the null
+*/
+matrix mE = {b.E}
+# apply defaults
+if !inbundle(b, &quot;k&quot;) 	# default: test unbiasedness
+  b.k = 0				# means no test for lag effects
+elif b.k &lt; 0 || (b.k != int(b.k))
+  funcerr &quot;lag number k must be non-negative integer&quot;
+endif
+scalar k = b.k	 # (scalar treated by gretl as 1x1 matrix, should be OK)
+if !k &amp;&amp; inbundle(b, &quot;CGX&quot;)
+  print &quot;You provide X [CGX] but set k=0 (lag order).&quot;
+  print &quot;Please set k&gt;0 for running the orthogonality test.&quot;
+  print &quot;(And make sure the CGX themselves are given without lags.)&quot;
+  funcerr &quot;X [CGX] together with k == 0 impossible.&quot;
+elif inbundle(b, &quot;CGX&quot;)
+  matrix mCGX = {b.CGX}
+  if rows(mE) != rows(mCGX)
+    print &quot; (Error, possible reason: give CGX directly&quot;
+    print &quot;  and use k for lag specification.)&quot;
+    funcerr &quot;sample mismatch X (CGX)&quot;
+  endif
+endif
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+if inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;)
+  series E = b.y - b.fc
+  if !inbundle(b, &quot;E&quot;)
+    series b.E = E # copy for use in backend functions
+  endif
+elif inbundle(b, &quot;E&quot;)
+  series E = b.E
+else
+  funcerr &quot;Suitable input missing.&quot;
+endif
+# Either test on (a) unbiasedness, (b) serial correlation,
+# or (c) orthogonality
+if !inbundle(b, &quot;CGX&quot;)
+  # no exogenous/orthogonality terms
+  matrices testout = CamDufStats(mE, k)
+else
+  # orthogonality test, with recursive median recentering
+  matrices testout = CamDufStats(mE ~ mCGX, k, 1)
+endif
+### process results
+scalar T = testout[4][1]
+## sign test
+scalar b.CGSIGNstat = testout[1][1,1]
+# Binomial dist
+if b.CGSIGNstat &lt; (T + 1) / 2 # left tail of the distribution
+  temp = pvalue(B, 0.5, T, b.CGSIGNstat)
+  # (gretl does &gt; x, not &gt;= x here!)
+  b.CGSIGNpval = 2 * (1 - temp) # because of symmetry under p=0.5
+else	# right tail
+  # (force X &gt;= x by passing x' = x-1, since gretl does &gt; x)
+  b.CGSIGNpval = 2 * pvalue(B, 0.5, T, b.CGSIGNstat - 1)
+  # (again, because of symmetry)
+endif
+## signed rank test
+if !inbundle(b, &quot;CGX&quot;) # serial correlation, or unbiasedness
+  # here we can use the standard variant
+  scalar b.CGWILCstat = testout[3][1,1]
+else	# orthogonality test
+  #... must use Campbell&amp;Dufour's special signed-rank variant
+  # (we argue that strict exogeneity is very unrealistic)
+  scalar b.CGWILCstat = testout[2][1,1]
+endif
+## p-value calc with functions from extra
+err = loadextra()
+if !err
+  if b.CGWILCstat &lt; (T * (T + 1) / 2 / 2) # left tail
+    # (force X &gt; x by passing x' = x+1 since this func does &gt;= x)
+    temp = WSRpvalue(T, b.CGWILCstat + 1)
+    b.CGWILCpval = 2 * (1 - temp) # because of symmetry
+  else # right tail
+    # (this func does X &gt;= x)
+    b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
+  endif
+else	# extra.gfn package not available/loadable
+  scalar b.CGWILCpval = NA
+endif
+if b.verb
+  CGprint(&amp;b)	# (lives in FEP_private.inp)
+endif
 </code>
 </gretl-function>
 <gretl-function name="doDMtest" type="void">
@@ -578,216 +802,43 @@ if b.verb == 1
 endif
 </code>
 </gretl-function>
-<gretl-function name="doMZtest" type="void">
+<gretl-function name="doCWtest" type="void">
  <params count="1">
   <param name="b" type="bundleref"/>
  </params>
-<code># Intercept automatically added
-# series y = actual realizations
-# series fc = forecast values
-# apply default
-if !inbundle(b, nboot)
-  b.nboot = 0
+<code># All: b.y, b.fhor
+# (The horizon fhor is only needed to decide whether an
+#	[H]AC std. error should be used; for fhor &gt; 1.)
+# Model 1: b.f1, parsimonious model
+# Model 2: b.f2, larger nesting model
+if !inbundle(b, &quot;fhor&quot;)
+  b.fhor = 1	# default 1-step horizon (tau in CW)
 endif
-if !inbundle(b, &quot;robust&quot;)
-  scalar b.robust = 0
-endif
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
-# acommodate old variant
-if inbundle(b, &quot;strrob&quot;)
-  string strrob = b.strrob
+series e1 = b.y - b.f1
+series e2 = b.y - b.f2
+smpl e1 e2 --no-missing
+series fhathalf = e1 * (e1 - e2) # equiv. to eq 2.1 hopefully
+if b.fhor == 1
+  ols fhathalf const --quiet
 else
-  string strrob = (b.robust == 1) ? &quot;--robust&quot; : &quot;&quot;
+  set force_hc off	# ensure AC-consistency, not just HC
+  ols fhathalf const --robust --quiet
 endif
-series fc = b.fc
-series y = b.y
-Rmat = {1,0;0,1}
-qvec = {0,1}'
-if b.nboot &gt; 0
-  set bootrep b.nboot
-  string strboot = &quot;--bootstrap&quot;
-else
-  string strboot = &quot;&quot;
-endif
-ols y const fc @strrob --quiet
-catch restrict @strboot --silent
-  R = Rmat
-  q = qvec
-end restrict
-if $error
-  catch restrict --silent
-    R = Rmat
-    q = qvec
-  end restrict
-endif
-if b.verb == 1
-  printf &quot;\n***********************************************\n&quot;
-  printf &quot;*** Mincer &amp; Zarnowitz test\n&quot;
-  printf &quot;*** on forecast unbiasedness\n&quot;
-  if !b.robust
-    printf &quot;\nMethod: Approach using asymptotic VCV.\n&quot;
-  elif b.robust == 1
-    printf &quot;\nMethod: Approach using HAC robust VCV.\n&quot;
-  endif
-  if b.nboot &gt; 0
-    printf &quot;Bootstrap p-value using %d iterations.\n&quot;, b.nboot
-  endif
-  printf &quot;H0: forecasts are unbiased\n&quot;
-  printf &quot;Test stat.: %.4f\n&quot;, $test
-  printf &quot;p-value:   %.4f\n&quot;, $pvalue
-  printf &quot;***********************************************\n&quot;
-endif
-b.MZstat = $test
-b.MZpval = $pvalue
-</code>
-</gretl-function>
-<gretl-function name="doPTtest" type="void">
- <params count="1">
-  <param name="b" type="bundleref"/>
- </params>
-<code># compatibility treatment:
-# PTmeth was old code for what is actually robustness: 1: not robust, 2: robust
-if inbundle(b, &quot;PTmeth&quot;)
-  print &quot;Warning: PTmeth is deprecated, use 'robust' (0/1)&quot;
-  if b.PTmeth == 1 || b.PTmeth == 2
-    scalar b.robust = b.PTmeth - 1
-  else
-    funcerr &quot;PTmeth can only be 1 or 2&quot;
-  endif
-endif
-# apply defaults
-if !inbundle(b, &quot;robust&quot;)
-  b.robust = 0
-endif
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
-series y = b.yup		# Binary of var. of actual ups
-series fc = b.fcup		# Binary of var. of forecasted ups
-smpl y fc --no-missing
-if rows(values(y)) &gt; 2 || rows(values(fc)) &gt; 2
-  printf &quot;*** Note: Running the Pesaran &amp; Timmermann test requires ***\n&quot;
-  printf &quot;*** that y and fc are both binary variables! Check again! *** \n&quot;
-  funcerr &quot;Check that y and fc are both binary variables.&quot;
-endif
-if !b.robust   # PTmeth == 1
-  scalar r = mcorr({y} ~ {fc})[1,2]
-  scalar T = nobs(y)
-  scalar test = sqrt(T) * r	# test stat. (Pesaran 2015, p. 399)
-  scalar pval = 2 * pvalue(z, abs(test))		# PT ~ N(0,1)
-elif b.robust == 1  # PTmeth == 2
-  ols y const fc --robust --quiet
-  scalar test = $coeff[2] / $stderr[2]
-  scalar pval = 2 * pvalue(t, $df, abs(test))
-else
-  print &quot;Warning: Invalid PTmeth input&quot;
-endif
-if b.verb == 1
-  printf &quot;\n***********************************************\n&quot;
-  printf &quot;*** Pesaran &amp; Timmermann (1992, 2006) test\n&quot;
-  printf &quot;*** on directional change\n&quot;
-  if !b.robust    #  PTmeth == 1
-    printf &quot;\nMethod: Correlation approach using asymptotic VCV.\n&quot;
-  elif b.robust == 1  # PTmeth == 2
-    printf &quot;\nMethod: Regression approach using HAC robust VCV.\n&quot;
-  endif
-  printf &quot;H0: y(t) and x(t) are distributed independently \n&quot;
-  printf &quot;Test stat.: %.4f\n&quot;, test
-  printf &quot;p-value:   %.4f\n&quot;, pval
-  printf &quot;***********************************************\n&quot;
-endif
-b.PTstat = test
-b.PTpval = pval
-</code>
-</gretl-function>
-<gretl-function name="doCGtest" type="void">
- <params count="1">
-  <param name="b" type="bundleref"/>
- </params>
-<code># consolidating all CG test variants
-/* Computes both Campbell &amp; Ghysels sign and signed rank
-(Wilcoxon-type) nonparam. statistics, going back to Campbell &amp; Dufour who also showed that in
-general it's not exactly identical to a Wilcoxon test, but the distribution of the test stat is identical.
-# series E: series of forecast errors
-# int k: Lag at which to construct the cross product
-# series CGX: variables for orthogonality test (optional)
-# plain test: H0: Median of E = 0, H1: Median of E != 0
-# other variants: substitute E with a cross-product
-# Additional assumption that E is symmetric about 0 under the null
-*/
-# apply defaults
-if !inbundle(b, &quot;k&quot;) 	# default: test unbiasedness
-  b.k = 0							# means no test for lag effects
-elif b.k &lt; 0 || (b.k != int(b.k))
-  funcerr &quot;lag number k must be non-negative integer&quot;
-endif
-scalar k = b.k	 # (scalar treated by gretl as 1x1 matrix, should be OK)
-if !k &amp;&amp; inbundle(b, &quot;CGX&quot;)
-  funcerr &quot;You provide X [CGX] but set k=0. Please set k&gt;0 for running the orthogonality test.&quot;
-endif
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
-if inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;)
-  series E = b.y - b.fc
-  if !inbundle(b, &quot;E&quot;)
-    series b.E = E # copy for use in backend functions
-  endif
-elif inbundle(b, &quot;E&quot;)
-  series E = b.E
-else
-  funcerr &quot;Suitable input missing.&quot;
-endif
-# Either test on (a) unbiasedness, (b) serial correlation,
-# or (c) orthogonality
-if !inbundle(b, &quot;CGX&quot;)
-  # no exogenous/orthogonality terms
-  matrices testout = CamDufStats({E}, k)
-else
-  # orthogonality test, with recursive median recentering
-  matrices testout = CamDufStats({E} ~ {b.CGX}, k, 1)
-endif
-### process results
-scalar T = testout[4][1]
-## sign test
-scalar b.CGSIGNstat = testout[1][1,1]
-# Binomial dist
-if b.CGSIGNstat &lt; (T + 1) / 2 # left tail of the distribution
-  temp = pvalue(B, 0.5, T, b.CGSIGNstat)
-  # (gretl does &gt; x, not &gt;= x here!)
-  b.CGSIGNpval = 2 * (1 - temp) # because of symmetry under p=0.5
-else	# right tail
-  # (force X &gt;= x by passing x' = x-1, since gretl does &gt; x)
-  b.CGSIGNpval = 2 * pvalue(B, 0.5, T, b.CGSIGNstat - 1)
-  # (again, because of symmetry)
-endif
-## signed rank test
-if !inbundle(b, &quot;CGX&quot;) # serial correlation, or unbiasedness
-  # here we can use the standard variant
-  scalar b.CGWILCstat = testout[3][1,1]
-else	# orthogonality test
-  #... must use Campbell&amp;Dufour's special signed-rank variant
-  # (we argue that strict exogeneity is very unrealistic)
-  scalar b.CGWILCstat = testout[2][1,1]
-endif
-## p-value calc with functions from extra
-err = loadextra()
-if !err
-  if b.CGWILCstat &lt; (T * (T + 1) / 2 / 2) # left tail
-    # (force X &gt; x by passing x' = x+1 since this func does &gt;= x)
-    temp = WSRpvalue(T, b.CGWILCstat + 1)
-    b.CGWILCpval = 2 * (1 - temp) # because of symmetry
-  else # right tail
-    # (this func does X &gt;= x)
-    b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
-  endif
-else	# extra.gfn package not available/loadable
-  scalar b.CGWILCpval = NA
-endif
+# omit const  # doesn't work in gretl
+b.CWstat = $coeff(const) / $stderr(const)
+b.CWpval = pvalue(t, $df, b.CWstat) # one-sided test
 if b.verb
-  CGprint(&amp;b)	# (lives in FEP_private.inp)
+  printf &quot;\n***********************************************\n&quot;
+  printf &quot;*** Clark &amp; West (2006) test\n&quot;
+  printf &quot;*** on equal forecast accuracy in nested models\n&quot;
+  if b.fhor==0 &amp;&amp; b.verb
+    printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
+  endif
+  printf &quot;Forecast horizon: %d \n&quot;, b.fhor
+  printf &quot;H0: forecasts are equally accurate\n&quot;
+  printf &quot;Test stat.: %.4f\n&quot;, b.CWstat
+  printf &quot;p-value (t-distributed): %.4f\n&quot;, b.CWpval
+  printf &quot;***********************************************\n&quot;
 endif
 </code>
 </gretl-function>
@@ -1034,6 +1085,9 @@ elif b.code == &quot;GW&quot;
   else
     printf &quot;Sign of the mean of the loss is (+) -- 2nd model dominates\n&quot;
   endif
+elif b.code == &quot;CW&quot;	# Clark-West
+  print &quot;FIXME: The null hypothesis is... the smaller model dominates...?&quot;
+  printf &quot;Test stat %g, p-value %g\n&quot;, b.CWstat, b.CWpval
 elif b.code == &quot;MZ&quot;
   if b.nboot
     printf &quot;(bootstrapped) &quot;
@@ -1066,10 +1120,10 @@ endif
 </gretl-function>
 <gretl-function name="GUI_FEP" type="bundle" pkg-role="gui-main">
  <params count="11">
-  <param name="which" type="int" min="1" max="9">
+  <param name="which" type="int" min="1" max="10">
 <description>Choose test</description>
-<labels count="9">
-"Mincer-Zarnowitz (MZ)" "Holden-Peel (HP)" "Diebold-Lopez (DL)" "Elliott-Komunjer-Timmermann (EKT)" "(Hanssen-) Kuiper score (KS)" "Pesaran-Timmermann (PT)" "Campbell-Ghysels (CG)" "Diebold-Mariano (DM)" "Giacomini-White (GW)" </labels>
+<labels count="10">
+"Mincer-Zarnowitz (MZ)" "Holden-Peel (HP)" "Diebold-Lopez (DL)" "Elliott-Komunjer-Timmermann (EKT)" "(Hanssen-) Kuiper score (KS)" "Pesaran-Timmermann (PT)" "Campbell-Ghysels (CG)" "Diebold-Mariano (DM)" "Giacomini-White (GW)" "Clark-West (CW)" </labels>
   </param>
   <param name="realiz" type="series">
 <description>Realizations</description>
@@ -1078,7 +1132,7 @@ endif
 <description>Forecasts</description>
   </param>
   <param name="flexarg" type="int" min="0" default="0">
-<description>bootrep (MZ,HP) / horizon (DM,GW) / lag (CG)</description>
+<description>bootrep (MZ,HP) / horizon (DM,GW,CW) / lag (CG)</description>
   </param>
   <param name="robortype" type="int" min="0" max="1" default="0">
 <description>robust (MZ,HP,PT) / loss (DM,GW,EKT)</description>
@@ -1096,7 +1150,7 @@ endif
 "no details" "print details" </labels>
   </param>
   <param name="fc2" type="series" optional="true">
-<description>Alternative forecasts (DM,GW)</description>
+<description>Alternative forecasts (DM,GW,CW)</description>
   </param>
   <param name="shape" type="scalar" min="0" max="1" default="0.5">
 <description>Shape param (EKT)</description>
@@ -1110,12 +1164,12 @@ endif
  </params>
 <code>###
 # copy the choice to string code
-strings sarr = defarray(&quot;MZ&quot;,&quot;HP&quot;,&quot;DL&quot;,&quot;EKT&quot;,&quot;KS&quot;,&quot;PT&quot;,&quot;CG&quot;,&quot;DM&quot;,&quot;GW&quot;)
+strings sarr = defarray(&quot;MZ&quot;,&quot;HP&quot;,&quot;DL&quot;,&quot;EKT&quot;,&quot;KS&quot;,&quot;PT&quot;,&quot;CG&quot;,   &quot;DM&quot;,&quot;GW&quot;,&quot;CW&quot;)
 bundle b
 ## process args
 string b.code = sarr[which]
 # process realiz
-if b.code == &quot;KS&quot; || b.code == &quot;PT&quot;
+if b.code == &quot;KS&quot; || b.code == &quot;PT&quot; || b.code == &quot;DL&quot;
   series b.yup = realiz
 elif strlen(strstr(&quot;CG EKT&quot; , b.code))
   if exists(fc)	# expected case
@@ -1129,9 +1183,9 @@ else
 endif
 # process fc (and also fc2)
 if exists(fc)
-  if b.code == &quot;KS&quot; || b.code == &quot;PT&quot;
+  if b.code == &quot;KS&quot; || b.code == &quot;PT&quot; || b.code == &quot;DL&quot;
     series b.fcup = fc
-  elif b.code == &quot;DM&quot; || b.code == &quot;GW&quot;
+  elif b.code == &quot;DM&quot; || b.code == &quot;GW&quot; || b.code == &quot;CW&quot;
     if exists(fc2)
       series b.f1 = fc
       series b.f2 = fc2
@@ -1141,7 +1195,7 @@ if exists(fc)
   else
     series b.fc = fc
   endif
-elif strlen(strstr(&quot;DL HP MZ KS PT DM GW&quot;, b.code))	# and here: fc is null
+elif strlen(strstr(&quot;DL HP MZ KS PT DM GW CW&quot;, b.code))	# and here: fc is null
   funcerr &quot;Need forecast (fc) input!&quot;
 endif
 # process flexarg
@@ -1149,7 +1203,7 @@ if b.code == &quot;MZ&quot; || b.code == &quot;HP&quot;
   b.nboot = flexarg	# bootstrap replications
 elif b.code == &quot;CG&quot;
   b.k = flexarg	# lag at which to test
-elif b.code == &quot;DM&quot; || b.code == &quot;GW&quot;
+elif b.code == &quot;DM&quot; || b.code == &quot;GW&quot; || b.code == &quot;CW&quot;
   b.fhor = flexarg	# horizon
 endif
 # process robortype
@@ -1193,37 +1247,7 @@ GUI_FEP_print(&amp;b)	# new to accommodate removal of no-print
 return b
 </code>
 </gretl-function>
-<gretl-function name="doCGWILCtest" type="void">
- <params count="1">
-  <param name="b" type="bundleref"/>
- </params>
-<code>print &quot;Warning: The name doCGWILCtest is deprecated, use doCGtest&quot;
-doCGtest(&amp;b)
-# (old names b.CGWILCstat and b.CGWILCpval are still OK)
-</code>
-</gretl-function>
-<gretl-function name="doCGRANKtest" type="void">
- <params count="1">
-  <param name="b" type="bundleref"/>
- </params>
-<code># This name was misleading, despite &quot;RANK&quot; it was actually
-# calculating the sign test!
-print &quot;Warning: The name doCGRANKtest is deprecated, use doCGtest&quot;
-doCGtest(&amp;b)
-# add old names for backwards compatibility:
-scalar b.CGRANKstat = b.CGSIGNstat
-scalar b.CGRANKpval = b.CGSIGNpval
-</code>
-</gretl-function>
-<gretl-function name="doKStest" type="void">
- <params count="1">
-  <param name="b" type="bundleref"/>
- </params>
-<code>print &quot;Warning: The name doKStest is deprecated, use doKS.&quot;
-doKS(&amp;b)
-</code>
-</gretl-function>
-<gretl-function name="doEKTtest" type="void">
+<gretl-function name="doEKTtest_matrix" type="void">
  <params count="1">
   <param name="b" type="bundleref"/>
  </params>
@@ -1370,17 +1394,6 @@ else
 endif
 </code>
 </gretl-function>
-<gretl-function name="doKGtest" type="void">
- <params count="1">
-  <param name="b" type="bundleref"/>
- </params>
-<code>print &quot;Warning: The name doKGtest is deprecated, use doHPtest.&quot;
-doHPtest(&amp;b)
-# add old names for backwards compatibility:
-scalar b.KGstat = b.HPstat
-scalar b.KGpval = b.HPpval
-</code>
-</gretl-function>
 <gretl-function name="CamDufStats" type="matrices">
  <params count="3">
   <param name="mdat" type="matrix"/>
@@ -1505,16 +1518,16 @@ return defarray(Sg, SRg, Wg, effTs)
   <param name="which" type="string" const="true"/>
  </params>
 <code>printf &quot;Test choice: %s\n&quot;, which
-if (which==&quot;DM&quot; || which==&quot;GW&quot; || which==&quot;HP&quot; || which==&quot;MZ&quot;) &amp;&amp; !inbundle(b, &quot;y&quot;)
+if (which==&quot;DM&quot; || which==&quot;GW&quot; || which==&quot;HP&quot; || which==&quot;MZ&quot; || which == &quot;CW&quot;)   &amp;&amp; !inbundle(b, &quot;y&quot;)
   funcerr &quot;Series of realizations 'y' is missing.&quot;
   # Strictly speaking: also need to check type of y
 elif (which==&quot;HP&quot; || which==&quot;MZ&quot;) &amp;&amp; !inbundle(b, &quot;fc&quot;)
   funcerr &quot;Series of forecasts values 'fc' is missing.&quot;
 elif (which==&quot;CG&quot; || which==&quot;EKT&quot;) &amp;&amp; !inbundle(b, &quot;E&quot;) &amp;&amp; ( !inbundle(b, &quot;y&quot;) || !inbundle(b, &quot;fc&quot;) )
   funcerr &quot;Both series of realizations 'y' and of forecasts 'fc' must be passed. (Or errors 'E'.)&quot;
-elif (which==&quot;DM&quot; || which==&quot;GW&quot;) &amp;&amp; !inbundle(b, &quot;f1&quot;)
+elif (which==&quot;DM&quot; || which==&quot;GW&quot; || which == &quot;CW&quot;) &amp;&amp; !inbundle(b, &quot;f1&quot;)
   funcerr &quot;Series of forecast values 'f1' is missing.&quot;
-elif (which==&quot;DM&quot; || which==&quot;GW&quot;) &amp;&amp; !inbundle(b, &quot;f2&quot;)
+elif (which==&quot;DM&quot; || which==&quot;GW&quot; || which == &quot;CW&quot;) &amp;&amp; !inbundle(b, &quot;f2&quot;)
   funcerr &quot;Series of forecast values 'f1' is missing.&quot;
 elif (which==&quot;DL&quot; || which==&quot;KS&quot; || which==&quot;PT&quot; || which==&quot;PS&quot;) &amp;&amp; !inbundle(b, &quot;yup&quot;)
   funcerr &quot;Binary indicator series of realizations 'yup' is missing.&quot;
@@ -1586,8 +1599,8 @@ printf &quot;********************************************************\n&quot;
  <params count="1">
   <param name="scode" type="string"/>
  </params>
-<code>strings codes = defarray(&quot;MZ&quot;,&quot;KG&quot;,&quot;DL&quot;,&quot;EKT&quot;,&quot;KS&quot;,&quot;PT&quot;, &quot;CGRANK&quot;,&quot;CGWILC&quot;,&quot;DM&quot;,&quot;GW&quot;, &quot;HP&quot;, &quot;PS&quot;, &quot;CG&quot;)
-strings fulls = defarray(&quot;Mincer-Zarnowitz (MZ)&quot;, &quot;Holden-Peel-Kirchgaessner (KG)&quot;, &quot;Diebold-Lopez (DL)&quot;, &quot;Elliott-Komunjer-Timmermann (EKT)&quot;, &quot;Kuiper score (KS)&quot;, &quot;Pesaran-Timmermann (PT)&quot;, &quot;Campbell-Ghysels rank sign (CGRANK)&quot;, &quot;Campbell-Ghysels Wilcoxon sign (CGWILC)&quot;, &quot;Diebold-Mariano (DM)&quot;, &quot;Giacomini-White (GW)&quot;, &quot;Holden-Peel (HP)&quot;, &quot;Probability Score (PS)&quot;, &quot;Campbell-Ghysels (CG)&quot;)
+<code>strings codes = defarray(&quot;MZ&quot;,&quot;KG&quot;,&quot;DL&quot;,&quot;EKT&quot;,&quot;KS&quot;,&quot;PT&quot;, &quot;CGRANK&quot;,&quot;CGWILC&quot;,&quot;DM&quot;,&quot;GW&quot;, &quot;HP&quot;, &quot;PS&quot;, &quot;CG&quot;, &quot;CW&quot;)
+strings fulls = defarray(&quot;Mincer-Zarnowitz (MZ)&quot;, &quot;Holden-Peel-Kirchgaessner (KG)&quot;, &quot;Diebold-Lopez (DL)&quot;, &quot;Elliott-Komunjer-Timmermann (EKT)&quot;, &quot;Kuiper score (KS)&quot;, &quot;Pesaran-Timmermann (PT)&quot;, &quot;Campbell-Ghysels rank sign (CGRANK)&quot;, &quot;Campbell-Ghysels Wilcoxon sign (CGWILC)&quot;, &quot;Diebold-Mariano (DM)&quot;, &quot;Giacomini-White (GW)&quot;, &quot;Holden-Peel (HP)&quot;, &quot;Probability Score (PS)&quot;, &quot;Campbell-Ghysels (CG)&quot;, &quot;Clark-West (CW)&quot;)
 loop i=1..nelem(codes) -q
   if scode == codes[i]
     return fulls[i]
@@ -1853,6 +1866,18 @@ b.cond = 1			# 0=un-, 1=conditional
 list b.z = fc(-2)	# conditioning variables
 #b.fhor = 1			# forecast horizon (default=1)
 applyFCtests(&amp;b, &quot;GW&quot;)
+print b
+
+#-------------
+# Clark &amp; West
+#-------------
+bundle b = null
+b.y = y
+b.f1 = fc			# Forecast from parsimonious model
+b.f2 = fc(-1)		# Forecast from the larger model that nests model 1
+b.verb = 1
+#b.fhor = 1			# forecast horizon (default=1)
+applyFCtests(&amp;b, &quot;CW&quot;)
 print b
 
 #------------------------------------
