@@ -544,7 +544,18 @@ general it's not exactly identical to a Wilcoxon test, but the distribution of t
 # other variants: substitute E with a cross-product
 # Additional assumption that E is symmetric about 0 under the null
 */
-matrix mE = {b.E}
+# handle various ways to provide the needed input
+if inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;)
+  series E = b.y - b.fc
+  if !inbundle(b, &quot;E&quot;)
+    series b.E = E # copy for use in backend functions
+  endif
+elif inbundle(b, &quot;E&quot;)
+  series E = b.E
+else
+  funcerr &quot;Suitable input missing.&quot;
+endif
+matrix mE = {E}
 # apply defaults
 if !inbundle(b, &quot;k&quot;) 	# default: test unbiasedness
   b.k = 0				# means no test for lag effects
@@ -567,16 +578,6 @@ elif inbundle(b, &quot;CGX&quot;)
 endif
 if !inbundle(b, &quot;verb&quot;)
   b.verb = 0
-endif
-if inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;)
-  series E = b.y - b.fc
-  if !inbundle(b, &quot;E&quot;)
-    series b.E = E # copy for use in backend functions
-  endif
-elif inbundle(b, &quot;E&quot;)
-  series E = b.E
-else
-  funcerr &quot;Suitable input missing.&quot;
 endif
 # Either test on (a) unbiasedness, (b) serial correlation,
 # or (c) orthogonality
@@ -1849,7 +1850,7 @@ b.f1 = fc		# FC 1 series
 b.f2 = fc(-1)	# FC 2 series
 b.loss = 2			# 1=&quot;U-shape&quot;, 2=&quot;V-shape&quot; 
 b.verb = 1
-#b.fhor = 1			# for small-sample corrected critical values (default=1)
+# b.fhor = 1			# for small-sample corrected critical values (default=1)
 applyFCtests(&amp;b, &quot;DM&quot;)
 print b
 
@@ -1864,7 +1865,7 @@ b.loss = 2			# 1=&quot;U-shape&quot; (default), 2=&quot;V-shape&quot;
 b.verb = 1
 b.cond = 1			# 0=un-, 1=conditional
 list b.z = fc(-2)	# conditioning variables
-#b.fhor = 1			# forecast horizon (default=1)
+# b.fhor = 1			# forecast horizon (default=1)
 applyFCtests(&amp;b, &quot;GW&quot;)
 print b
 
@@ -1874,9 +1875,11 @@ print b
 bundle b = null
 b.y = y
 b.f1 = fc			# Forecast from parsimonious model
-b.f2 = fc(-1)		# Forecast from the larger model that nests model 1
+b.f2 = fc + 0.1*fc(-1)    # Forecast from the larger model that nests model 1
+# (The test result here appears to be &quot;on the wrong&quot; side 
+# for a one-sided test...!?)
 b.verb = 1
-#b.fhor = 1			# forecast horizon (default=1)
+# b.fhor = 1			# forecast horizon (default=1)
 applyFCtests(&amp;b, &quot;CW&quot;)
 print b
 

@@ -460,8 +460,20 @@ function void doCGtest (bundle *b)
 
        # Additional assumption that E is symmetric about 0 under the null
     */
+	
+	# handle various ways to provide the needed input
+	if inbundle(b, "y") && inbundle(b, "fc")
+        series E = b.y - b.fc
+        if !inbundle(b, "E")
+            series b.E = E # copy for use in backend functions
+        endif
+    elif inbundle(b, "E")
+        series E = b.E
+    else
+        funcerr "Suitable input missing."
+    endif
 
-	matrix mE = {b.E}
+	matrix mE = {E}
 
     # apply defaults
     if !inbundle(b, "k") 	# default: test unbiasedness
@@ -490,16 +502,6 @@ function void doCGtest (bundle *b)
 
     if !inbundle(b, "verb")
         b.verb = 0
-    endif
-    if inbundle(b, "y") && inbundle(b, "fc")
-        series E = b.y - b.fc
-        if !inbundle(b, "E")
-            series b.E = E # copy for use in backend functions
-        endif
-    elif inbundle(b, "E")
-        series E = b.E
-    else
-        funcerr "Suitable input missing."
     endif
 
     # Either test on (a) unbiasedness, (b) serial correlation,
