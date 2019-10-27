@@ -8,14 +8,15 @@
 
 include FEP_private.inp
 include FEP_public.inp
-include FEP_tests.inp # also public functions in there
+include FEP_tests_individual.inp # also public functions in there
+include FEP_tests_other.inp
 include FEP_wrappers.inp # also public functions in there
 
 
 # --------------------------------------
 
 function bundle GUI_FEP(
-    int which[1:9:] "Choose test" \
+    int which[1:10:] "Choose test" \
                         {"Mincer-Zarnowitz (MZ)",
       "Holden-Peel (HP)",
       "Diebold-Lopez (DL)",
@@ -24,30 +25,32 @@ function bundle GUI_FEP(
       "Pesaran-Timmermann (PT)",
       "Campbell-Ghysels (CG)",
       "Diebold-Mariano (DM)",
-      "Giacomini-White (GW)"},
+      "Giacomini-White (GW)",
+	  "Clark-West (CW)"},
 
       series realiz "Realizations",
       series fc[null] "Forecasts",
-      int flexarg[0::0] "bootrep (MZ,HP) / horizon (DM,GW) / lag (CG)",
+      int flexarg[0::0] "bootrep (MZ,HP) / horizon (DM,GW,CW) / lag (CG)",
       int robortype[0:1:0] "robust (MZ,HP,PT) / loss (DM,GW,EKT)" \
       {"standard /U-shape", "robust /V-shape"},
       int cond[0:1:0] "conditional predictive ability (GW)" \
       {"unconditional", "conditional"},
       int verbosity[0:1:0] "Verbosity" {"no details", "print details"},
-      series fc2[null] "Alternative forecasts (DM,GW)",
+      series fc2[null] "Alternative forecasts (DM,GW,CW)",
       scalar shape[0:1:0.5] "Shape param (EKT)",
       list zli[null] "info set (HP,GW), instr (EKT), further (CG)",
       string lossdraw[null] "Actual path, or 'no' or 'display' (EKT)"  )
 
     ###
     # copy the choice to string code
-    strings sarr = defarray("MZ","HP","DL","EKT","KS","PT","CG","DM","GW")
+    strings sarr = defarray("MZ","HP","DL","EKT","KS","PT","CG", \
+		"DM","GW","CW")
 
     bundle b
     ## process args
     string b.code = sarr[which]
     # process realiz
-    if b.code == "KS" || b.code == "PT"
+    if b.code == "KS" || b.code == "PT" || b.code == "DL"
         series b.yup = realiz
 
     elif strlen(strstr("CG EKT" , b.code))
@@ -64,9 +67,9 @@ function bundle GUI_FEP(
 
     # process fc (and also fc2)
     if exists(fc)
-        if b.code == "KS" || b.code == "PT"
+        if b.code == "KS" || b.code == "PT" || b.code == "DL"
             series b.fcup = fc
-        elif b.code == "DM" || b.code == "GW"
+        elif b.code == "DM" || b.code == "GW" || b.code == "CW"
             if exists(fc2)
                 series b.f1 = fc
                 series b.f2 = fc2
@@ -78,7 +81,7 @@ function bundle GUI_FEP(
             series b.fc = fc
         endif
 
-    elif strlen(strstr("DL HP MZ KS PT DM GW", b.code))	# and here: fc is null
+    elif strlen(strstr("DL HP MZ KS PT DM GW CW", b.code))	# and here: fc is null
         funcerr "Need forecast (fc) input!"
     endif
 
@@ -89,7 +92,7 @@ function bundle GUI_FEP(
     elif b.code == "CG"
         b.k = flexarg	# lag at which to test
 
-    elif b.code == "DM" || b.code == "GW"
+    elif b.code == "DM" || b.code == "GW" || b.code == "CW"
         b.fhor = flexarg	# horizon
     endif
 
@@ -137,7 +140,6 @@ function bundle GUI_FEP(
     endif
     b.a0 = shape # EKT only
 
-    # call the function
     applyFCtests(&b, b.code)
 
     GUI_FEP_print(&b)	# new to accommodate removal of no-print
@@ -152,7 +154,6 @@ function void GUI_FEP_print(bundle *b)
     printf "Your choice: %s test\n", fullname(b.code)
 
     if b.code == "KS"
-        # printf "*** Kuipers Score ***\n"
         printf "Hit Rate        = %.3f\n", b.KShit
         printf "False Alarm Rate = %.3f\n", b.KSfalse
         printf "Kuipers Score   = %.3f\n", b.KSstat
@@ -198,12 +199,16 @@ function void GUI_FEP_print(bundle *b)
         endif
         printf "(Loss function shape: %s)\n", shape
         printf "Test stat %g, p-value %g (chi^2-dist based)\n", b.GWstat, b.GWpval
-        if b.sign<0
+        if b.sign < 0
             printf "Sign of the mean of the loss is (-) -- 1st model dominates\n"
         else
             printf "Sign of the mean of the loss is (+) -- 2nd model dominates\n"
         endif
-        
+
+	elif b.code == "CW"	# Clark-West 
+		print "FIXME: The null hypothesis is... the smaller model dominates...?"
+		printf "Test stat %g, p-value %g\n", b.CWstat, b.CWpval
+
     elif b.code == "MZ"
         if b.nboot
             printf "(bootstrapped) "
@@ -214,10 +219,10 @@ function void GUI_FEP_print(bundle *b)
         printf "Test stat %g (p-value %g)\n", b.MZstat, b.MZpval
 
     elif b.code == "PT"
-        if !b.robust
-            print "(Regression approach using asymptotic VCV.)"
-        elif b.robust
+        if b.robust
             print "(Regression approach using HAC robust VCV.)"
+        else
+            print "(Regression approach using asymptotic VCV.)"
         endif
         print "H0: y(t) and x(t) are distributed independently"
         printf "Test stat %.4f (p-value: %.4f)\n", b.PTstat, b.PTpval

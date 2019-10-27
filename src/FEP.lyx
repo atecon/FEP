@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.21, August 2019
+ version 2.3, October 2019
 \end_layout
 
 \begin_layout Abstract
@@ -567,7 +567,7 @@ Campbell-Ghysels sign or signed rank (Wilcoxon type) tests for unbiasedness
 \begin_inset Text
 
 \begin_layout Plain Layout
-doEKTtest_series()
+doEKTtest()
 \end_layout
 
 \end_inset
@@ -3889,8 +3889,8 @@ can be between 0 and 1 (non-integer, default 0.5).
 \begin_layout Plain Layout
 
 \size small
-*: EKT refers to the doEKTtest_series() variant.
- For the matrix-based variant doEKTtest() see the source code.
+*: EKT refers to the doEKTtest() variant.
+ For the matrix-based variant doEKTtest_matrix() see the source code.
 \end_layout
 
 \end_inset
@@ -12515,6 +12515,50 @@ status open
 Changelog
 \end_layout
 
+\begin_layout Itemize
+version 2.3 (October 2019)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Implement experimental version of Clark-West test on equal predictive accuracy
+ of nested models.
+\end_layout
+
+\begin_layout Itemize
+As previously announced, rename doEKTtest_series to doEKTtest and doEKTtest
+ to doEKTtest_matrix to harmonize the interfaces.
+ This is backwards-incompatible, but the minimal needed change is to follow
+ the renaming to doEKTtest_matrix (or adapt your used interface).
+\end_layout
+
+\begin_layout Itemize
+remove several deprecated aliases: doCGWILCtest (use: doCGtest), doCGRANKtest
+ (use: doCGtest), doKStest (use: doKS), doKGtest (use: doHPtest)
+\end_layout
+
+\begin_layout Itemize
+Remove deprecated compatibility handling of y and fc in doDLtest.
+ (Need to use the documented labels 
+\begin_inset Quotes eld
+\end_inset
+
+yup
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+fcup
+\begin_inset Quotes erd
+\end_inset
+
+.)
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 version 2.21 (August 2019)
 \end_layout

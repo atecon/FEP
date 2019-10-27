@@ -88,7 +88,7 @@ b.f1 = fc		# FC 1 series
 b.f2 = fc(-1)	# FC 2 series
 b.loss = 2			# 1="U-shape", 2="V-shape" 
 b.verb = 1
-#b.fhor = 1			# for small-sample corrected critical values (default=1)
+# b.fhor = 1			# for small-sample corrected critical values (default=1)
 applyFCtests(&b, "DM")
 print b
 
@@ -103,8 +103,22 @@ b.loss = 2			# 1="U-shape" (default), 2="V-shape"
 b.verb = 1
 b.cond = 1			# 0=un-, 1=conditional
 list b.z = fc(-2)	# conditioning variables
-#b.fhor = 1			# forecast horizon (default=1)
+# b.fhor = 1			# forecast horizon (default=1)
 applyFCtests(&b, "GW")
+print b
+
+#-------------
+# Clark & West
+#-------------
+bundle b = null
+b.y = y
+b.f1 = fc			# Forecast from parsimonious model
+b.f2 = fc + 0.1*fc(-1)    # Forecast from the larger model that nests model 1
+# (The test result here appears to be "on the wrong" side 
+# for a one-sided test...!?)
+b.verb = 1
+# b.fhor = 1			# forecast horizon (default=1)
+applyFCtests(&b, "CW")
 print b
 
 #------------------------------------
