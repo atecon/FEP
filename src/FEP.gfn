@@ -145,14 +145,14 @@ if $error
     q = qvec
   end restrict
 endif
-if b.verb == 1
+if b.verb
   printf &quot;\n***********************************************\n&quot;
   printf &quot;*** Holden &amp; Peel test\n&quot;
   printf &quot;*** on forecast efficiency\n&quot;
-  if !b.robust
-    printf &quot;\nMethod: Approach using asymptotic VCV.\n&quot;
-  elif b.robust == 1
+  if b.robust
     printf &quot;\nMethod: Approach using HAC robust VCV.\n&quot;
+  else
+    printf &quot;\nMethod: Approach using asymptotic VCV.\n&quot;
   endif
   if b.nboot &gt; 0
     printf &quot;Bootstrap p-value using %d iterations.\n&quot;, b.nboot
@@ -436,14 +436,14 @@ if $error
     q = qvec
   end restrict
 endif
-if b.verb == 1
+if b.verb
   printf &quot;\n***********************************************\n&quot;
   printf &quot;*** Mincer &amp; Zarnowitz test\n&quot;
   printf &quot;*** on forecast unbiasedness\n&quot;
-  if !b.robust
-    printf &quot;\nMethod: Approach using asymptotic VCV.\n&quot;
-  elif b.robust == 1
+  if b.robust
     printf &quot;\nMethod: Approach using HAC robust VCV.\n&quot;
+  else
+    printf &quot;\nMethod: Approach using asymptotic VCV.\n&quot;
   endif
   if b.nboot &gt; 0
     printf &quot;Bootstrap p-value using %d iterations.\n&quot;, b.nboot
@@ -482,7 +482,7 @@ if rows(values(y)) &gt; 2 || rows(values(fc)) &gt; 2
   printf &quot;*** that y and fc are both binary variables! Check again! *** \n&quot;
   funcerr &quot;Check that y and fc are both binary variables.&quot;
 endif
-if !b.robust   # PTmeth == 1
+if b.robust == 0  # PTmeth == 1
   scalar r = mcorr({y} ~ {fc})[1,2]
   scalar T = nobs(y)
   scalar test = sqrt(T) * r	# test stat. (Pesaran 2015, p. 399)
@@ -494,14 +494,14 @@ elif b.robust == 1  # PTmeth == 2
 else
   print &quot;Warning: Invalid PTmeth input&quot;
 endif
-if b.verb == 1
+if b.verb
   printf &quot;\n***********************************************\n&quot;
   printf &quot;*** Pesaran &amp; Timmermann (1992, 2006) test\n&quot;
   printf &quot;*** on directional change\n&quot;
-  if !b.robust    #  PTmeth == 1
-    printf &quot;\nMethod: Correlation approach using asymptotic VCV.\n&quot;
-  elif b.robust == 1  # PTmeth == 2
+  if b.robust    #  PTmeth == 2
     printf &quot;\nMethod: Regression approach using HAC robust VCV.\n&quot;
+  else			# PTmeth == 1
+    printf &quot;\nMethod: Correlation approach using asymptotic VCV.\n&quot;
   endif
   printf &quot;H0: y(t) and x(t) are distributed independently \n&quot;
   printf &quot;Test stat.: %.4f\n&quot;, test
