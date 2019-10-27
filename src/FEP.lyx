@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.3, September 2019
+ version 2.3, October 2019
 \end_layout
 
 \begin_layout Abstract
@@ -12516,10 +12516,15 @@ Changelog
 \end_layout
 
 \begin_layout Itemize
-version 2.3 (September 2019)
+version 2.3 (October 2019)
 \end_layout
 
 \begin_deeper
+\begin_layout Itemize
+Implement experimental version of Clark-West test on equal predictive accuracy
+ of nested models.
+\end_layout
+
 \begin_layout Itemize
 As previously announced, rename doEKTtest_series to doEKTtest and doEKTtest
  to doEKTtest_matrix to harmonize the interfaces.
