@@ -94,15 +94,11 @@ doEKTtest_matrix(&amp;b)
  </params>
 <code># renamed from KG (Kirchgaessner) at v2.0
 # apply defaults
-if !inbundle(b, &quot;robust&quot;)
-  scalar b.robust = 0
-endif
+set_robust_flag(&amp;b)
 if !inbundle(b, &quot;nboot&quot;)
   b.nboot = 0
 endif
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
+set_verbatim_flag(&amp;b)
 # acommodate old variant
 if inbundle(b, &quot;strrob&quot;)
   string strrob = b.strrob
@@ -132,7 +128,6 @@ scalar nv = 2 + nelem(Z)
 matrix Rmat = I(nv)
 matrix qvec = zeros(nv,1)
 qvec[2] = 1
-# nboot = b.nboot
 if b.nboot &gt; 0
   set bootrep b.nboot
   string strboot = &quot;--bootstrap&quot;
@@ -249,9 +244,7 @@ if rows(values(y)) &gt; 2 || rows(values(fc)) &gt; 2
   printf &quot;*** yup and fcup are both binary variables! Check again! *** \n&quot;
   funcerr &quot;Check that y and fc are both binary variables!&quot;
 endif
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
+set_verbatim_flag(&amp;b)
 /* Artur's version
 # M has the form:
 # 		 | Up (Y=1) Down (Y=0)
@@ -410,18 +403,12 @@ return loss
   <param name="b" type="bundleref"/>
  </params>
 <code># Intercept automatically added
-# series y = actual realizations
-# series fc = forecast values
 # apply default
 if !inbundle(b, nboot)
   b.nboot = 0
 endif
-if !inbundle(b, &quot;robust&quot;)
-  scalar b.robust = 0
-endif
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
+set_robust_flag(&amp;b)
+set_verbatim_flag(&amp;b)
 # acommodate old variant
 if inbundle(b, &quot;strrob&quot;)
   string strrob = b.strrob
@@ -485,12 +472,8 @@ if inbundle(b, &quot;PTmeth&quot;)
   endif
 endif
 # apply defaults
-if !inbundle(b, &quot;robust&quot;)
-  b.robust = 0
-endif
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
+set_robust_flag(&amp;b)
+set_verbatim_flag(&amp;b)
 series y = b.yup		# Binary of var. of actual ups
 series fc = b.fcup		# Binary of var. of forecasted ups
 smpl y fc --no-missing
@@ -576,9 +559,7 @@ elif inbundle(b, &quot;CGX&quot;)
     funcerr &quot;sample mismatch X (CGX)&quot;
   endif
 endif
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
+set_verbatim_flag(&amp;b)
 # Either test on (a) unbiasedness, (b) serial correlation,
 # or (c) orthogonality
 if !inbundle(b, &quot;CGX&quot;)
@@ -1278,9 +1259,7 @@ endif
 if !inbundle(b, &quot;lossdraw&quot;)
   string b.lossdraw = &quot;no&quot;
 endif
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
+set_verbatim_flag(&amp;b)
 if !inbundle(b, &quot;a0&quot;)
   scalar b.a0 = 0.5
 endif
@@ -1303,8 +1282,8 @@ matrix a2 = meanc( iv .* (Y .&lt; 0) .* vMod )'	# k by 1
 # Initial value of S
 matrix sOLD = I(cols(iv))				# k by k
 scalar niter = 0
-nfail = 0
-failed = 0
+scalar nfail = 0
+scalar failed = 0
 loop while diffmax &gt; convcrit -q
   scalar err1 = 0
   try_invert(sOLD, &amp;err1)
@@ -1576,13 +1555,31 @@ else
 endif
 </code>
 </gretl-function>
+<gretl-function name="set_robust_flag" type="void" private="1">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code>/* For avoiding code duplicity. */
+if !inbundle(b, &quot;robust&quot;)
+  scalar b.robust = 0
+endif
+</code>
+</gretl-function>
+<gretl-function name="set_verbatim_flag" type="void" private="1">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code>/* For avoiding code duplicity. */
+if !inbundle(b, &quot;verb&quot;)
+  b.verb = 0
+endif
+</code>
+</gretl-function>
 <gretl-function name="CGprint" type="void" private="1">
  <params count="1">
   <param name="b" type="bundleref"/>
  </params>
-<code># helper function
-# string sType = (b.CGmeth == 1) ? &quot;sign test&quot; : &quot;signed-rank test&quot;
-printf &quot;********************************************************\n&quot;
+<code>printf &quot;********************************************************\n&quot;
 if !b.k &amp;&amp; !inbundle(b, &quot;CGX&quot;)
   printf &quot;You selected the test(s) of unbiasedness.\n&quot;
 elif !b.k &amp;&amp; inbundle(b, &quot;CGX&quot;)
@@ -1626,7 +1623,7 @@ funcerr &quot;Code scode didn't match anything&quot;
  </params>
 <code>matrix stat = DMstat / sqrt( (T+1-2*h+h*(h-1)/T)/T )
 matrix pv = 2*pvalue(t,(T-1),abs(stat))
-return pv #stat | pv
+return pv
 </code>
 </gretl-function>
 <gretl-function name="try_invert" type="void" private="1">

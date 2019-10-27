@@ -15,7 +15,6 @@ function void doEKTtest_matrix (bundle *b) # was doEKTtest
     # compatibility handling of non-harmonized earlier input
     if inbundle(b, "fcerrors") # new internal interface for wrapper func
         matrix Y = b.fcerrors
-
     elif inbundle(b, "y")
         if typestr(typeof(b.y)) = "matrix"	# old interface
             matrix Y = b.y # expects matrix / see help text (Sven)
@@ -31,9 +30,7 @@ function void doEKTtest_matrix (bundle *b) # was doEKTtest
     if !inbundle(b, "lossdraw")
         string b.lossdraw = "no"
     endif
-    if !inbundle(b, "verb")
-        b.verb = 0
-    endif
+    set_verbatim_flag(&b)
     if !inbundle(b, "a0")
         scalar b.a0 = 0.5
     endif
@@ -59,8 +56,8 @@ function void doEKTtest_matrix (bundle *b) # was doEKTtest
     # Initial value of S
     matrix sOLD = I(cols(iv))				# k by k
     scalar niter = 0
-    nfail = 0
-    failed = 0
+    scalar nfail = 0
+    scalar failed = 0
     loop while diffmax > convcrit -q
         scalar err1 = 0
         try_invert(sOLD, &err1)
@@ -159,15 +156,11 @@ function void doHPtest (bundle *b)
     # renamed from KG (Kirchgaessner) at v2.0
 
     # apply defaults
-    if !inbundle(b, "robust")
-        scalar b.robust = 0
-    endif
+    set_robust_flag(&b)
     if !inbundle(b, "nboot")
         b.nboot = 0
     endif
-    if !inbundle(b, "verb")
-        b.verb = 0
-    endif
+    set_verbatim_flag(&b)
 
     # acommodate old variant
     if inbundle(b, "strrob")
@@ -202,7 +195,6 @@ function void doHPtest (bundle *b)
     matrix Rmat = I(nv)
     matrix qvec = zeros(nv,1)
     qvec[2] = 1
-    # nboot = b.nboot
     if b.nboot > 0
         set bootrep b.nboot
         string strboot = "--bootstrap"
@@ -259,9 +251,8 @@ function void doDLtest (bundle *b)
         printf "*** yup and fcup are both binary variables! Check again! *** \n"
         funcerr "Check that y and fc are both binary variables!"
     endif
-    if !inbundle(b, "verb")
-        b.verb = 0
-    endif
+    set_verbatim_flag(&b)
+    
     /* Artur's version
        # M has the form:
        # 		 | Up (Y=1) Down (Y=0)
@@ -312,19 +303,13 @@ end function
 
 function void doMZtest (bundle *b)
     # Intercept automatically added
-    # series y = actual realizations
-    # series fc = forecast values
 
     # apply default
     if !inbundle(b, nboot)
         b.nboot = 0
     endif
-    if !inbundle(b, "robust")
-        scalar b.robust = 0
-    endif
-    if !inbundle(b, "verb")
-        b.verb = 0
-    endif
+    set_robust_flag(&b)
+    set_verbatim_flag(&b)
 
     # acommodate old variant
     if inbundle(b, "strrob")
@@ -394,12 +379,8 @@ function void doPTtest (bundle *b)
     endif
 
     # apply defaults
-    if !inbundle(b, "robust")
-        b.robust = 0
-    endif
-    if !inbundle(b, "verb")
-        b.verb = 0
-    endif
+    set_robust_flag(&b)
+    set_verbatim_flag(&b)
 
     series y = b.yup		# Binary of var. of actual ups
     series fc = b.fcup		# Binary of var. of forecasted ups
@@ -499,10 +480,7 @@ function void doCGtest (bundle *b)
 			funcerr "sample mismatch X (CGX)"
 		endif
     endif
-
-    if !inbundle(b, "verb")
-        b.verb = 0
-    endif
+    set_verbatim_flag(&b)
 
     # Either test on (a) unbiasedness, (b) serial correlation,
     # or (c) orthogonality
@@ -522,7 +500,6 @@ function void doCGtest (bundle *b)
 
     # Binomial dist
     if b.CGSIGNstat < (T + 1) / 2 # left tail of the distribution
-
         temp = pvalue(B, 0.5, T, b.CGSIGNstat)
         # (gretl does > x, not >= x here!)
         b.CGSIGNpval = 2 * (1 - temp) # because of symmetry under p=0.5
@@ -534,7 +511,6 @@ function void doCGtest (bundle *b)
     endif
 
     ## signed rank test
-
     if !inbundle(b, "CGX") # serial correlation, or unbiasedness
         # here we can use the standard variant
         scalar b.CGWILCstat = testout[3][1,1]

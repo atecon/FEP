@@ -79,10 +79,25 @@ function scalar loadextra(void)
     endif
 end function
 
+function void set_robust_flag (bundle *b)
+    /* For avoiding code duplicity. */
+
+    if !inbundle(b, "robust")
+        scalar b.robust = 0
+    endif
+end function
+
+function void set_verbatim_flag (bundle *b)
+    /* For avoiding code duplicity. */
+    
+    if !inbundle(b, "verb")
+        b.verb = 0
+    endif
+end function
+
+    
 
 function void CGprint(bundle *b)
-    # helper function
-    # string sType = (b.CGmeth == 1) ? "sign test" : "signed-rank test"
     printf "********************************************************\n"
     if !b.k && !inbundle(b, "CGX")
         printf "You selected the test(s) of unbiasedness.\n"
@@ -139,7 +154,7 @@ function matrix HLN (scalar DMstat "Diebold-Mariano test statistics",
                      int h "Forecast horizon")
     matrix stat = DMstat / sqrt( (T+1-2*h+h*(h-1)/T)/T )
     matrix pv = 2*pvalue(t,(T-1),abs(stat))
-    return pv #stat | pv
+    return pv
 end function
 
 function void try_invert (matrix m,
