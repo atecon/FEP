@@ -459,7 +459,6 @@ function void doCGtest (bundle *b)
     # apply defaults
     if !inbundle(b, "k") 	# default: test unbiasedness
         b.k = 0				# means no test for lag effects
-
     elif b.k < 0 || (b.k != int(b.k))
         funcerr "lag number k must be non-negative integer"
     endif
