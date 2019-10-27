@@ -1,19 +1,15 @@
-# FEP_wrappers.inp
-
 function void doEKTtest(bundle *b)	# was doEKTtest_series
-  
+
     # A wrapper that turns some series elements into matrices,
-      # as expected by doEKTtest.
+    # as expected by doEKTtest.
     # Since the matrix x for doEKTtest can be n-dim (I think),
-      # the corresponding input will be a list. 
-  
+    # the corresponding input will be a list.
+
     # apply default value
     if !inbundle(b, "lossdraw")
         string b.lossdraw = "no"
     endif
-    if !inbundle(b, "verb")
-        b.verb = 0
-    endif
+    set_verbatim_flag(&b)
 
     if inbundle(b, "E")
         if typestr(typeof(b.E)) == "series"
@@ -24,21 +20,21 @@ function void doEKTtest(bundle *b)	# was doEKTtest_series
     else
         funcerr "Suitable input missing."
     endif
-      
+
     matrix b.fcerrors = {sertemp}
     matrix b.x = {b.z}			# z should be a list -> TODO: Shall we test this?
 
     if rows(b.fcerrors) != rows(b.x)
         funcerr "Obs of forecasts and instruments don't match."
     endif
-  
+
     doEKTtest_matrix(&b)
 end function
 
 
 function void doPS (bundle *b)
     # wrap the probscore(function) for bundle/series use
-  
+
     if !inbundle(b, "yup") || !inbundle(b, "pfc")
         funcerr "Suitable input missing"
     endif

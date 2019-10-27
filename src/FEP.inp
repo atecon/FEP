@@ -140,7 +140,6 @@ function bundle GUI_FEP(
     endif
     b.a0 = shape # EKT only
 
-    # call the function
     applyFCtests(&b, b.code)
 
     GUI_FEP_print(&b)	# new to accommodate removal of no-print
@@ -155,7 +154,6 @@ function void GUI_FEP_print(bundle *b)
     printf "Your choice: %s test\n", fullname(b.code)
 
     if b.code == "KS"
-        # printf "*** Kuipers Score ***\n"
         printf "Hit Rate        = %.3f\n", b.KShit
         printf "False Alarm Rate = %.3f\n", b.KSfalse
         printf "Kuipers Score   = %.3f\n", b.KSstat
@@ -201,12 +199,12 @@ function void GUI_FEP_print(bundle *b)
         endif
         printf "(Loss function shape: %s)\n", shape
         printf "Test stat %g, p-value %g (chi^2-dist based)\n", b.GWstat, b.GWpval
-        if b.sign<0
+        if b.sign < 0
             printf "Sign of the mean of the loss is (-) -- 1st model dominates\n"
         else
             printf "Sign of the mean of the loss is (+) -- 2nd model dominates\n"
         endif
-        
+
 	elif b.code == "CW"	# Clark-West 
 		print "FIXME: The null hypothesis is... the smaller model dominates...?"
 		printf "Test stat %g, p-value %g\n", b.CWstat, b.CWpval
@@ -221,10 +219,10 @@ function void GUI_FEP_print(bundle *b)
         printf "Test stat %g (p-value %g)\n", b.MZstat, b.MZpval
 
     elif b.code == "PT"
-        if !b.robust
-            print "(Regression approach using asymptotic VCV.)"
-        elif b.robust
+        if b.robust
             print "(Regression approach using HAC robust VCV.)"
+        else
+            print "(Regression approach using asymptotic VCV.)"
         endif
         print "H0: y(t) and x(t) are distributed independently"
         printf "Test stat %.4f (p-value: %.4f)\n", b.PTstat, b.PTpval

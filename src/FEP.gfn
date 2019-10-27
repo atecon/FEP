@@ -68,9 +68,7 @@ b.KSmat = M
 if !inbundle(b, &quot;lossdraw&quot;)
   string b.lossdraw = &quot;no&quot;
 endif
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
+set_verbatim_flag(&amp;b)
 if inbundle(b, &quot;E&quot;)
   if typestr(typeof(b.E)) == &quot;series&quot;
     series sertemp = b.E  # fc error, series
@@ -80,8 +78,8 @@ elif inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;)
 else
   funcerr &quot;Suitable input missing.&quot;
 endif
-matrix b.fcerrors = {sertemp}	# new interface (Nov 2017)
-matrix b.x = {b.z}	# z should be a list
+matrix b.fcerrors = {sertemp}
+matrix b.x = {b.z}			# z should be a list -&gt; TODO: Shall we test this?
 if rows(b.fcerrors) != rows(b.x)
   funcerr &quot;Obs of forecasts and instruments don't match.&quot;
 endif
@@ -188,7 +186,7 @@ loop i = 1..nelem(testcodes) --quiet
   elif which == &quot;CG&quot;
     doCGtest(&amp;b)	# Campbell &amp; Ghysels
   elif which == &quot;EKT&quot;
-    alreadyEKT = 0
+    scalar alreadyEKT = 0
     if inbundle(b, &quot;y&quot;)
       # accomodate old-style interface with matrix
       if typestr(typeof(b.y)) == &quot;matrix&quot;
@@ -210,18 +208,6 @@ loop i = 1..nelem(testcodes) --quiet
     doPS(&amp;b)	# probability score
   elif which == &quot;CW&quot;	# Clark-West
     doCWtest(&amp;b)
-    # Now comes a compatibility layer with deprecated codes
-    /*
-  elif which == &quot;KG&quot; # ex Kirchgaessner, now HP
-    print &quot;KG deprecated... switch to HP soon...&quot;
-    doKGtest(&amp;b)	# call the wrapper to activate old bundle names
-  elif which == &quot;CGWILC&quot;
-    print &quot;CGWILC deprecated, switch to CG&quot;
-    doCGWILCtest(&amp;b)
-  elif which == &quot;CGRANK&quot;
-    print &quot;CGRANK deprecated, switch to CG&quot;
-    doCGRANKtest(&amp;b)
-    */
   endif
 endloop
 </code>
@@ -279,7 +265,7 @@ scalar info_fc = M[1,1]/r[1] + M[2,2]/r[2]	# &gt; 1 indicates some positive info
 scalar b.DLstat = chi_fc
 scalar b.DLinfo = info_fc		# Information value
 scalar b.DLpval = pvalue(x,1,chi_fc)
-if b.verb == 1
+if b.verb
   printf &quot;\n***********************************************\n&quot;
   printf &quot;*** Diebold &amp; Lopez test\n&quot;
   printf &quot;*** on directional change\n&quot;
@@ -616,15 +602,11 @@ endif
   <param name="b" type="bundleref"/>
  </params>
 <code># apply defaults
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
+set_verbatim_flag(&amp;b)
 if !inbundle(b, &quot;loss&quot;)
   b.loss = 1	# U-shape
 endif
-if !inbundle(b, &quot;fhor&quot;)
-  b.fhor = 1
-endif
+set_fhor_default(&amp;b)
 series e1 = b.y - b.f1
 series e2 = b.y - b.f2
 smpl e1 e2 --no-missing
@@ -648,16 +630,16 @@ b.DMstat = tstat
 b.pvaln = 2 * pvalue(z, abs(tstat))			# stand. normal
 b.pvalt = 2 * pvalue(t, ($T-1), abs(tstat))	# t-distribution
 b.DMpvalssc = HLN(tstat, $T, b.fhor)		# small-sample correction
-if b.verb == 1
+if b.verb
   printf &quot;\n***********************************************\n&quot;
   printf &quot;*** Diebold &amp; Mariano (1995) test\n&quot;
   printf &quot;*** on equal forecast accuracy\n&quot;
-  if b.fhor==0 &amp;&amp; b.verb==1
+  if b.fhor == 0
     printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
   endif
-  if b.loss==1
+  if b.loss == 1
     printf &quot;\nLoss: U-shape quadratic.\n&quot;
-  elif b.loss==2
+  elif b.loss == 2
     printf &quot;\nLoss: V-shape linear.\n&quot;
   endif
   printf &quot;Forecast horizon: %d \n&quot;, b.fhor
@@ -685,14 +667,13 @@ approach allows evaluation of the forecasting method, which includes the model, 
 procedure and the possible cond of estimation window.&quot;
 */
 # apply defaults
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
+set_verbatim_flag(&amp;b)
 if !inbundle(b, &quot;loss&quot;)
   b.loss = 1	# U-shape
 endif
-if !inbundle(b, &quot;fhor&quot;)
-  b.fhor = 1
+set_fhor_default(&amp;b)
+if b.fhor == 0
+  printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
 endif
 if !inbundle(b, &quot;cond&quot;)
   b.cond = 0	# 0: unconditional test
@@ -751,13 +732,10 @@ b.L = L										# series of loss differentials
 b.GWstat = tstat
 b.GWpval = pvalue(c,df,abs(tstat))     		# Chi^2 distributed
 b.sign = mean(L)
-if b.verb == 1
+if b.verb
   printf &quot;\n*********************************************\n&quot;
   printf &quot;*** Giacomini &amp; White (2006) test\n&quot;
   printf &quot;*** of conditional predictive ability\n&quot;
-  if b.fhor==0 &amp;&amp; b.verb==1
-    printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
-  endif
   if b.loss==1
     printf &quot;\nLoss: U-shape quadratic.\n&quot;
   elif b.loss==2
@@ -775,7 +753,7 @@ if b.verb == 1
   printf &quot;H0: forecasts are equally accurate\n&quot;
   printf &quot;Test stat.: %.4f\n&quot;, b.GWstat
   printf &quot;p-value (chi^2): %.4f\n&quot;, b.GWpval
-  if b.sign&lt;0
+  if b.sign &lt; 0
     printf &quot;Sign of the mean of the loss is (-) -- 1st model dominates\n&quot;
   else
     printf &quot;Sign of the mean of the loss is (+) -- 2nd model dominates\n&quot;
@@ -793,8 +771,9 @@ endif
 #	[H]AC std. error should be used; for fhor &gt; 1.)
 # Model 1: b.f1, parsimonious model
 # Model 2: b.f2, larger nesting model
-if !inbundle(b, &quot;fhor&quot;)
-  b.fhor = 1	# default 1-step horizon (tau in CW)
+set_fhor_default(&amp;b)	# default 1-step horizon (tau in CW)
+if b.fhor == 0
+  printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
 endif
 series e1 = b.y - b.f1
 series e2 = b.y - b.f2
@@ -813,9 +792,6 @@ if b.verb
   printf &quot;\n***********************************************\n&quot;
   printf &quot;*** Clark &amp; West (2006) test\n&quot;
   printf &quot;*** on equal forecast accuracy in nested models\n&quot;
-  if b.fhor==0 &amp;&amp; b.verb
-    printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
-  endif
   printf &quot;Forecast horizon: %d \n&quot;, b.fhor
   printf &quot;H0: forecasts are equally accurate\n&quot;
   printf &quot;Test stat.: %.4f\n&quot;, b.CWstat
@@ -829,11 +805,10 @@ endif
   <param name="b" type="bundleref"/>
  </params>
 <code># wrap the probscore(function) for bundle/series use
-if !inbundle(b, yup) || !inbundle(b, pfc)
+if !inbundle(b, &quot;yup&quot;) || !inbundle(b, &quot;pfc&quot;)
   funcerr &quot;Suitable input missing&quot;
 endif
 matrix ps = probscore({b.yup}, {b.pfc})
-# transfer results
 scalar b.qps = ps[1]
 scalar b.lps = ps[2]
 </code>
@@ -1021,7 +996,6 @@ end plot --output=&quot;@fpath&quot;
 <code># This refers to the bundle returned by GUI_FEP.
 printf &quot;Your choice: %s test\n&quot;, fullname(b.code)
 if b.code == &quot;KS&quot;
-  # printf &quot;*** Kuipers Score ***\n&quot;
   printf &quot;Hit Rate        = %.3f\n&quot;, b.KShit
   printf &quot;False Alarm Rate = %.3f\n&quot;, b.KSfalse
   printf &quot;Kuipers Score   = %.3f\n&quot;, b.KSstat
@@ -1062,7 +1036,7 @@ elif b.code == &quot;GW&quot;
   endif
   printf &quot;(Loss function shape: %s)\n&quot;, shape
   printf &quot;Test stat %g, p-value %g (chi^2-dist based)\n&quot;, b.GWstat, b.GWpval
-  if b.sign&lt;0
+  if b.sign &lt; 0
     printf &quot;Sign of the mean of the loss is (-) -- 1st model dominates\n&quot;
   else
     printf &quot;Sign of the mean of the loss is (+) -- 2nd model dominates\n&quot;
@@ -1079,10 +1053,10 @@ elif b.code == &quot;MZ&quot;
   endif
   printf &quot;Test stat %g (p-value %g)\n&quot;, b.MZstat, b.MZpval
 elif b.code == &quot;PT&quot;
-  if !b.robust
-    print &quot;(Regression approach using asymptotic VCV.)&quot;
-  elif b.robust
+  if b.robust
     print &quot;(Regression approach using HAC robust VCV.)&quot;
+  else
+    print &quot;(Regression approach using asymptotic VCV.)&quot;
   endif
   print &quot;H0: y(t) and x(t) are distributed independently&quot;
   printf &quot;Test stat %.4f (p-value: %.4f)\n&quot;, b.PTstat, b.PTpval
@@ -1223,7 +1197,6 @@ else
   string b.lossdraw = &quot;no&quot; # default
 endif
 b.a0 = shape # EKT only
-# call the function
 applyFCtests(&amp;b, b.code)
 GUI_FEP_print(&amp;b)	# new to accommodate removal of no-print
 return b
@@ -1498,7 +1471,7 @@ return defarray(Sg, SRg, Wg, effTs)
   <param name="which" type="string" const="true"/>
  </params>
 <code>printf &quot;Test choice: %s\n&quot;, which
-if (which==&quot;DM&quot; || which==&quot;GW&quot; || which==&quot;HP&quot; || which==&quot;MZ&quot; || which == &quot;CW&quot;)   &amp;&amp; !inbundle(b, &quot;y&quot;)
+if (which==&quot;DM&quot; || which==&quot;GW&quot; || which==&quot;HP&quot; || which==&quot;MZ&quot; || which == &quot;CW&quot;) &amp;&amp; !inbundle(b, &quot;y&quot;)
   funcerr &quot;Series of realizations 'y' is missing.&quot;
   # Strictly speaking: also need to check type of y
 elif (which==&quot;HP&quot; || which==&quot;MZ&quot;) &amp;&amp; !inbundle(b, &quot;fc&quot;)
@@ -1572,6 +1545,16 @@ endif
 <code>/* For avoiding code duplicity. */
 if !inbundle(b, &quot;verb&quot;)
   b.verb = 0
+endif
+</code>
+</gretl-function>
+<gretl-function name="set_fhor_default" type="void" private="1">
+ <params count="1">
+  <param name="b" type="bundleref"/>
+ </params>
+<code>/* For avoiding code duplicity. */
+if !inbundle(b, &quot;fhor&quot;)
+  b.fhor = 1
 endif
 </code>
 </gretl-function>

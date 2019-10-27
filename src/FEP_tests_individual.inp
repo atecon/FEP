@@ -1,5 +1,3 @@
-## FEP_tests_individual.inp
-
 function void doEKTtest_matrix (bundle *b) # was doEKTtest
     # Reference paper: Elliott, Komunjer, and Timmermann, 2005,
     # Estimation and Testing of Forecast Rationality under Flexible Loss,
@@ -58,6 +56,7 @@ function void doEKTtest_matrix (bundle *b) # was doEKTtest
     scalar niter = 0
     scalar nfail = 0
     scalar failed = 0
+
     loop while diffmax > convcrit -q
         scalar err1 = 0
         try_invert(sOLD, &err1)
@@ -252,7 +251,7 @@ function void doDLtest (bundle *b)
         funcerr "Check that y and fc are both binary variables!"
     endif
     set_verbatim_flag(&b)
-    
+
     /* Artur's version
        # M has the form:
        # 		 | Up (Y=1) Down (Y=0)
@@ -287,7 +286,7 @@ function void doDLtest (bundle *b)
     scalar b.DLstat = chi_fc
     scalar b.DLinfo = info_fc		# Information value
     scalar b.DLpval = pvalue(x,1,chi_fc)
-    if b.verb == 1
+    if b.verb
         printf "\n***********************************************\n"
         printf "*** Diebold & Lopez test\n"
         printf "*** on directional change\n"
@@ -395,7 +394,7 @@ function void doPTtest (bundle *b)
         scalar T = nobs(y)
         scalar test = sqrt(T) * r	# test stat. (Pesaran 2015, p. 399)
         scalar pval = 2 * pvalue(z, abs(test))		# PT ~ N(0,1)
-    else			  # PTmeth == 2
+    elif b.robust == 1  # PTmeth == 2
         ols y const fc --robust --quiet
         scalar test = $coeff[2] / $stderr[2]
         scalar pval = 2 * pvalue(t, $df, abs(test))
@@ -441,9 +440,9 @@ function void doCGtest (bundle *b)
 
        # Additional assumption that E is symmetric about 0 under the null
     */
-	
-	# handle various ways to provide the needed input
-	if inbundle(b, "y") && inbundle(b, "fc")
+
+    # handle various ways to provide the needed input
+    if inbundle(b, "y") && inbundle(b, "fc")
         series E = b.y - b.fc
         if !inbundle(b, "E")
             series b.E = E # copy for use in backend functions
@@ -454,7 +453,7 @@ function void doCGtest (bundle *b)
         funcerr "Suitable input missing."
     endif
 
-	matrix mE = {E}
+    matrix mE = {E}
 
     # apply defaults
     if !inbundle(b, "k") 	# default: test unbiasedness
@@ -465,19 +464,19 @@ function void doCGtest (bundle *b)
     scalar k = b.k	 # (scalar treated by gretl as 1x1 matrix, should be OK)
 
     if !k && inbundle(b, "CGX")
-		print "You provide X [CGX] but set k=0 (lag order)."
-		print "Please set k>0 for running the orthogonality test."
-		print "(And make sure the CGX themselves are given without lags.)"
+        print "You provide X [CGX] but set k=0 (lag order)."
+        print "Please set k>0 for running the orthogonality test."
+        print "(And make sure the CGX themselves are given without lags.)"
 
         funcerr "X [CGX] together with k == 0 impossible."
 
-	elif inbundle(b, "CGX")
-		matrix mCGX = {b.CGX}
-		if rows(mE) != rows(mCGX)
-			print " (Error, possible reason: give CGX directly"
-			print "  and use k for lag specification.)"
-			funcerr "sample mismatch X (CGX)"
-		endif
+    elif inbundle(b, "CGX")
+        matrix mCGX = {b.CGX}
+        if rows(mE) != rows(mCGX)
+            print " (Error, possible reason: give CGX directly"
+            print "  and use k for lag specification.)"
+            funcerr "sample mismatch X (CGX)"
+        endif
     endif
     set_verbatim_flag(&b)
 

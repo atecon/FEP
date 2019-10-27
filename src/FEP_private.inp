@@ -4,7 +4,7 @@ function void check_series_in_b (const bundle b, const string which)
     printf "Test choice: %s\n", which
 
     if (which=="DM" || which=="GW" || which=="HP" || which=="MZ" || which == "CW") \
-		&& !inbundle(b, "y")
+          && !inbundle(b, "y")
 
         funcerr "Series of realizations 'y' is missing."
         # Strictly speaking: also need to check type of y
@@ -13,7 +13,7 @@ function void check_series_in_b (const bundle b, const string which)
         funcerr "Series of forecasts values 'fc' is missing."
 
     elif (which=="CG" || which=="EKT") && !inbundle(b, "E") && \
-          ( !inbundle(b, "y") || !inbundle(b, "fc") ) 
+          ( !inbundle(b, "y") || !inbundle(b, "fc") )
         funcerr "Both series of realizations 'y' and of forecasts 'fc' must be passed. (Or errors 'E'.)"
 
     elif (which=="DM" || which=="GW" || which == "CW") && !inbundle(b, "f1")
@@ -89,13 +89,22 @@ end function
 
 function void set_verbatim_flag (bundle *b)
     /* For avoiding code duplicity. */
-    
+
     if !inbundle(b, "verb")
         b.verb = 0
     endif
 end function
 
-    
+
+function void set_fhor_default (bundle *b)
+    /* For avoiding code duplicity. */
+
+    if !inbundle(b, "fhor")
+        b.fhor = 1
+    endif
+end function
+
+
 
 function void CGprint(bundle *b)
     printf "********************************************************\n"
@@ -134,7 +143,7 @@ function string fullname(string scode)
       "Holden-Peel (HP)",
       "Probability Score (PS)",
       "Campbell-Ghysels (CG)",
-	  "Clark-West (CW)")
+      "Clark-West (CW)")
 
     loop i=1..nelem(codes) -q
         if scode == codes[i]
