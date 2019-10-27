@@ -13,81 +13,38 @@ function void doEKTtest(bundle *b)	# was doEKTtest_series
     endif
     if !inbundle(b, "verb")
         b.verb = 0
-    endif 
-  
+    endif
+
     if inbundle(b, "E")
         if typestr(typeof(b.E)) == "series"
             series sertemp = b.E  # fc error, series
         endif
     elif inbundle(b, "y") && inbundle(b, "fc")
-        series sertemp = b.y - b.fc # again fc error 
+        series sertemp = b.y - b.fc # again fc error
     else
         funcerr "Suitable input missing."
     endif
       
-    matrix b.fcerrors = {sertemp}	# new interface (Nov 2017)
-    matrix b.x = {b.z}	# z should be a list
-  
+    matrix b.fcerrors = {sertemp}
+    matrix b.x = {b.z}			# z should be a list -> TODO: Shall we test this?
+
     if rows(b.fcerrors) != rows(b.x)
         funcerr "Obs of forecasts and instruments don't match."
     endif
   
     doEKTtest_matrix(&b)
-  
 end function
 
-############
-/*
-function void doCGWILCtest (bundle *b)    
-    print "Warning: The name doCGWILCtest is deprecated, use doCGtest"
-    
-    doCGtest(&b)
-    # (old names b.CGWILCstat and b.CGWILCpval are still OK)    
-end function
-
-############
-
-function void doCGRANKtest (bundle *b)
-    # This name was misleading, despite "RANK" it was actually
-    # calculating the sign test!
-    
-    print "Warning: The name doCGRANKtest is deprecated, use doCGtest"       
-    doCGtest(&b)
-    
-    # add old names for backwards compatibility:  
-    scalar b.CGRANKstat = b.CGSIGNstat
-    scalar b.CGRANKpval = b.CGSIGNpval
-end function
-
-############
-
-function void doKStest (bundle *b)
-    print "Warning: The name doKStest is deprecated, use doKS."
-    doKS(&b)
-end function
-
-############
-
-function void doKGtest (bundle *b)
-    print "Warning: The name doKGtest is deprecated, use doHPtest."
-    doHPtest(&b)
-    # add old names for backwards compatibility:
-    scalar b.KGstat = b.HPstat
-    scalar b.KGpval = b.HPpval
-end function 
-*/
-############
 
 function void doPS (bundle *b)
     # wrap the probscore(function) for bundle/series use
   
-    if !inbundle(b, yup) || !inbundle(b, pfc)
+    if !inbundle(b, "yup") || !inbundle(b, "pfc")
         funcerr "Suitable input missing"
     endif
-  
+
     matrix ps = probscore({b.yup}, {b.pfc})
-  
-    # transfer results
+
     scalar b.qps = ps[1]
     scalar b.lps = ps[2]
 end function
