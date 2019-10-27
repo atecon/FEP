@@ -395,7 +395,7 @@ function void doPTtest (bundle *b)
         scalar T = nobs(y)
         scalar test = sqrt(T) * r	# test stat. (Pesaran 2015, p. 399)
         scalar pval = 2 * pvalue(z, abs(test))		# PT ~ N(0,1)
-    elif b.robust == 1  # PTmeth == 2
+    else			  # PTmeth == 2
         ols y const fc --robust --quiet
         scalar test = $coeff[2] / $stderr[2]
         scalar pval = 2 * pvalue(t, $df, abs(test))
