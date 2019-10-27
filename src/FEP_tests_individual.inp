@@ -213,14 +213,14 @@ function void doHPtest (bundle *b)
         end restrict
     endif
 
-    if b.verb == 1
+    if b.verb
         printf "\n***********************************************\n"
         printf "*** Holden & Peel test\n"
         printf "*** on forecast efficiency\n"
-        if !b.robust
-            printf "\nMethod: Approach using asymptotic VCV.\n"
-        elif b.robust == 1
+        if b.robust
             printf "\nMethod: Approach using HAC robust VCV.\n"
+        else
+            printf "\nMethod: Approach using asymptotic VCV.\n"
         endif
         if b.nboot > 0
             printf "Bootstrap p-value using %d iterations.\n", b.nboot
@@ -341,14 +341,14 @@ function void doMZtest (bundle *b)
         end restrict
     endif
 
-    if b.verb == 1
+    if b.verb
         printf "\n***********************************************\n"
         printf "*** Mincer & Zarnowitz test\n"
         printf "*** on forecast unbiasedness\n"
-        if !b.robust
-            printf "\nMethod: Approach using asymptotic VCV.\n"
-        elif b.robust == 1
+        if b.robust
             printf "\nMethod: Approach using HAC robust VCV.\n"
+        else
+            printf "\nMethod: Approach using asymptotic VCV.\n"
         endif
         if b.nboot > 0
             printf "Bootstrap p-value using %d iterations.\n", b.nboot
@@ -390,7 +390,7 @@ function void doPTtest (bundle *b)
         printf "*** that y and fc are both binary variables! Check again! *** \n"
         funcerr "Check that y and fc are both binary variables."
     endif
-    if !b.robust   # PTmeth == 1
+    if b.robust == 0  # PTmeth == 1
         scalar r = mcorr({y} ~ {fc})[1,2]
         scalar T = nobs(y)
         scalar test = sqrt(T) * r	# test stat. (Pesaran 2015, p. 399)
@@ -403,14 +403,14 @@ function void doPTtest (bundle *b)
         print "Warning: Invalid PTmeth input"
     endif
 
-    if b.verb == 1
+    if b.verb
         printf "\n***********************************************\n"
         printf "*** Pesaran & Timmermann (1992, 2006) test\n"
         printf "*** on directional change\n"
-        if !b.robust    #  PTmeth == 1
-            printf "\nMethod: Correlation approach using asymptotic VCV.\n"
-        elif b.robust == 1  # PTmeth == 2
+        if b.robust    #  PTmeth == 2
             printf "\nMethod: Regression approach using HAC robust VCV.\n"
+        else			# PTmeth == 1
+            printf "\nMethod: Correlation approach using asymptotic VCV.\n"
         endif
         printf "H0: y(t) and x(t) are distributed independently \n"
         printf "Test stat.: %.4f\n", test
@@ -532,7 +532,6 @@ function void doCGtest (bundle *b)
         else # right tail
             # (this func does X >= x)
             b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
-
         endif
 
     else	# extra.gfn package not available/loadable
