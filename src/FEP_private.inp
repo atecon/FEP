@@ -79,6 +79,166 @@ function scalar loadextra(void)
     endif
 end function
 
+################
+
+function scalar check_y_fc_length (const series y, const list fc)
+    /* Check number of valid observations. Needed for ForecastMetrics(). */
+    
+    scalar ret = 0			# no. of fc-series which have less valid obs. than series y
+    scalar Ty = nobs(y)
+    
+    loop foreach i fc -q
+        scalar d = nobs(fc.$i)-Ty
+
+        if d < 0
+            ret++
+            string case = "less"
+        elif d > 0
+            ret++
+            string case = "more"
+        endif
+        if d != 0
+            printf "\nWarning: Forecast series '%s' has %d %s valid observations than your \n\
+              series of realizations\n", varnames(fc)[i], abs(d), case
+        endif
+    endloop
+
+    return ret
+end function
+
+function matrix add_labels (const matrix metrics)
+    /* Helper function adding row- and column-labels. Needed for ForecastMetrics(). */
+    
+    strings cnames = array(cols(metrics))
+    loop i=1..cols(metrics) -q
+        cnames[i] = sprintf("Forecast_$i")
+    endloop
+    cnameset(metrics, cnames)
+    
+    strings rnames = name_of_basic_point_metrics() + name_of_pct_error_metrics()
+    rnameset(metrics, rnames)
+
+    return metrics    
+end function
+
+function matrix basic_point_metrics (const series y, const list fc)
+    /* Call built-in gretl function. */
+    return fcstats(y, fc)[1:5,]		# discard Theil's U + associated statistics
+end function
+
+function strings name_of_basic_point_metrics (void)
+    return defarray("ME", "RMSE", "MAE", "MPE", "MAPE")
+end function
+
+function strings name_of_pct_error_metrics (void)
+    return defarray("MdAPE", "RMSPE", "RMdSPE", "sMAPE", "sMdAPE", "sMAAPE", "sMdAAPE")
+end function
+
+function matrix get_pct_error_metrics (const series y, const list fc)
+    /* Wrapper retrieving various percentage error metrics */
+    
+    list fc_error = get_fc_error_list(y, fc)
+    matrix metrics = zeros(7, nelem(fc))
+    
+    metrics[1,] = MdAPE(y, fc_error)'
+    metrics[2,] = RMdSPE(y, fc_error)'
+    metrics[3,] = RMdSPE(y, fc_error, 1)'
+    metrics[4,] = sMdAPE(y, fc_error)'
+    metrics[5,] = sMdAPE(y, fc_error, 1)'
+    metrics[6,] = sMdAAPE(y, fc_error)'
+    metrics[7,] = sMdAAPE(y, fc_error, 1)'
+
+    return metrics
+end function
+
+
+function matrix sMdAPE (const series y, const list fc, bool use_median[0])
+    /* Symmetric mean/ median absolute percentage error */
+    
+    matrix metric = zeros(nelem(fc),1)
+    loop foreach i fc -q
+        if use_median
+            metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) / (y+fc.$i) )
+        else
+            metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) / (y+fc.$i) )
+        endif
+    endloop
+    
+    return metric
+end function
+
+
+function matrix sMdAAPE (const series y, const list fc, bool use_median[0])
+    /* Symmetric mean/ median absolute absolute percentage error */
+    
+    matrix metric = zeros(nelem(fc),1)
+    loop foreach i fc -q
+        if use_median
+            metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) / abs((y+fc.$i)) )
+        else
+            metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) / abs((y+fc.$i)) )
+        endif
+    endloop
+    
+    return metric
+end function
+
+
+function matrix RMdSPE (const series y, const list fc_error, bool use_median[0])
+    /* Root mean/ median square percentage error -- based on percentage errors */
+     
+    matrix metric = zeros(nelem(fc_error),1)
+    loop foreach i fc_error -q
+        if use_median
+            metric[i] = sqrt( mean(pct_error(y, fc_error.$i)^ 2))
+        else
+            metric[i] = sqrt( mean(pct_error(y, fc_error.$i)^ 2))
+        endif        
+    endloop
+        
+    return metric
+end function
+
+
+function matrix MdAPE (const series y, const list fc_error)
+    /* Median absolute percentage error -- based on percentage errors */
+     
+    matrix metric = zeros(nelem(fc_error),1)
+    loop foreach i fc_error -q
+        metric[i] = median( abs( pct_error(y, fc_error.$i) ) )
+    endloop
+        
+    return metric
+end function
+
+
+function list get_fc_error_list (const series y, const list fc)
+    /* Compute list of forecast errors */
+    
+    list fc_error = null
+    loop foreach i fc -q
+        series err_$i = get_fc_error(y, fc.$i)
+        list fc_error += err_$i
+    endloop
+    
+    return fc_error
+end function
+
+
+function series pct_error (const series y, const series fc_error)
+    /* Compute percentage error series */    
+    return 100 * fc_error / y
+end function
+
+
+function series get_fc_error (const series y, const series fc)
+    /* Compute forecast error series */        
+    return y - fc
+end function
+
+#########
+
+
 function void set_robust_flag (bundle *b)
     /* For avoiding code duplicity. */
 
@@ -103,7 +263,6 @@ function void set_fhor_default (bundle *b)
         b.fhor = 1
     endif
 end function
-
 
 
 function void CGprint(bundle *b)

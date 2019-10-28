@@ -181,6 +181,12 @@ b.pfc = pr
 doPS(&b)
 print b
 
+#--------------------------------------------
+# ForecastMetrics(): Evaluate point forecasts
+#--------------------------------------------
+matrix fc_eval = ForecastMetrics(y, fc)
+print fc_eval
+
 #-----------------------------------------------
 # Compute forecast error losses using getLoss()
 #-----------------------------------------------
