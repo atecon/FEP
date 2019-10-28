@@ -42,7 +42,6 @@ function void applyFCtests (bundle *b, string which)
             doPTtest(&b)	# Pesaran & Timmermann (1992)
         elif which == "PS"
             doPS(&b)	# probability score
-
         elif which == "CW"	# Clark-West
             doCWtest(&b)
         endif
@@ -53,6 +52,26 @@ end function
 
 ###############
 
+function matrix ForecastMetrics (const series y "Series of realizations",
+                                 const list fc "List of forecast series")
+    /* Compute several metrics for the evaluation of point forecasts. For 5 metrics
+    gretl's built-in fcstats() function is used. */
+
+    scalar check = check_y_fc_length(y, fc)
+
+    if check > 0
+        smpl --no-missing y fc
+        printf "\nInfo: The effective sample comprises %d valid observations\n", $nobs
+    endif
+
+    matrix metrics = basic_point_metrics(y, fc) | get_pct_error_metrics(y, fc)
+
+    metrics = add_labels(metrics)
+
+    return metrics
+end function 
+
+###############
 
 function matrix getLoss (matrix fce "FC (errors)",
       string LF[null] "Loss function",
