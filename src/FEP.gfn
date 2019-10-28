@@ -1921,7 +1921,7 @@ endif
 matrix omegahat = Z'Z/n		# sample variance
 if nlags &gt; 0
   #sample autocovariances
-  loop for ii=1..nlags -q
+  loop ii=1..nlags -q
     Zlag = zeros(ii,k) | Z[1:n-ii,]
     gamma = (Z'Zlag +Zlag'Z)/n
     w = 1 - (ii/(nlags+1))
