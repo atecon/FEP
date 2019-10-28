@@ -184,7 +184,8 @@ print b
 #--------------------------------------------
 # ForecastMetrics(): Evaluate point forecasts
 #--------------------------------------------
-matrix fc_eval = ForecastMetrics(y, fc)
+list FC = fc diff(fc)		# use list for illustration
+matrix fc_eval = ForecastMetrics(y, FC)
 print fc_eval
 
 #-----------------------------------------------

@@ -9,7 +9,7 @@ data-requirement = no-data-ok
 public = doKS doEKTtest doHPtest applyFCtests doDLtest \
   getLoss doMZtest doPTtest \
   doCGtest doDMtest doGWtest doCWtest \
-  doPS probscore \
+  doPS probscore ForecastMetrics\
   DrawLoss DrawLoss2 \
   GUI_FEP_print GUI_FEP \
   doEKTtest_matrix CamDufStats

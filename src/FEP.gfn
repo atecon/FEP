@@ -19,9 +19,7 @@ FEPdata.gdt </data-files>
  </params>
 <code># FIXME: change this to use scores2x2 from extra.gfn once it's ready!
 # apply defaults
-if !inbundle(b, &quot;verb&quot;)
-  b.verb = 0
-endif
+set_verbatim_flag(&amp;b)
 series y = b.yup		# Binary of var. of actual ups
 series fc = b.fcup		# Binary of var. of forecasted ups
 smpl y fc --no-missing
@@ -40,7 +38,7 @@ M[1,1:2] = sum(y==1 &amp;&amp; fc==1) ~ sum(y==0 &amp;&amp; fc==1)
 M[2,1:2] = sum(y==1 &amp;&amp; fc==0) ~ sum(y==0 &amp;&amp; fc==0)
 scalar hi = M[1,1] / sumc(M[,1])	# hit rate
 scalar fa = M[1,2] / sumc(M[,2])	# false alarm rate
-if b.verb == 1
+if b.verb
   printf &quot;\n*************************\n&quot;
   printf &quot;*** Kuipers Score ***\n&quot;
   printf &quot;Hit Rate        = %.3f\n&quot;, hi
@@ -854,6 +852,27 @@ endif
 return mout
 </code>
 </gretl-function>
+<gretl-function name="ForecastMetrics" type="matrix">
+ <params count="2">
+  <param name="y" type="series" const="true">
+<description>Series of realizations</description>
+  </param>
+  <param name="fc" type="list" const="true">
+<description>List of forecast series</description>
+  </param>
+ </params>
+<code>/* Compute several metrics for the evaluation of point forecasts. For 5 metrics
+gretl's built-in fcstats() function is used. */
+scalar check = check_y_fc_length(y, fc)
+if check &gt; 0
+  smpl --no-missing y fc
+  printf &quot;\nInfo: The effective sample comprises %d valid observations\n&quot;, $nobs
+endif
+matrix metrics = basic_point_metrics(y, fc) | get_pct_error_metrics(y, fc)
+metrics = add_labels(metrics)
+return metrics
+</code>
+</gretl-function>
 <gretl-function name="DrawLoss" type="void">
  <params count="4">
   <param name="p" type="int" min="1" max="2" default="1">
@@ -1528,6 +1547,179 @@ else
 endif
 </code>
 </gretl-function>
+<gretl-function name="check_y_fc_length" type="scalar" private="1">
+ <params count="2">
+  <param name="y" type="series" const="true"/>
+  <param name="fc" type="list" const="true"/>
+ </params>
+<code>/* Check number of valid observations. Needed for ForecastMetrics(). */
+scalar ret = 0			# no. of fc-series which have less valid obs. than series y
+scalar Ty = nobs(y)
+loop foreach i fc -q
+  scalar d = nobs(fc.$i)-Ty
+  if d &lt; 0
+    ret++
+    string case = &quot;less&quot;
+  elif d &gt; 0
+    ret++
+    string case = &quot;more&quot;
+  endif
+  if d != 0
+    printf &quot;\nWarning: Forecast series '%s' has %d %s valid observations than your \n               series of realizations\n&quot;, varnames(fc)[i], abs(d), case
+  endif
+endloop
+return ret
+</code>
+</gretl-function>
+<gretl-function name="add_labels" type="matrix" private="1">
+ <params count="1">
+  <param name="metrics" type="matrix" const="true"/>
+ </params>
+<code>/* Helper function adding row- and column-labels. Needed for ForecastMetrics(). */
+strings cnames = array(cols(metrics))
+loop i=1..cols(metrics) -q
+  cnames[i] = sprintf(&quot;Forecast_$i&quot;)
+endloop
+cnameset(metrics, cnames)
+strings rnames = name_of_basic_point_metrics() + name_of_pct_error_metrics()
+rnameset(metrics, rnames)
+return metrics
+</code>
+</gretl-function>
+<gretl-function name="basic_point_metrics" type="matrix" private="1">
+ <params count="2">
+  <param name="y" type="series" const="true"/>
+  <param name="fc" type="list" const="true"/>
+ </params>
+<code>/* Call built-in gretl function. */
+return fcstats(y, fc)[1:5,]		# discard Theil's U + associated statistics
+</code>
+</gretl-function>
+<gretl-function name="name_of_basic_point_metrics" type="strings" private="1">
+<code>return defarray(&quot;ME&quot;, &quot;RMSE&quot;, &quot;MAE&quot;, &quot;MPE&quot;, &quot;MAPE&quot;)
+</code>
+</gretl-function>
+<gretl-function name="name_of_pct_error_metrics" type="strings" private="1">
+<code>return defarray(&quot;MdAPE&quot;, &quot;RMSPE&quot;, &quot;RMdSPE&quot;, &quot;sMAPE&quot;, &quot;sMdAPE&quot;, &quot;sMAAPE&quot;, &quot;sMdAAPE&quot;)
+</code>
+</gretl-function>
+<gretl-function name="get_pct_error_metrics" type="matrix" private="1">
+ <params count="2">
+  <param name="y" type="series" const="true"/>
+  <param name="fc" type="list" const="true"/>
+ </params>
+<code>/* Wrapper retrieving various percentage error metrics */
+list fc_error = get_fc_error_list(y, fc)
+matrix metrics = zeros(7, nelem(fc))
+metrics[1,] = MdAPE(y, fc_error)'
+metrics[2,] = RMdSPE(y, fc_error)'
+metrics[3,] = RMdSPE(y, fc_error, 1)'
+metrics[4,] = sMdAPE(y, fc_error)'
+metrics[5,] = sMdAPE(y, fc_error, 1)'
+metrics[6,] = sMdAAPE(y, fc_error)'
+metrics[7,] = sMdAAPE(y, fc_error, 1)'
+return metrics
+</code>
+</gretl-function>
+<gretl-function name="sMdAPE" type="matrix" private="1">
+ <params count="3">
+  <param name="y" type="series" const="true"/>
+  <param name="fc" type="list" const="true"/>
+  <param name="use_median" type="bool" default="0"/>
+ </params>
+<code>/* Symmetric mean/ median absolute percentage error */
+matrix metric = zeros(nelem(fc),1)
+loop foreach i fc -q
+  if use_median
+    metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) / (y+fc.$i) )
+  else
+    metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) / (y+fc.$i) )
+  endif
+endloop
+return metric
+</code>
+</gretl-function>
+<gretl-function name="sMdAAPE" type="matrix" private="1">
+ <params count="3">
+  <param name="y" type="series" const="true"/>
+  <param name="fc" type="list" const="true"/>
+  <param name="use_median" type="bool" default="0"/>
+ </params>
+<code>/* Symmetric mean/ median absolute absolute percentage error */
+matrix metric = zeros(nelem(fc),1)
+loop foreach i fc -q
+  if use_median
+    metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) / abs((y+fc.$i)) )
+  else
+    metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) / abs((y+fc.$i)) )
+  endif
+endloop
+return metric
+</code>
+</gretl-function>
+<gretl-function name="RMdSPE" type="matrix" private="1">
+ <params count="3">
+  <param name="y" type="series" const="true"/>
+  <param name="fc_error" type="list" const="true"/>
+  <param name="use_median" type="bool" default="0"/>
+ </params>
+<code>/* Root mean/ median square percentage error -- based on percentage errors */
+matrix metric = zeros(nelem(fc_error),1)
+loop foreach i fc_error -q
+  if use_median
+    metric[i] = sqrt( mean(pct_error(y, fc_error.$i)^ 2))
+  else
+    metric[i] = sqrt( mean(pct_error(y, fc_error.$i)^ 2))
+  endif
+endloop
+return metric
+</code>
+</gretl-function>
+<gretl-function name="MdAPE" type="matrix" private="1">
+ <params count="2">
+  <param name="y" type="series" const="true"/>
+  <param name="fc_error" type="list" const="true"/>
+ </params>
+<code>/* Median absolute percentage error -- based on percentage errors */
+matrix metric = zeros(nelem(fc_error),1)
+loop foreach i fc_error -q
+  metric[i] = median( abs( pct_error(y, fc_error.$i) ) )
+endloop
+return metric
+</code>
+</gretl-function>
+<gretl-function name="get_fc_error_list" type="list" private="1">
+ <params count="2">
+  <param name="y" type="series" const="true"/>
+  <param name="fc" type="list" const="true"/>
+ </params>
+<code>/* Compute list of forecast errors */
+list fc_error = null
+loop foreach i fc -q
+  series err_$i = get_fc_error(y, fc.$i)
+  list fc_error += err_$i
+endloop
+return fc_error
+</code>
+</gretl-function>
+<gretl-function name="pct_error" type="series" private="1">
+ <params count="2">
+  <param name="y" type="series" const="true"/>
+  <param name="fc_error" type="series" const="true"/>
+ </params>
+<code>/* Compute percentage error series */
+return 100 * fc_error / y
+</code>
+</gretl-function>
+<gretl-function name="get_fc_error" type="series" private="1">
+ <params count="2">
+  <param name="y" type="series" const="true"/>
+  <param name="fc" type="series" const="true"/>
+ </params>
+<code>/* Compute forecast error series */
+return y - fc
+</code>
+</gretl-function>
 <gretl-function name="set_robust_flag" type="void" private="1">
  <params count="1">
   <param name="b" type="bundleref"/>
@@ -1922,6 +2114,13 @@ b.yup = UP
 b.pfc = pr
 doPS(&amp;b)
 print b
+
+#--------------------------------------------
+# ForecastMetrics(): Evaluate point forecasts
+#--------------------------------------------
+list FC = fc diff(fc)		# use list for illustration
+matrix fc_eval = ForecastMetrics(y, FC)
+print fc_eval
 
 #-----------------------------------------------
 # Compute forecast error losses using getLoss()
