@@ -269,9 +269,7 @@ function void doKS (bundle *b)
     # FIXME: change this to use scores2x2 from extra.gfn once it's ready!
 
     # apply defaults
-    if !inbundle(b, "verb")
-        b.verb = 0
-    endif
+    set_verbatim_flag(&b)
 
     series y = b.yup		# Binary of var. of actual ups
     series fc = b.fcup		# Binary of var. of forecasted ups
@@ -291,7 +289,7 @@ function void doKS (bundle *b)
     M[2,1:2] = sum(y==1 && fc==0) ~ sum(y==0 && fc==0)
     scalar hi = M[1,1] / sumc(M[,1])	# hit rate
     scalar fa = M[1,2] / sumc(M[,2])	# false alarm rate
-    if b.verb == 1
+    if b.verb
         printf "\n*************************\n"
         printf "*** Kuipers Score ***\n"
         printf "Hit Rate        = %.3f\n", hi
