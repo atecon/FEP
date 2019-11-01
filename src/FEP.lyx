@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.3, October 2019
+ version 2.3, November 2019
 \end_layout
 
 \begin_layout Abstract
@@ -227,21 +227,11 @@ reference "sec:Menu-driven-(GUI)-usage"
  we explain the easy usage from gretl's menu-driven interface (GUI), but
  until then we focus on the scripting way of performing the analysis.
  A function package can be downloaded and installed simply by invoking the
- install command:
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
-In future gretl versions (>2018c) this will be replaced by 'pkg install'.
-\end_layout
-
-\end_inset
-
-
+ install option of the pkg command:
 \end_layout
 
 \begin_layout LyX-Code
-install FEP
+pkg install FEP
 \end_layout
 
 \begin_layout Standard
@@ -1116,7 +1106,7 @@ If the function is called like this, then there will typically be some printed
 \size small
 \begin_inset Float table
 wide false
-sideways false
+sideways true
 status open
 
 \begin_layout Plain Layout
@@ -1142,17 +1132,13 @@ Bundle members needed for each function
 \begin_layout Plain Layout
 
 \size small
-\begin_inset space \hspace{}
-\length -2.5cm
-\end_inset
-
-
 \begin_inset Tabular
-<lyxtabular version="3" rows="23" columns="11">
+<lyxtabular version="3" rows="23" columns="12">
 <features booktabs="true" tabularvalignment="middle">
-<column alignment="right" valignment="top" width="3cm">
+<column alignment="right" valignment="top" width="5cm">
 <column alignment="center" valignment="top" width="1.7cm">
 <column alignment="center" valignment="top" width="1cm">
+<column alignment="center" valignment="top" width="1.1cm">
 <column alignment="center" valignment="top" width="1.1cm">
 <column alignment="center" valignment="top" width="1.1cm">
 <column alignment="center" valignment="top" width="1.2cm">
@@ -1211,6 +1197,15 @@ DM
 
 \size small
 GW
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CW
 \end_layout
 
 \end_inset
@@ -1318,6 +1313,15 @@ series inputs ([
 \end_inset
 </cell>
 <cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1444,6 +1448,15 @@ y
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+y
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -1559,6 +1572,17 @@ f1, f2
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size small
+f1, f2
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -1621,7 +1645,7 @@ fc
 </cell>
 </row>
 <row>
-<cell alignment="right" valignment="top" leftline="true" usebox="none">
+<cell alignment="right" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1653,6 +1677,15 @@ Forecast errors (replaces y, fc)
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1809,6 +1842,15 @@ yup
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \size small
 yup 
 \end_layout
@@ -1866,6 +1908,15 @@ Binary FC of yup
 
 \size small
 fcup
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -2049,6 +2100,15 @@ yup prob.
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \size small
 pfc
 \end_layout
@@ -2057,7 +2117,7 @@ pfc
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" usebox="none">
+<cell alignment="right" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2075,6 +2135,15 @@ Further tested
 
 \size small
 [CGX]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -2193,6 +2262,15 @@ list inputs
 \end_inset
 </cell>
 <cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2333,6 +2411,15 @@ regressors
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \size small
 z
 \end_layout
@@ -2384,6 +2471,15 @@ z
 
 \size small
 Instruments
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -2530,6 +2626,15 @@ scalar inputs (mostly integer / all are optional)
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
 <cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
@@ -2611,6 +2716,17 @@ FC horizon
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size small
+[fhor]
 \end_layout
 
 \end_inset
@@ -2740,6 +2856,15 @@ Loss type
 
 \size small
 [loss]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -2905,6 +3030,15 @@ Lag (efficiency test)
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
 </row>
 <row>
 <cell alignment="right" valignment="top" leftline="true" usebox="none">
@@ -2937,6 +3071,15 @@ Bootstrap iter.
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3021,6 +3164,15 @@ Bootstrap iter.
 
 \size small
 Robust switch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -3175,6 +3327,15 @@ Initial shape
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \size small
 [a0]
 \end_layout
@@ -3228,7 +3389,7 @@ Initial shape
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" usebox="none">
+<cell alignment="right" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3331,9 +3492,18 @@ Conditional
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" usebox="none">
+<cell alignment="right" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3350,6 +3520,17 @@ no option means no printout ever
 \end_inset
 
 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size small
+[verb]
 \end_layout
 
 \end_inset
@@ -3512,6 +3693,15 @@ string input (optional)
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
 <cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
@@ -3575,6 +3765,15 @@ string input (optional)
 
 \size small
 Loss drawing
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -3684,11 +3883,8 @@ Loss drawing
 \align left
 
 \size small
-Notes: 
-\begin_inset space ~
-\end_inset
-
-
+Notes: (*: EKT refers to the doEKTtest() variant.
+ For the matrix-based variant doEKTtest_matrix() see the source code.)
 \end_layout
 
 \begin_layout Plain Layout
@@ -3699,7 +3895,7 @@ Notes:
 <lyxtabular version="3" rows="8" columns="2">
 <features booktabs="true" tabularvalignment="middle">
 <column alignment="center" valignment="top">
-<column alignment="left" valignment="top" width="13cm">
+<column alignment="left" valignment="top" width="17cm">
 <row>
 <cell alignment="center" valignment="top" leftline="true" usebox="none">
 \begin_inset Text
@@ -3763,7 +3959,7 @@ cond
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3922,13 +4118,6 @@ can be between 0 and 1 (non-integer, default 0.5).
 \end_inset
 
 
-\end_layout
-
-\begin_layout Plain Layout
-
-\size small
-*: EKT refers to the doEKTtest() variant.
- For the matrix-based variant doEKTtest_matrix() see the source code.
 \end_layout
 
 \end_inset
@@ -5831,7 +6020,7 @@ noprefix "false"
 
 \end_inset
 
-).
+.
  For further readings we refer to 
 \begin_inset CommandInset citation
 LatexCommand citet
@@ -6428,7 +6617,7 @@ series
 \emph on
 y
 \emph default
-: series of actuals
+: series of actual outcomes
 \end_layout
 
 \end_inset
@@ -6472,7 +6661,15 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-12 by k matrix with 12 measures for k different forecasts
+12 by 
+\emph on
+k
+\emph default
+ matrix with 12 measures for 
+\emph on
+k
+\emph default
+ different forecasts
 \end_layout
 
 \end_inset
@@ -11848,7 +12045,470 @@ Clark-West test – doCWtest()
 \end_layout
 
 \begin_layout Standard
-TBW
+Experimental implementation of 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "ClarkWest2007"
+literal "false"
+
+\end_inset
+
+, testing equal predictive accuracy in nested models (one-sided test); see
+ Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:doCWtest"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:doCWtest"
+
+\end_inset
+
+Clark-West test (experimental)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="13" columns="3">
+<features booktabs="true" tabularvalignment="bottom">
+<column alignment="left" valignment="top" width="2.5cm">
+<column alignment="left" valignment="top" width="3cm">
+<column alignment="left" valignment="top" width="7.5cm">
+<row>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Function
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+doCWtest(bundle *b)
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none" width="10.5cm">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Clark-West test of equal predictive ability in nested models
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Return type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+none (void)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Function arguments
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Pointer to the model bundle.
+ This bundle includes as members:
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+series 
+\emph on
+y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+realized values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+series 
+\emph on
+f1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+forecast values of model 1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+series 
+\emph on
+f
+\emph default
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+forecast values of model 2 (larger nesting model)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scalar 
+\emph on
+fhor
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+forecast horizon (default 1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scalar 
+\emph on
+verb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 = print no details (default), 1 = print details
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Output
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The following new elements are stored into the model bundle:
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scalar 
+\emph on
+CWstat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+test statistic
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scalar 
+\emph on
+CWpval
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+p-value based on t-distribution (one-sided)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Reference
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset CommandInset citation
+LatexCommand citet
+key "ClarkWest2007"
+literal "true"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -11955,7 +12615,8 @@ name "fig:Screenshot"
 
 \end_inset
 
-Screenshot of the FEP graphical interface (under Ubuntu Linux)
+Screenshot of the FEP graphical interface (a previous version, under Ubuntu
+ Linux)
 \end_layout
 
 \end_inset
@@ -13241,7 +13902,7 @@ Changelog
 \end_layout
 
 \begin_layout Itemize
-version 2.3 (October 2019)
+version 2.3 (November 2019)
 \end_layout
 
 \begin_deeper
