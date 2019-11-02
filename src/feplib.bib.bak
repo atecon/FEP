@@ -1,5 +1,21 @@
 % Encoding: UTF-8
 
+@Article{Hyndman.Koehler2006,
+  author={Hyndman, Rob J. and Koehler, Anne B.},
+  title={{Another look at measures of forecast accuracy}},
+  journal={International Journal of Forecasting},
+  year=2006,
+  volume={22},
+  number={4},
+  pages={679-688},
+  month={},
+  keywords={},
+  doi={},
+  abstract={We discuss and compare measures of accuracy of univariate time series forecasts. The methods used in the M-competition and the M3-competition, and many of the measures recommended by previous authors on this topic, are found to be inadequate, and many of them are degenerate in commonly occurring situations. Instead, we propose that the mean absolute scaled error become the standard measure for comparing forecast accuracy across multiple time series.<br><small>(This abstract was borrowed from another version of this item.)</small>},
+  url={https://ideas.repec.org/a/eee/intfor/v22y2006i4p679-688.html}
+}
+
+
 @Book{Pesaran2015,
   title     = {{Time Series and Panel Data Econometrics}},
   publisher = {Oxford University Press},
@@ -161,6 +177,35 @@
   keywords  = {Serial dependence, Rank tests, Nonoparametric tests: Runs, Wilcoxon signed-rank test, Serial correlation},
   publisher = {Blackwell Publishing Ltd},
   url       = {http://dx.doi.org/10.1111/j.1467-9892.1981.tb00317.x},
+}
+
+@Article{Giacomini.White2006,
+  author   = {Raffaella Giacomini and Halbert White},
+  title    = {{Tests of Conditional Predictive Ability}},
+  journal  = {Econometrica},
+  year     = {2006},
+  volume   = {74},
+  number   = {6},
+  pages    = {1545-1578},
+  abstract = { We propose a framework for out-of-sample predictive ability testing and forecast selection designed for use in the realistic situation in which the forecasting model is possibly misspecified, due to unmodeled dynamics, unmodeled heterogeneity, incorrect functional form, or any combination of these. Relative to the existing literature (Diebold and Mariano (1995) and West (1996)), we introduce two main innovations: (i) We derive our tests in an environment where the finite sample properties of the estimators on which the forecasts may depend are preserved asymptotically. (ii) We accommodate conditional evaluation objectives (can we predict which forecast will be more accurate at a future date?), which nest unconditional objectives (which forecast was more accurate on average?), that have been the sole focus of previous literature. As a result of (i), our tests have several advantages: they capture the effect of estimation uncertainty on relative forecast performance, they can handle forecasts based on both nested and nonnested models, they allow the forecasts to be produced by general estimation methods, and they are easy to compute. Although both unconditional and conditional approaches are informative, conditioning can help fine-tune the forecast selection to current economic conditions. To this end, we propose a two-step decision rule that uses current information to select the best forecast for the future date of interest. We illustrate the usefulness of our approach by comparing forecasts from leading parameter-reduction methods for macroeconomic forecasting using a large number of predictors. Copyright The Econometric Society 2006.},
+  url      = {https://ideas.repec.org/a/ecm/emetrp/v74y2006i6p1545-1578.html},
+}
+
+@Article{ClarkWest2007,
+  author        = {Todd E. Clark and Kenneth D. West},
+  title         = {Approximately normal tests for equal predictive accuracy in nested models},
+  journal       = {Journal of Econometrics},
+  year          = {2007},
+  volume        = {138},
+  number        = {1},
+  pages         = {291--311},
+  issn          = {0304-4076},
+  note          = {50th Anniversary Econometric Institute},
+  __markedentry = {[fantomas:6]},
+  abstract      = {Forecast evaluation often compares a parsimonious null model to a larger model that nests the null model. Under the null that the parsimonious model generates the data, the larger model introduces noise into its forecasts by estimating parameters whose population values are zero. We observe that the mean squared prediction error (MSPE) from the parsimonious model is therefore expected to be smaller than that of the larger model. We describe how to adjust MSPEs to account for this noise. We propose applying standard methods [West, K.D., 1996. Asymptotic inference about predictive ability. Econometrica 64, 1067–1084] to test whether the adjusted mean squared error difference is zero. We refer to nonstandard limiting distributions derived in Clark and McCracken [2001. Tests of equal forecast accuracy and encompassing for nested models. Journal of Econometrics 105, 85–110; 2005a. Evaluating direct multistep forecasts. Econometric Reviews 24, 369–404] to argue that use of standard normal critical values will yield actual sizes close to, but a little less than, nominal size. Simulation evidence supports our recommended procedure.},
+  doi           = {https://doi.org/10.1016/j.jeconom.2006.05.023},
+  keywords      = {Out of sample, Causality, Random walk, Testing, Efficient markets, Principle of parsimony},
+  url           = {http://www.sciencedirect.com/science/article/pii/S0304407606000960},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
