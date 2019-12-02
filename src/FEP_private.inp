@@ -216,12 +216,12 @@ function matrix RMdSPE (const series y, const list fc_error, bool use_median[0])
     matrix metric = zeros(nelem(fc_error),1)
     loop foreach i fc_error -q
         if use_median
-            metric[i] = sqrt( mean(pct_error(y, fc_error.$i)^ 2))
+            metric[i] = sqrt(median(pct_error(y, fc_error.$i)^2))
         else
-            metric[i] = sqrt( mean(pct_error(y, fc_error.$i)^ 2))
+            metric[i] = sqrt(mean(pct_ error(y, fc_error.$i)^2))
         endif        
     endloop
-        
+
     return metric
 end function
 
