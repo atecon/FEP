@@ -1600,7 +1600,7 @@ return fcstats(y, fc)[1:5,]		# discard Theil's U + associated statistics
 </code>
 </gretl-function>
 <gretl-function name="name_of_pct_error_metrics" type="strings" private="1">
-<code>return defarray(&quot;MdAPE&quot;, &quot;RMSPE&quot;, &quot;RMdSPE&quot;, &quot;sMAPE&quot;, &quot;sMdAPE&quot;, &quot;sMAAPE&quot;, &quot;sMdAAPE&quot;)
+<code>return defarray(&quot;MdE&quot;, &quot;MdAPE&quot;, &quot;RMSPE&quot;, &quot;RMdSPE&quot;, &quot;sMAPE&quot;, &quot;sMdAPE&quot;, &quot;sMAAPE&quot;, &quot;sMdAAPE&quot;)
 </code>
 </gretl-function>
 <gretl-function name="get_pct_error_metrics" type="matrix" private="1">
@@ -1610,15 +1610,28 @@ return fcstats(y, fc)[1:5,]		# discard Theil's U + associated statistics
  </params>
 <code>/* Wrapper retrieving various percentage error metrics */
 list fc_error = get_fc_error_list(y, fc)
-matrix metrics = zeros(7, nelem(fc))
-metrics[1,] = MdAPE(y, fc_error)'
-metrics[2,] = RMdSPE(y, fc_error)'
-metrics[3,] = RMdSPE(y, fc_error, 1)'
-metrics[4,] = sMdAPE(y, fc_error)'
-metrics[5,] = sMdAPE(y, fc_error, 1)'
-metrics[6,] = sMdAAPE(y, fc_error)'
-metrics[7,] = sMdAAPE(y, fc_error, 1)'
+matrix metrics = zeros(8, nelem(fc))
+metrics[1,] = MdE(fc_error)'
+metrics[2,] = MdAPE(y, fc_error)'
+metrics[3,] = RMdSPE(y, fc_error)'
+metrics[4,] = RMdSPE(y, fc_error, 1)'
+metrics[5,] = sMdAPE(y, fc_error)'
+metrics[6,] = sMdAPE(y, fc_error, 1)'
+metrics[7,] = sMdAAPE(y, fc_error)'
+metrics[8,] = sMdAAPE(y, fc_error, 1)'
 return metrics
+</code>
+</gretl-function>
+<gretl-function name="MdE" type="matrix" private="1">
+ <params count="1">
+  <param name="fc_error" type="list" const="true"/>
+ </params>
+<code>/* Median error */
+matrix metric = zeros(nelem(fc_error),1)
+loop foreach i fc_error -q
+  metric[i] = median(fc_error.$i)
+endloop
+return metric
 </code>
 </gretl-function>
 <gretl-function name="sMdAPE" type="matrix" private="1">

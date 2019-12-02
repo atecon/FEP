@@ -131,24 +131,50 @@ function strings name_of_basic_point_metrics (void)
 end function
 
 function strings name_of_pct_error_metrics (void)
-    return defarray("MdAPE", "RMSPE", "RMdSPE", "sMAPE", "sMdAPE", "sMAAPE", "sMdAAPE")
+    return defarray("MdE", "MdAE", "MdAPE", "RMSPE", \
+      "RMdSPE", "sMAPE", "sMdAPE", "sMAAPE", "sMdAAPE")
 end function
 
 function matrix get_pct_error_metrics (const series y, const list fc)
     /* Wrapper retrieving various percentage error metrics */
     
     list fc_error = get_fc_error_list(y, fc)
-    matrix metrics = zeros(7, nelem(fc))
+    matrix metrics = {} #zeros(9, nelem(fc))
     
-    metrics[1,] = MdAPE(y, fc_error)'
-    metrics[2,] = RMdSPE(y, fc_error)'
-    metrics[3,] = RMdSPE(y, fc_error, 1)'
-    metrics[4,] = sMdAPE(y, fc_error)'
-    metrics[5,] = sMdAPE(y, fc_error, 1)'
-    metrics[6,] = sMdAAPE(y, fc_error)'
-    metrics[7,] = sMdAAPE(y, fc_error, 1)'
+    metrics |= MdE(fc_error)'
+    metrics |= MdAE(fc_error)'
+    metrics |= MdAPE(y, fc_error)'
+    metrics |= RMdSPE(y, fc_error)'
+    metrics |= RMdSPE(y, fc_error, 1)'
+    metrics |= sMdAPE(y, fc_error)'
+    metrics |= sMdAPE(y, fc_error, 1)'
+    metrics |= sMdAAPE(y, fc_error)'
+    metrics |= sMdAAPE(y, fc_error, 1)'
 
     return metrics
+end function
+
+function matrix MdE (const list fc_error)
+    /* Median error */
+     
+    matrix metric = zeros(nelem(fc_error),1)
+    loop foreach i fc_error -q
+        metric[i] = median(fc_error.$i)
+    endloop
+        
+    return metric
+end function
+
+
+function matrix MdAE (const list fc_error)
+    /* Median absolute error */
+     
+    matrix metric = zeros(nelem(fc_error),1)
+    loop foreach i fc_error -q
+        metric[i] = median(abs(fc_error.$i))
+    endloop
+        
+    return metric
 end function
 
 
