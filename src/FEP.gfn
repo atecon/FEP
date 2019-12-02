@@ -1631,9 +1631,10 @@ return metrics
   <param name="fc" type="list" const="true"/>
   <param name="use_median" type="bool" default="0"/>
  </params>
-<code>/* Mean (median) absolute error scaled by the in-sample mean (median)
-of the realizations. Proposed by Kolassa and Schütz (2007):
-&quot;Advantages of the MAD/Mean Ratio over the MAPE&quot;, Foresight: The International Journal of Applied Forecasting, 6 (2007), pp. 40-43. */
+<code>/* Mean (median) absolute error scaled by the sample mean (median)
+of realizations. Proposed by Kolassa and Schütz (2007):
+&quot;Advantages of the MAD/Mean Ratio over the MAPE&quot;, Foresight: The International Journal of Applied Forecasting, 6 (2007), pp. 40-43. See also:
+https://www.sciencedirect.com/science/article/pii/S0169207016000121#br000070 */
 matrix metric = zeros(nelem(fc),1)
 loop foreach i fc -q
   if use_median
@@ -2169,7 +2170,6 @@ print b
 list FC = fc diff(fc)		# use list for illustration
 matrix fc_eval = ForecastMetrics(y, FC)
 print fc_eval
-stop
 
 #-----------------------------------------------
 # Compute forecast error losses using getLoss()

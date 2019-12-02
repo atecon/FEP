@@ -160,8 +160,8 @@ end function
 
 
 function matrix MADMean (const series y, const list fc, bool use_median[0])
-    /* Mean (median) absolute error scaled by the in-sample mean (median)
-    of the realizations. Proposed by Kolassa and Schütz (2007):
+    /* Mean (median) absolute error scaled by the sample mean (median)
+    of realizations. Proposed by Kolassa and Schütz (2007):
     "Advantages of the MAD/Mean Ratio over the MAPE",
       Foresight: The International Journal of Applied Forecasting, 6 (2007),
       pp. 40-43. See also:

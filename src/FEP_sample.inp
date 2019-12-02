@@ -187,7 +187,6 @@ print b
 list FC = fc diff(fc)		# use list for illustration
 matrix fc_eval = ForecastMetrics(y, FC)
 print fc_eval
-stop
 
 #-----------------------------------------------
 # Compute forecast error losses using getLoss()
