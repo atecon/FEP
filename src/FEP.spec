@@ -1,7 +1,7 @@
 author = Artur Tarassow and Sven Schreiber
 email = atecon@posteo.de
-version = 2.3
-date = 2019-11-01
+version = 2.4
+date = 2019-12-03
 description = Forecast Evaluation Package
 tags = C12 C52 C53
 min-version = 2017a
