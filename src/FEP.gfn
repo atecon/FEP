@@ -1581,7 +1581,7 @@ loop i=1..cols(metrics) -q
   cnames[i] = sprintf(&quot;Forecast_$i&quot;)
 endloop
 cnameset(metrics, cnames)
-strings rnames = name_of_basic_point_metrics() + name_of_pct_error_metrics()
+strings rnames = names_of_basic_point_metrics() + names_of_udf_point_metrics()
 rnameset(metrics, rnames)
 return metrics
 </code>
@@ -1595,12 +1595,12 @@ return metrics
 return fcstats(y, fc)[1:5,]		# discard Theil's U + associated statistics
 </code>
 </gretl-function>
-<gretl-function name="name_of_basic_point_metrics" type="strings" private="1">
+<gretl-function name="names_of_basic_point_metrics" type="strings" private="1">
 <code>return defarray(&quot;ME&quot;, &quot;RMSE&quot;, &quot;MAE&quot;, &quot;MPE&quot;, &quot;MAPE&quot;)
 </code>
 </gretl-function>
-<gretl-function name="name_of_pct_error_metrics" type="strings" private="1">
-<code>return defarray(&quot;MdE&quot;, &quot;MdAE&quot;, &quot;MAM&quot;, &quot;MdAMd&quot;, &quot;MdAPE&quot;, &quot;RMSPE&quot;, &quot;RMdSPE&quot;, &quot;sMAPE&quot;, &quot;sMdAPE&quot;, &quot;sMAAPE&quot;, &quot;sMdAAPE&quot;)
+<gretl-function name="names_of_udf_point_metrics" type="strings" private="1">
+<code>return defarray(&quot;MdAPE&quot;, &quot;RMSPE&quot;, &quot;RMdSPE&quot;, &quot;sMAPE&quot;, &quot;sMdAPE&quot;, &quot;sMAAPE&quot;, &quot;sMdAAPE&quot;, &quot;MdE&quot;, &quot;MdAE&quot;, &quot;MAM&quot;, &quot;MdAMd&quot;)
 </code>
 </gretl-function>
 <gretl-function name="get_pct_error_metrics" type="matrix" private="1">
@@ -1611,10 +1611,6 @@ return fcstats(y, fc)[1:5,]		# discard Theil's U + associated statistics
 <code>/* Wrapper retrieving various percentage error metrics */
 list fc_error = get_fc_error_list(y, fc)
 matrix metrics = {}
-metrics |= MdE(fc_error)'
-metrics |= MdAE(fc_error)'
-metrics |= MADMean(y, fc_error)'
-metrics |= MADMean(y, fc_error, 1)'
 metrics |= MdAPE(y, fc_error)'
 metrics |= RMdSPE(y, fc_error)'
 metrics |= RMdSPE(y, fc_error, 1)'
@@ -1622,6 +1618,10 @@ metrics |= sMdAPE(y, fc_error)'
 metrics |= sMdAPE(y, fc_error, 1)'
 metrics |= sMdAAPE(y, fc_error)'
 metrics |= sMdAAPE(y, fc_error, 1)'
+metrics |= MdE(fc_error)'
+metrics |= MdAE(fc_error)'
+metrics |= MADMean(y, fc_error)'
+metrics |= MADMean(y, fc_error, 1)'
 return metrics
 </code>
 </gretl-function>

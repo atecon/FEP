@@ -115,7 +115,7 @@ function matrix add_labels (const matrix metrics)
     endloop
     cnameset(metrics, cnames)
     
-    strings rnames = name_of_basic_point_metrics() + name_of_pct_error_metrics()
+    strings rnames = names_of_basic_point_metrics() + names_of_udf_point_metrics()
     rnameset(metrics, rnames)
 
     return metrics    
@@ -126,16 +126,14 @@ function matrix basic_point_metrics (const series y, const list fc)
     return fcstats(y, fc)[1:5,]		# discard Theil's U + associated statistics
 end function
 
-function strings name_of_basic_point_metrics (void)
+function strings names_of_basic_point_metrics (void)
     return defarray("ME", "RMSE", "MAE", "MPE", "MAPE")
 end function
 
-function strings name_of_pct_error_metrics (void)
-    return defarray("MdE", "MdAE", "MAM", "MdAMd", \
-      "MdAPE", "RMSPE", "RMdSPE", "sMAPE", "sMdAPE", \
-      "sMAAPE", "sMdAAPE")
+function strings names_of_udf_point_metrics (void)
+    return defarray("MdAPE", "RMSPE", "RMdSPE", "sMAPE", "sMdAPE", \
+      "sMAAPE", "sMdAAPE", "MdE", "MdAE", "MAM", "MdAMd")
 end function
-
 
 function matrix get_pct_error_metrics (const series y, const list fc)
     /* Wrapper retrieving various percentage error metrics */
@@ -143,10 +141,6 @@ function matrix get_pct_error_metrics (const series y, const list fc)
     list fc_error = get_fc_error_list(y, fc)
     matrix metrics = {} 
 
-    metrics |= MdE(fc_error)'
-    metrics |= MdAE(fc_error)'
-    metrics |= MADMean(y, fc_error)'
-    metrics |= MADMean(y, fc_error, 1)'
     metrics |= MdAPE(y, fc_error)'
     metrics |= RMdSPE(y, fc_error)'
     metrics |= RMdSPE(y, fc_error, 1)'
@@ -154,6 +148,10 @@ function matrix get_pct_error_metrics (const series y, const list fc)
     metrics |= sMdAPE(y, fc_error, 1)'
     metrics |= sMdAAPE(y, fc_error)'
     metrics |= sMdAAPE(y, fc_error, 1)'
+    metrics |= MdE(fc_error)'
+    metrics |= MdAE(fc_error)'
+    metrics |= MADMean(y, fc_error)'
+    metrics |= MADMean(y, fc_error, 1)'
 
     return metrics
 end function
