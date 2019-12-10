@@ -9,7 +9,7 @@ $(PKG).gfn: $(PKG).inp $(PKG).spec $(PKG)_sample.inp
 #	pdflatex $<
 #	pdflatex $<
 
-$(PKG).zip: $(PKG).gfn $(PKG).pdf
+$(PKG).zip: $(PKG).gfn $(PKG).pdf FEPdata.gdt
 	echo makepkg $(PKG).zip | gretlcli -b -
 
 # Only if the manual is a pdf file or you provide an external dataset
@@ -21,8 +21,5 @@ install: $(PKG).zip
 #	echo pkg install $(PKG).gfn --local | gretlcli -b -
 
 # Only for zip-file
-#clean:
-#	rm -f $(PKG).zip
-
-#clean:
-#	rm -f $(PKG).gfn
+clean:
+	rm -f $(PKG).zip
