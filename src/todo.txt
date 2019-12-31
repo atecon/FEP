@@ -1,20 +1,20 @@
-To-Do FEP 2.2 ff.
+To-Do FEP post-2.4 
+(Stand Silvester 2019) 
 
-- DONE:
- JACK: "One small comment, for future reference. It would be nice if the
-packaged dataset, FEPdata.gdt, had descriptive strings for the variables
-and a substantive comment on the source under "Dataset info"."
-(Außerdem, ist FEPdata.gdt "undated", es wäre doch sinnvoller, wenn es als Zeitreihen gespeichert würde.)
 
-- Add bootstrap DM version using SB.gfn
-- Add block bootstrap to both MZ and HP tests using SB.gfn
+1) Add bootstrap DM version using SB.gfn
+2) Add block bootstrap to both MZ and HP tests using SB.gfn
+3) Erläuterung bzw. Referenz generell für den Bootstrap bei MZ und HP (vgl. Rubaskez-Feedback)
 
-- DONE: Add Giacomini/White test
+4) Prüfe Pesaran&Timmermann 2006, was wohl im Printout erscheint, aber nicht (im Doc) referenziert ist.
+(Rubaskez schlägt Verweis vor auf: Pesaran, M. H., & Timmermann, A. (2009). Testing dependence among serially correlated multicategory variables. Journal of the American Statistical Association, 104(485), 325-337)
 
-- DONE (eigentlich wurde k=0 schon abgefangen): Bei CG (auch woanders?) gibt es Fehler "Matrizen nicht passend bei Operation", wenn man z.B. b.CGX = fc(-1) eingibt (statt b.CGX=fc zusammen mit b.k=1).
+5) DM: Für fhor>1 wird (hoffentlich) t_HLN berechnet, aber laut unserer Tab. 16 wird nur der entsprechende p-Wert bereitgestellt (als DMpvalssc), nicht die korrigierte
+Statistik t_HLN selbst. Das sollte ergänzt werden (als "DMstatssc"), und dann wohl
+auch im Ergebnisoutput irgendwie ausgedruckt werden. (vgl. Rubaskez-Feedback)  
 
-- DONE: Output: "p-value.:" , Punkt weg
+6) CW: Im Beispiel wird fc und fc(-1) gemischt, daher sollte die Inferenz HAC-robust sein. Bei uns dient dafür b.fhor > 1, was also ins Beispiel eingefügt werden sollte. Außerdem sollte in der Doku (die sowieso noch richtig ergänzt werden muss) erklärt werden, dass b.fhor hier einzig dafür dient. Alternativ könnte man b.fhor evtl. streichen und einfach immer beide Varianten berechnen, standard und robust. 
 
-- DONE: doDLtest: Verfeinere (oder entferne) die Behandlung des alten Interface (das y und fc intern benutzte). Denn im Moment gibt es einen Fehler, wenn im Bundle auch noch y und fc existieren, auch wenn diese gar nicht für DL gedacht waren.
+### marginales Zeug ####
 
-- DONE: Umbenennung von doEKTtest in doEKTtest_matrix, und dann doEKTtest_series in doEKTtest, zur Vereinfachung. 
+M1) typo: degress -> degrees
