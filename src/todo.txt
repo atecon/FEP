@@ -18,3 +18,4 @@ auch im Ergebnisoutput irgendwie ausgedruckt werden. (vgl. Rubaskez-Feedback)
 ### marginales Zeug ####
 
 M1) typo: degress -> degrees
+M2) Dank an Michał Rubaszek für Kommentare.
