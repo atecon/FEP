@@ -1,0 +1,129 @@
+/*
+   Functions to calculate the test statistics from 
+   Campbell & Dufour 1995 (C&D), which are sign statistics 
+   and related --but not all identical-- to 
+   Wilcoxon test statistics.
+*/
+
+function matrices CamDufStats( matrix mdat, 
+      int recenter[0:2:0], matrix whichlags[null] )
+  
+    /*
+       'mdat': The first column is Y_t in C&D,
+       the remaining columns are different X_t 's (or g_t 's).
+       (If only a single column exists in mdat, then it is assumed 
+       that g_t = Y_t, which means that effectively Y_t is tested
+       against its own lags.) 
+  
+       'whichlags': Specify which lags for the X_t (g_t) should be 
+       used. Optional; the default is to use just the first lag. 
+       The lags apply to all the X_t (g_t)'s. Non-positive lags 
+       are an error. Each lags needs to be given separately,
+       e.g. {1,2,3}.
+  
+       'recenter': If recenter==1 (==2), then subtracts a recursively calculated
+       median (mean) from the X_t (g_t)'s
+  
+       For a single set of test statistics, only 2 columns (or 1)
+       and a one-element matrix 'whichlags' are needed. 
+       With more columns or more lags, this is not a joint test, 
+       but just several tests in one go. (The first column against 
+       all others.)
+  
+       Output are 4 matrices in an array:
+       (L: number of chosen lag specs in whichlags,
+       K: number of X_t (g_t)'s, i.e. max(cols(mdat)-1, 1) )
+   
+       First: L x K matrix of sign stats Sg
+       Second: L x K matrix of special signed rank stats SRg
+       Third: L x K matrix of standard Wilcoxon signed rank stats Wg 
+       Fourth: L x 1 vector of effective sample lengths used  
+    */
+  
+    if !exists(whichlags)
+        matrix whichlags = {1} # the default
+    else
+        whichlags = vec(whichlags)	# ensure vector
+    endif
+  
+    r = rows(mdat)
+    if max(whichlags) >= r - 1
+        funcerr "lag is too large for sample length"
+    elif min(whichlags) < 1
+        funcerr "lags must be at least 1"
+    endif
+  
+    # handle the convenience case of own lag
+    if cols(mdat) == 1
+        mdat = mdat ~ mdat # copy 1st col to 2nd col 
+    endif
+    c = cols(mdat)
+  
+    # go over all lags
+    matrix effTs = {} # to hold effective sample lengths
+    matrix Sg = {} 	# will hold the sign stats (eq (7))
+    matrix SRg = {} 	# to hold their own sign-rank stat (eq (9))
+    matrix Wg = {} 	# Wilcoxon, eq(8)
+    
+    # recursive recentering: C&G97 p. 9
+    if recenter>0
+        X = mdat[, 2:]
+        matrix Xc = zeros(rows(X),c)	# hold re-centered values
+        loop i=2..rows(X) -q	# at least 2 obs. required
+            xtmp = X[1:i,]                
+            # re-centering procedure
+            xrec = (recenter == 1) ? quantile(xtmp,0.5)' : meanc(xtmp)
+            /* Could be used later in case the linear de-trending should be added
+            if recenter==1
+                xrec = meanc(xtmp)
+            elif recenter==2
+                xrec = quantile(xtmp,0.5)'
+            elif recenter==3	# linear trend
+                # TODO: could be implemented by running a simple regression
+            endif
+            */
+            Xc[i,] = xrec
+        endloop
+    else
+        Xc = mdat[, 2:]		# make sure we proceed with Xc
+    endif
+    loop lix = 1..nelem(whichlags) -q
+        lag = int(whichlags[lix])
+    
+        # do it for all g_t 's    
+        matrix glag = mlag( Xc, lag )[1 + lag : ,]                
+        /* OLD for non-recentered case
+           matrix glag = mlag( mdat[, 2:], lag )[1 + lag : ,]
+           # ... or maybe here... ? FIXME --> AT: I think should be done above already
+        */
+    
+        # adjust the common sample length
+        matrix ycut = Xc[1 + lag :, 1]	#OLD: mdat[1 + lag :, 1]
+        effTs |= rows(ycut)
+    
+        # the products Y_t x g_t-lag
+        matrix prod = ycut .* glag
+        matrix prodsigns = (prod .> 0)
+    
+        # stack the new sign stats vertically
+        Sg |= sumc(prodsigns)
+    
+        # the ranking of abs Y, i.e. R+2
+        matrix Rplus2 = ranking(abs(ycut))
+        
+        # stack the new signed-rank stats vertically
+        SRg |= sumc( prodsigns .* Rplus2 ) 
+
+        # the ranking of the products, i.e. R+1
+        matrix Rplus1 = {}
+        loop i=1..cols(prod) -q
+            Rplus1 ~= ranking( abs(prod[, i]) )
+        endloop
+        Wg |= sumc( prodsigns .* Rplus1 )
+    
+    endloop
+  
+    return defarray(Sg, SRg, Wg, effTs)
+end function
+
+     

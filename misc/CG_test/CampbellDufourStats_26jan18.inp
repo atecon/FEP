@@ -1,0 +1,161 @@
+/*
+   Functions to calculate the test statistics from 
+   Campbell & Dufour 1995 (C&D), which are sign statistics 
+   and related --but not all identical-- to 
+   Wilcoxon test statistics.
+*/
+
+function matrices CamDufStats( matrix mdat, 
+    matrix whichlags[null], int recenter[0:2:0])
+  # (switched the arg ordering ...)
+      
+  /*
+     'mdat': The first column is Y_t in C&D,
+     the remaining columns are different X_t 's (or g_t 's).
+     (If only a single column exists in mdat, then it is assumed 
+     that g_t = Y_t; effectively Y_t is tested against its own lags.) 
+  
+     'whichlags': Specify which lags for the X_t (g_t) should be 
+     used. The lags apply to all the X_t (g_t)'s. Negative lags 
+     are an error. Each lags needs to be given separately,
+     e.g. {1,2,3}. 
+     Optional; the default is to use just the first lag.
+       
+     Special convenience case for unbiasedness test: 
+     Put a single column in 'mdat' and set 'whichlags' to {0} 
+     (gretl also accepts scalar 0), then:
+     The sign and signed-rank statistics then refer directly to Y_t.       
+  
+     'recenter': If 1, then subtracts a recursively calculated
+     median from the X_t (g_t)'s;
+     If 2, a mean. 
+     If 3 (not yet implemented), some trend
+         
+     For a single set of test statistics, only 2 columns (or 1)
+     and a one-element matrix 'whichlags' are needed. 
+     With more columns or more lags, this is not a joint test, 
+     but just several tests in one go. (The first column against 
+     all others.)
+  
+     Output are 3 matrices in an array:
+     (L: number of chosen lag specs in whichlags,
+     K: number of X_t (g_t)'s, i.e. max(cols(mdat)-1, 1) )
+   
+     First: L x K matrix of sign stats Sg
+     Second: L x K matrix of special signed rank stats SRg
+     Third: L x K matrix of standard Wilcoxon signed rank stats Wg 
+     Fourth: L x 1 vector of effective sample lengths used  
+  */
+  
+  # basic choices
+  if !exists(whichlags)
+    matrix whichlags = {1} # the default
+  else
+    whichlags = vec(whichlags)	# ensure vector
+  endif
+  
+  # some checks
+  r = rows(mdat)
+  if max(whichlags) >= r - 1
+    funcerr "lag is too large for sample length"
+      
+  elif min(whichlags) < 0
+    funcerr "lags must not be negative"
+      
+  elif min(whichlags) == 0 && cols(mdat) > 1 
+    funcerr "unbiasedness test on itself only valid for single variable"
+      
+  endif
+      
+  # handle special case unbiasedness of Y_t 
+  # FIXME: AT: im Prinzip braucht man ja für den unbiasedness Test
+  #			kein "whichlag" anzugeben -- d.h. ich würde whichlag "null" setzen
+  #			bzw. gar nicht angeben wollen. 
+  if !min(whichlags)
+    whichlags = {0}	# just to be on the safe side    
+    if recenter 
+      funcerr "unbiasedness test incompatible with recentering"
+    endif
+    
+    # handle the convenience case of own lags
+  elif cols(mdat) == 1
+    mdat = mdat ~ mdat # copy 1st col to 2nd col 
+  endif
+  
+  matrix X = mdat[, 2:]
+  
+  ## recursive recentering, at least 2 obs. required
+  # cf. C&G97 p. 9
+  if recenter
+    
+    matrix Xc = zeros(rows(X) -  1, cols(X))	# hold re-centered values
+    
+    loop i = 2..rows(X) -q	# at least 2 obs.                
+      # re-centering procedure
+      if recenter == 1
+        Xc[i - 1,] = X[i, ] - quantile(X[1:i, ], 0.5)        
+        
+      elif recenter == 2
+        Xc[i - 1,] = X[i, ] - meanc( X[1:i, ] )
+                  
+       # elif recenter == 3	# linear trend
+       # TODO: could be implemented by running a simple regression
+      endif
+    endloop
+                    
+    matrix glag = mlag( Xc, lag )[1 + lag : ,]
+        
+  elif lag > 0 # unnecessary otherwise      
+    matrix glag = mlag( X, lag )[1 + lag : ,]
+
+  endif	# recentering 
+
+  # go over all lags
+  matrix effTs = {} # to hold effective sample lengths
+  matrix Sg = {} 	# will hold the sign stats (eq (7))
+  matrix SRg = {} 	# to hold their own sign-rank stat (eq (9))
+  # (empty for convenience case)
+  matrix Wg = {} 	# Wilcoxon, eq(8)
+  loop lix = 1..nelem(whichlags) -q
+    lag = int(whichlags[lix])
+    
+    # do it for all g_t 's
+ 
+    if lag 
+      # adjust the common sample length
+      delta = rows(mdat) - rows(glag)
+      matrix ycut = mdat[1 + delta :, 1] 
+      effTs |= rows(ycut) 
+      matrix prod = ycut .* glag
+      
+    else # the convenience case, do it on itself!
+      effTs |= rows(mdat)
+      matrix prod = mdat    
+    endif
+
+    matrix prodsigns = (prod .> 0)
+    
+    # stack the new sign stats vertically
+    Sg |= sumc(prodsigns)
+    
+    if lag # not for unbiasedness
+      # the ranking of abs Y, i.e. R+2
+      matrix Rplus2 = ranking(abs(ycut))
+        
+      # stack the new signed-rank stats vertically
+      SRg |= sumc( prodsigns .* Rplus2 ) 
+    endif 
+    
+    # the ranking of the products, i.e. R+1
+    matrix Rplus1 = {}
+    loop i=1..cols(prod) -q
+      Rplus1 ~= ranking( abs(prod[, i]) )
+    endloop
+    Wg |= sumc( prodsigns .* Rplus1 )
+    
+  endloop # through the lag indices
+  
+  return defarray(Sg, SRg, Wg, effTs)
+end function
+
+     
