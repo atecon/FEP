@@ -1,5 +1,5 @@
 To-Do FEP post-2.4 
-(Stand Silvester 2019) 
+(Stand Silvester 2019, update Ende Januar 2020) 
 
 
 1) Add bootstrap DM version using SB.gfn
@@ -12,10 +12,12 @@ To-Do FEP post-2.4
 5) DM: Für fhor>1 wird (hoffentlich) t_HLN berechnet, aber laut unserer Tab. 16 wird nur der entsprechende p-Wert bereitgestellt (als DMpvalssc), nicht die korrigierte
 Statistik t_HLN selbst. Das sollte ergänzt werden (als "DMstatssc"), und dann wohl
 auch im Ergebnisoutput irgendwie ausgedruckt werden. (vgl. Rubaskez-Feedback)  
+-- done in 2.41
 
 6) CW: Im Beispiel wird fc und fc(-1) gemischt, daher sollte die Inferenz HAC-robust sein. Bei uns dient dafür b.fhor > 1, was also ins Beispiel eingefügt werden sollte. Außerdem sollte in der Doku (die sowieso noch richtig ergänzt werden muss) erklärt werden, dass b.fhor hier einzig dafür dient. Alternativ könnte man b.fhor evtl. streichen und einfach immer beide Varianten berechnen, standard und robust. 
+-- done in 2.41 (letztere Variante)
 
 ### marginales Zeug ####
 
-M1) typo: degress -> degrees
-M2) Dank an Michał Rubaszek für Kommentare.
+M1) typo: degress -> degrees -- done in 2.41
+M2) Dank an Michał Rubaszek für Kommentare. -- done in 2.41

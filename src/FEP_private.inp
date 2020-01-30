@@ -3,8 +3,8 @@
 function void check_series_in_b (const bundle b, const string which)
     printf "Test choice: %s\n", which
 
-    if (which=="DM" || which=="GW" || which=="HP" || which=="MZ" || which == "CW") \
-          && !inbundle(b, "y")
+    if (which=="DM" || which=="GW" || which=="HP" || which=="MZ" \
+			|| which == "CW")   && !inbundle(b, "y")
 
         funcerr "Series of realizations 'y' is missing."
         # Strictly speaking: also need to check type of y
@@ -14,7 +14,9 @@ function void check_series_in_b (const bundle b, const string which)
 
     elif (which=="CG" || which=="EKT") && !inbundle(b, "E") && \
           ( !inbundle(b, "y") || !inbundle(b, "fc") )
-        funcerr "Both series of realizations 'y' and of forecasts 'fc' must be passed. (Or errors 'E'.)"
+        printf "Both series realizations 'y' and forecasts 'fc'" 
+		printf " must be passed. (Or errors 'E'.)"
+		funcerr "Missing input series"
 
     elif (which=="DM" || which=="GW" || which == "CW") && !inbundle(b, "f1")
         funcerr "Series of forecast values 'f1' is missing."
@@ -22,7 +24,8 @@ function void check_series_in_b (const bundle b, const string which)
     elif (which=="DM" || which=="GW" || which == "CW") && !inbundle(b, "f2")
         funcerr "Series of forecast values 'f1' is missing."
 
-    elif (which=="DL" || which=="KS" || which=="PT" || which=="PS") && !inbundle(b, "yup")
+    elif (which=="DL" || which=="KS" || which=="PT" || which=="PS") \
+		&& !inbundle(b, "yup")
         funcerr "Binary indicator series of realizations 'yup' is missing."
 
     elif (which=="DL" || which=="KS" || which=="PT") && !inbundle(b, "fcup")
@@ -84,7 +87,7 @@ end function
 function scalar check_y_fc_length (const series y, const list fc)
     /* Check number of valid observations. Needed for ForecastMetrics(). */
     
-    scalar ret = 0			# no. of fc-series which have less valid obs. than series y
+    scalar ret = 0	# no. of fc-series with less valid obs. than series y
     scalar Ty = nobs(y)
     
     loop foreach i fc -q
@@ -98,8 +101,9 @@ function scalar check_y_fc_length (const series y, const list fc)
             string case = "more"
         endif
         if d != 0
-            printf "\nWarning: Forecast series '%s' has %d %s valid observations than your \n\
-              series of realizations\n", varnames(fc)[i], abs(d), case
+            printf "\nWarning: Forecast series '%s' has %d %s", \
+				varnames(fc)[i], abs(d), case
+			printf " valid observations than your series of realizations\n" 
         endif
     endloop
 
@@ -107,7 +111,8 @@ function scalar check_y_fc_length (const series y, const list fc)
 end function
 
 function matrix add_labels (const matrix metrics)
-    /* Helper function adding row- and column-labels. Needed for ForecastMetrics(). */
+    /* Helper function adding row- and column-labels. 
+	Needed for ForecastMetrics(). */
     
     strings cnames = array(cols(metrics))
     loop i=1..cols(metrics) -q
@@ -115,7 +120,8 @@ function matrix add_labels (const matrix metrics)
     endloop
     cnameset(metrics, cnames)
     
-    strings rnames = names_of_basic_point_metrics() + names_of_udf_point_metrics()
+    strings rnames = names_of_basic_point_metrics() + \
+					names_of_udf_point_metrics()
     rnameset(metrics, rnames)
 
     return metrics    
@@ -123,7 +129,7 @@ end function
 
 function matrix basic_point_metrics (const series y, const list fc)
     /* Call built-in gretl function. */
-    return fcstats(y, fc)[1:5,]		# discard Theil's U + associated statistics
+    return fcstats(y, fc)[1:5,]		# discard Theil's U + associated stats
 end function
 
 function strings names_of_basic_point_metrics (void)
@@ -163,7 +169,8 @@ function matrix MADMean (const series y, const list fc, bool use_median[0])
     "Advantages of the MAD/Mean Ratio over the MAPE",
       Foresight: The International Journal of Applied Forecasting, 6 (2007),
       pp. 40-43. See also:
-      https://www.sciencedirect.com/science/article/pii/S0169207016000121#br000070 */
+      https://www.sciencedirect.com/science/
+		article/pii/S0169207016000121#br000070 */
     
     matrix metric = zeros(nelem(fc),1)
     loop foreach i fc -q
@@ -224,9 +231,11 @@ function matrix sMdAAPE (const series y, const list fc, bool use_median[0])
     matrix metric = zeros(nelem(fc),1)
     loop foreach i fc -q
         if use_median
-            metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) / abs((y+fc.$i)) )
+            metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) / \
+					abs((y+fc.$i)) )
         else
-            metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) / abs((y+fc.$i)) )
+            metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) / \
+					abs((y+fc.$i)) )
         endif
     endloop
     
@@ -234,8 +243,10 @@ function matrix sMdAAPE (const series y, const list fc, bool use_median[0])
 end function
 
 
-function matrix RMdSPE (const series y, const list fc_error, bool use_median[0])
-    /* Root mean/ median square percentage error -- based on percentage errors */
+function matrix RMdSPE (const series y, const list fc_error, 
+						bool use_median[0])
+    /* Root mean/ median square percentage error 
+		-- based on percentage errors */
      
     matrix metric = zeros(nelem(fc_error),1)
     loop foreach i fc_error -q
@@ -317,6 +328,7 @@ end function
 
 function void CGprint(bundle *b)
     printf "********************************************************\n"
+	print "*** Campbell & Ghysels "
     if !b.k && !inbundle(b, "CGX")
         printf "You selected the test(s) of unbiasedness.\n"
 
@@ -325,11 +337,19 @@ function void CGprint(bundle *b)
     endif
 
     if b.k > 0 && !inbundle(b, "CGX")
-        printf "You selected the test(s) of (no) serial correlation at lag %d.\n", b.k
+        printf "You selected the test(s) of (no) serial "
+		printf "correlation at lag %d.\n", b.k
 
     elif inbundle(b, "CGX")
         printf "You selected the test(s) of orthogonality at lag %d.\n", b.k
     endif
+
+
+	printf "Test stat (sign)        = %.1f ", b.CGSIGNstat
+	printf "(p-val %.4f)\n", b.CGSIGNpval
+	printf "Test stat (signed rank) = %.1f ", b.CGWILCstat
+	printf "(p-val %.4f)\n", b.CGWILCpval
+
     printf "********************************************************\n"
 end function
 
@@ -370,9 +390,10 @@ end function
 function matrix HLN (scalar DMstat "Diebold-Mariano test statistics",
                      int T "No. of forecasts",
                      int h "Forecast horizon")
-    matrix stat = DMstat / sqrt( (T+1-2*h+h*(h-1)/T)/T )
-    matrix pv = 2*pvalue(t,(T-1),abs(stat))
-    return pv
+	# coming from Harvey, Leybourne, Newbold 1997
+    stat = DMstat / sqrt( (T+1 -2*h + h*(h-1) / T) /T )
+    pv = 2 * pvalue(t, (T-1), abs(stat))
+    return {stat; pv}
 end function
 
 function void try_invert (matrix m,
@@ -394,14 +415,14 @@ function matrix symtest (scalar aT "AlphaHat",
                          int verb)
     # Test the null hypothesis of symmetry: alfa = 0.5 #
     scalar TestSym = (aT - 0.5)/SE
-    scalar ProbSym = 2*(pvalue(z,abs(TestSym)))	# alfa is asymptotically normal
+    scalar ProbSym = 2*(pvalue(z,abs(TestSym)))	# alfa is asympt normal
     if verb==1
-        printf "\n*********************************************\n"
-        printf "Test for Symmetry: H0: aT=0.5 vs. H1: aT!=0.5\n"
-        printf "\nEstim. alpha = %12.3g\n", aT
-        printf "Test stat. = %12.3g\n", TestSym
-        printf "P-value = %12.3g\n", ProbSym
-        printf "\n*********************************************\n"
+        printf "\n*************************************************\n"
+        printf "Test for Symmetry: H0: aT = 0.5 vs. H1: aT != 0.5\n\n"
+        printf "Estimated alpha = %12.3g\n", aT
+        printf "Test statistic  = %12.3g\n", TestSym
+        printf "p-value         = %12.3g\n", ProbSym
+        printf "\n*************************************************\n"
     endif
     return TestSym ~ ProbSym
 end function
@@ -444,13 +465,13 @@ function matrix rattest (matrix Y,
         if cols(s)>1 && verb==1
             printf "\n*********************************************\n"
             printf "Rationality Test\n"
-            if iSym==1
+            if iSym == 1
                 printf "\nAlpha fixed to 0.5\n"
             else
                 printf "\nEstim. alpha = %12.3g\n", aT
             endif
             printf "J-statistics = %12.3g\n", J
-            printf "P-value = %12.3g\n", pv
+            printf "p-value      = %12.3g\n", pv
             printf "\n*********************************************\n"
         endif
         return J~pv

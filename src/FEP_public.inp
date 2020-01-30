@@ -311,9 +311,9 @@ function void doKS (bundle *b)
     if b.verb
         printf "\n*************************\n"
         printf "*** Kuipers Score ***\n"
-        printf "Hit Rate        = %.3f\n", hi
+        printf "Hit Rate         = %.3f\n", hi
         printf "False Alarm Rate = %.3f\n", fa
-        printf "Kuipers Score   = %.3f\n", hi-fa
+        printf "Kuipers Score    = %.3f\n", hi-fa
         printf "\n*************************\n"
     endif
     b.KShit = hi

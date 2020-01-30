@@ -2,8 +2,8 @@
 <gretl-functions>
 <gretl-function-package name="FEP" no-data-ok="true" minver="2017a" lives-in-subdir="true">
 <author email="atecon@posteo.de">Artur Tarassow and Sven Schreiber</author>
-<version>2.4</version>
-<date>2019-12-03</date>
+<version>2.41</version>
+<date>2020-01-30</date>
 <description>Forecast Evaluation Package</description>
 <tags>C12 C52 C53</tags>
 <label>Forecast evaluations</label>
@@ -41,9 +41,9 @@ scalar fa = M[1,2] / sumc(M[,2])	# false alarm rate
 if b.verb
   printf &quot;\n*************************\n&quot;
   printf &quot;*** Kuipers Score ***\n&quot;
-  printf &quot;Hit Rate        = %.3f\n&quot;, hi
+  printf &quot;Hit Rate         = %.3f\n&quot;, hi
   printf &quot;False Alarm Rate = %.3f\n&quot;, fa
-  printf &quot;Kuipers Score   = %.3f\n&quot;, hi-fa
+  printf &quot;Kuipers Score    = %.3f\n&quot;, hi-fa
   printf &quot;\n*************************\n&quot;
 endif
 b.KShit = hi
@@ -109,7 +109,8 @@ if typestr(typeof(b.z)) == &quot;matrix&quot;
     series S$i = mz[,i]
     Z += S$i
   endloop
-elif typestr(typeof(b.z)) == &quot;series&quot; # workaround for apparent gretl bug
+elif typestr(typeof(b.z)) == &quot;series&quot;
+  # (workaround for apparent gretl bug)
   list Z = genseries(&quot;z&quot;, b.z)
 else	# standard list case
   list Z = b.z
@@ -142,21 +143,21 @@ if $error
   end restrict
 endif
 if b.verb
-  printf &quot;\n***********************************************\n&quot;
-  printf &quot;*** Holden &amp; Peel test\n&quot;
-  printf &quot;*** on forecast efficiency\n&quot;
+  printf &quot;\n*********************************************\n&quot;
+  printf &quot;*** Holden &amp; Peel \n&quot;
+  printf &quot;*** test of forecast efficiency\n&quot;
   if b.robust
-    printf &quot;\nMethod: Approach using HAC robust VCV.\n&quot;
+    printf &quot;\nMethod: Approach using HAC robust VCV\n&quot;
   else
-    printf &quot;\nMethod: Approach using asymptotic VCV.\n&quot;
+    printf &quot;\nMethod: Approach using asymptotic VCV\n&quot;
   endif
   if b.nboot &gt; 0
     printf &quot;Bootstrap p-value using %d iterations.\n&quot;, b.nboot
   endif
   printf &quot;H0: forecasts are efficient\n&quot;
-  printf &quot;Test stat.: %.4f\n&quot;, $test
-  printf &quot;p-value:   %.4f\n&quot;, $pvalue
-  printf &quot;***********************************************\n&quot;
+  printf &quot;Test stat = %.4f &quot;, $test
+  printf &quot;(p-val %.4f)\n&quot;, $pvalue
+  printf &quot;*********************************************\n&quot;
 endif
 b.HPstat = $test
 b.HPpval = $pvalue
@@ -225,8 +226,8 @@ list L1 = y fc
 smpl L1 --no-missing
 if rows(values(y)) &gt; 2 || rows(values(fc)) &gt; 2
   printf &quot;*** Note: Running the DL test requires that ***\n&quot;
-  printf &quot;*** yup and fcup are both binary variables! Check again! *** \n&quot;
-  funcerr &quot;Check that y and fc are both binary variables!&quot;
+  printf &quot;*** yup and fcup are both binary variables! *** \n&quot;
+  funcerr &quot;Check again that y and fc are both binary variables!&quot;
 endif
 set_verbatim_flag(&amp;b)
 /* Artur's version
@@ -247,9 +248,10 @@ E_ii = O_idot*O_doti/O		# expected cell count 1,1
 E_ij = O_idot*O_dotj/O		# expected cell count 1,2
 E_ji = O_jdot*O_doti/O		# expected cell count 2,1
 E_jj = O_jdot*O_dotj/O		# expected cell count 2,2
-scalar chi_fc = (M[1,1]-E_ii)^2/E_ii + (M[1,2]-E_ij)^2/E_ij + (M[2,1]-E_ji)^2/E_ji + (M[2,2]-E_jj)^2/E_jj
+scalar chi_fc = (M[1,1]-E_ii)^2/E_ii + (M[1,2]-E_ij)^2/E_ij +    (M[2,1]-E_ji)^2/E_ji + (M[2,2]-E_jj)^2/E_jj
 scalar b.DLstat = chi_fc
-scalar info_fc = M[1,1]/O_doti + M[2,2]/O_dotj	# &gt; 1 indicates some positive information content
+scalar info_fc = M[1,1]/O_doti + M[2,2]/O_dotj
+# &gt; 1 indicates some positive information content
 */
 # Jack's version
 matrix M = mxtab(y,fc)
@@ -259,18 +261,18 @@ scalar n = sumc(c)
 matrix E = c*r/n
 P = (M - E).^2 ./ E
 chi_fc = sumc(vec(P))
-scalar info_fc = M[1,1]/r[1] + M[2,2]/r[2]	# &gt; 1 indicates some positive information content
+scalar info_fc = M[1,1]/r[1] + M[2,2]/r[2]	# &gt; 1 indicates pos info content
 scalar b.DLstat = chi_fc
 scalar b.DLinfo = info_fc		# Information value
 scalar b.DLpval = pvalue(x,1,chi_fc)
 if b.verb
   printf &quot;\n***********************************************\n&quot;
-  printf &quot;*** Diebold &amp; Lopez test\n&quot;
-  printf &quot;*** on directional change\n&quot;
+  printf &quot;*** Diebold &amp; Lopez \n&quot;
+  printf &quot;*** test of directional change\n&quot;
   printf &quot;\nH0: y(t) and fc(t) are independent \n&quot;
-  printf &quot;Info-value: %.4f\n&quot;, b.DLinfo
-  printf &quot;Test stat.: %.4f\n&quot;, b.DLstat
-  printf &quot;p-value:   %.4f\n&quot;, b.DLpval
+  printf &quot;Info-value = %.4f\n&quot;, b.DLinfo
+  printf &quot;Test stat  = %.4f &quot;, b.DLstat
+  printf &quot;(p-val %.4f)\n&quot;, b.DLpval
   printf &quot;***********************************************\n&quot;
 endif
 </code>
@@ -421,21 +423,21 @@ if $error
   end restrict
 endif
 if b.verb
-  printf &quot;\n***********************************************\n&quot;
-  printf &quot;*** Mincer &amp; Zarnowitz test\n&quot;
-  printf &quot;*** on forecast unbiasedness\n&quot;
+  printf &quot;\n*********************************************\n&quot;
+  printf &quot;*** Mincer &amp; Zarnowitz \n&quot;
+  printf &quot;*** test of forecast unbiasedness\n&quot;
   if b.robust
-    printf &quot;\nMethod: Approach using HAC robust VCV.\n&quot;
+    printf &quot;\nMethod: Approach using HAC robust VCV\n&quot;
   else
-    printf &quot;\nMethod: Approach using asymptotic VCV.\n&quot;
+    printf &quot;\nMethod: Approach using asymptotic VCV\n&quot;
   endif
   if b.nboot &gt; 0
     printf &quot;Bootstrap p-value using %d iterations.\n&quot;, b.nboot
   endif
   printf &quot;H0: forecasts are unbiased\n&quot;
-  printf &quot;Test stat.: %.4f\n&quot;, $test
-  printf &quot;p-value:   %.4f\n&quot;, $pvalue
-  printf &quot;***********************************************\n&quot;
+  printf &quot;Test stat = %.4f &quot;, $test
+  printf &quot;(p-val %.4f)\n&quot;, $pvalue
+  printf &quot;*********************************************\n&quot;
 endif
 b.MZstat = $test
 b.MZpval = $pvalue
@@ -446,7 +448,8 @@ b.MZpval = $pvalue
   <param name="b" type="bundleref"/>
  </params>
 <code># compatibility treatment:
-# PTmeth was old code for what is actually robustness: 1: not robust, 2: robust
+# PTmeth was old code for what is actually robustness:
+# 1: not robust, 2: robust
 if inbundle(b, &quot;PTmeth&quot;)
   print &quot;Warning: PTmeth is deprecated, use 'robust' (0/1)&quot;
   if b.PTmeth == 1 || b.PTmeth == 2
@@ -462,9 +465,9 @@ series y = b.yup		# Binary of var. of actual ups
 series fc = b.fcup		# Binary of var. of forecasted ups
 smpl y fc --no-missing
 if rows(values(y)) &gt; 2 || rows(values(fc)) &gt; 2
-  printf &quot;*** Note: Running the Pesaran &amp; Timmermann test requires ***\n&quot;
-  printf &quot;*** that y and fc are both binary variables! Check again! *** \n&quot;
-  funcerr &quot;Check that y and fc are both binary variables.&quot;
+  printf &quot;*** Note: the Pesaran &amp; Timmermann test requires ***\n&quot;
+  printf &quot;*** that y and fc are both binary variables! *** \n&quot;
+  funcerr &quot;Check again that y and fc are both binary variables.&quot;
 endif
 if b.robust == 0  # PTmeth == 1
   scalar r = mcorr({y} ~ {fc})[1,2]
@@ -479,18 +482,18 @@ else
   print &quot;Warning: Invalid PTmeth input&quot;
 endif
 if b.verb
-  printf &quot;\n***********************************************\n&quot;
-  printf &quot;*** Pesaran &amp; Timmermann (1992, 2006) test\n&quot;
-  printf &quot;*** on directional change\n&quot;
+  printf &quot;\n************************************************\n&quot;
+  printf &quot;*** Pesaran &amp; Timmermann (1992, 2006) \n&quot;
+  printf &quot;*** test of directional change\n&quot;
   if b.robust    #  PTmeth == 2
-    printf &quot;\nMethod: Regression approach using HAC robust VCV.\n&quot;
+    printf &quot;\nMethod: Regression approach using HAC robust VCV\n&quot;
   else			# PTmeth == 1
-    printf &quot;\nMethod: Correlation approach using asymptotic VCV.\n&quot;
+    printf &quot;\nMethod: Correlation approach using asymptotic VCV\n&quot;
   endif
   printf &quot;H0: y(t) and x(t) are distributed independently \n&quot;
-  printf &quot;Test stat.: %.4f\n&quot;, test
-  printf &quot;p-value:   %.4f\n&quot;, pval
-  printf &quot;***********************************************\n&quot;
+  printf &quot;Test stat = %.4f &quot;, test
+  printf &quot;(p-val %.4f)\n&quot;, pval
+  printf &quot;************************************************\n&quot;
 endif
 b.PTstat = test
 b.PTpval = pval
@@ -615,25 +618,29 @@ if b.loss == 1		# U-shape quadratic loss
 elif b.loss == 2		# V-shape
   series L = abs(e1) - abs(e2)
 else
-  printf &quot;\n*** You can choose only between loss=1 (U-shape) and loss=2 (V-shape). ***\n&quot;
+  printf &quot;\n*** You can choose only between loss=1 (U-shape)&quot;
+  printf &quot; and loss=2 (V-shape). ***\n&quot;
   printf &quot;*** Please re-specify b.loss.\n&quot;
   funcerr &quot;Loss can only be 1 or 2.&quot;
 endif
 # Run regression based HAC robust DM test
 ols L 0 --robust --quiet
 # Return test statistics and p-value
-b.L = L										# series of loss differentials
-scalar tstat = $coeff/$stderr
+b.L = L									# series of loss differentials
+scalar tstat = $coeff / $stderr
 b.DMstat = tstat
 b.pvaln = 2 * pvalue(z, abs(tstat))			# stand. normal
 b.pvalt = 2 * pvalue(t, ($T-1), abs(tstat))	# t-distribution
-b.DMpvalssc = HLN(tstat, $T, b.fhor)		# small-sample correction
+matrix ssc = HLN(tstat, $T, b.fhor)		# small-sample correction
+b.DMstatssc = ssc[1]
+b.DMpvalssc = ssc[2]
 if b.verb
   printf &quot;\n***********************************************\n&quot;
-  printf &quot;*** Diebold &amp; Mariano (1995) test\n&quot;
-  printf &quot;*** on equal forecast accuracy\n&quot;
+  printf &quot;*** Diebold &amp; Mariano (1995) \n&quot;
+  printf &quot;*** test of equal forecast accuracy\n&quot;
   if b.fhor == 0
-    printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
+    printf &quot;\n*** Warning: You have set the forecast horizon
+    printf &quot; to h=0.\n&quot;
   endif
   if b.loss == 1
     printf &quot;\nLoss: U-shape quadratic.\n&quot;
@@ -642,10 +649,11 @@ if b.verb
   endif
   printf &quot;Forecast horizon: %d \n&quot;, b.fhor
   printf &quot;H0: forecasts are equally accurate\n&quot;
-  printf &quot;Test stat.: %.4f\n&quot;, b.DMstat
-  printf &quot;p-value (stand. normal): %.4f\n&quot;, b.pvaln
-  printf &quot;p-value (t-distributed): %.4f\n&quot;, b.pvalt
-  printf &quot;p-value (small-sample):  %.4f\n&quot;, b.DMpvalssc
+  printf &quot;Test statistic: \t%.4f\n&quot;, b.DMstat
+  printf &quot;p-val (stand. normal): \t%.4f\n&quot;, b.pvaln
+  printf &quot;p-val (t-distr): \t%.4f\n&quot;, b.pvalt
+  printf &quot;Test stat (small-sample corrected): %.4f\n&quot;, b.DMstatssc
+  printf &quot;p-val (small-sample): \t%.4f\n&quot;, b.DMpvalssc
   printf &quot;***********************************************\n&quot;
 endif
 </code>
@@ -656,12 +664,12 @@ endif
  </params>
 <code>/*
 This function performs the asymptotic Conditional Predictive Ability Test
-Raffaella Giacomini &amp; Halbert White, 2006. &quot;Tests of Conditional Predictive
-Ability,&quot; Econometrica, Econometric Society, vol. 74(6), pages 1545-1578, November.
+Raffaella Giacomini &amp; Halbert White, 2006. &quot;Tests of Conditional
+Predictive Ability,&quot; Econometrica, Econometric Society, vol. 74(6),	pages 1545-1578, November.
 &lt;https://ideas.repec.org/a/ecm/emetrp/v74y2006i6p1545-1578.html&gt;
-Diebold-Mariano and West (1996) type tests rather test which of two models better approximates the DGP
-&quot;As a result, whereas the unconditional tests restrict attention to the forecast model, the conditional
-approach allows evaluation of the forecasting method, which includes the model, the estimation
+&quot;As a result, whereas the unconditional tests restrict attention to
+the forecast model, the conditional approach allows evaluation of
+the forecasting method, which includes the model, the estimation
 procedure and the possible cond of estimation window.&quot;
 */
 # apply defaults
@@ -690,7 +698,8 @@ scalar T = nobs(L) - b.fhor
 list z = const
 # set up the instruments for a conditional analysis
 if b.cond
-  # add lagged loss values -- information set available in period t for the t+h forecast
+  # add lagged loss values --
+  # info set available in period t for the t+h forecast
   z += L(-b.fhor to -b.fhor)
   # add additional regressor
   if inbundle(b, &quot;z&quot;)
@@ -701,14 +710,15 @@ if b.cond
         series S$i = mz[,i]
         z += S$i
       endloop
-    elif typestr(typeof(b.z)) == &quot;series&quot; # workaround for apparent gretl bug
+    elif typestr(typeof(b.z)) == &quot;series&quot;
+      # (workaround for apparent gretl bug)
       list z += genseries(&quot;z&quot;, b.z)
     else	# standard list case
       list z += b.z
     endif
   endif
 endif
-# create the regressor matrix given by L*ht', where ht is the matrix of instruments
+# create the reg matrix given by L*ht', where ht is matrix of instr
 list reg = null
 loop foreach i z -q
   series r$i = z.$i * L
@@ -717,7 +727,7 @@ endloop
 df = nelem(reg)
 # Run regression
 if b.fhor == 1
-  # calculate the test stat as n*R^2 from the regression of one on L*ht
+  # calc the test stat as n*R^2 from the regression of one on L*ht
   ols 0 reg -q
   scalar tstat = $T*$rsq			# this only works for hor=1!
 else
@@ -726,35 +736,36 @@ else
   scalar tstat = T*zbar'*inv(omega)*zbar
 endif
 # Return test statistics and p-value
-b.L = L										# series of loss differentials
+b.L = L								# series of loss differentials
 b.GWstat = tstat
-b.GWpval = pvalue(c,df,abs(tstat))     		# Chi^2 distributed
+b.GWpval = pvalue(c,df,abs(tstat))  # Chi^2 distributed
 b.sign = mean(L)
 if b.verb
-  printf &quot;\n*********************************************\n&quot;
-  printf &quot;*** Giacomini &amp; White (2006) test\n&quot;
-  printf &quot;*** of conditional predictive ability\n&quot;
+  printf &quot;\n***********************************************\n&quot;
+  printf &quot;*** Giacomini &amp; White (2006) \n&quot;
+  printf &quot;*** test of conditional predictive ability\n&quot;
   if b.loss==1
     printf &quot;\nLoss: U-shape quadratic.\n&quot;
   elif b.loss==2
     printf &quot;\nLoss: V-shape linear.\n&quot;
   endif
   if b.cond==0
-    printf &quot;Your choice: \tUnconditional Test\n&quot;
+    printf &quot;Choice: \t\tUnconditional Test\n&quot;
     if inbundle(b, &quot;z&quot;)
-      printf &quot;Additional variables in element 'z' are thus not considered.\n&quot;
+      printf &quot;Additional variables in element 'z' are thus &quot;
+      printf &quot;not considered.\n&quot;
     endif
   else
     printf &quot;Your choice: \tConditional Test\n&quot;
   endif
   printf &quot;Forecast horizon: %d \n&quot;, b.fhor
   printf &quot;H0: forecasts are equally accurate\n&quot;
-  printf &quot;Test stat.: %.4f\n&quot;, b.GWstat
-  printf &quot;p-value (chi^2): %.4f\n&quot;, b.GWpval
+  printf &quot;Test stat = %.4f &quot;, b.GWstat
+  printf &quot;(p-val, chi^2-distr: %.4f)\n&quot;, b.GWpval
   if b.sign &lt; 0
-    printf &quot;Sign of the mean of the loss is (-) -- 1st model dominates\n&quot;
+    printf &quot;Sign of mean loss: (-) -- 1st model dominates\n&quot;
   else
-    printf &quot;Sign of the mean of the loss is (+) -- 2nd model dominates\n&quot;
+    printf &quot;Sign of mean loss: (+) -- 2nd model dominates\n&quot;
   endif
   printf &quot;***********************************************\n&quot;
 endif
@@ -764,36 +775,34 @@ endif
  <params count="1">
   <param name="b" type="bundleref"/>
  </params>
-<code># All: b.y, b.fhor
-# (The horizon fhor is only needed to decide whether an
-#	[H]AC std. error should be used; for fhor &gt; 1.)
+<code># All: b.y,
 # Model 1: b.f1, parsimonious model
 # Model 2: b.f2, larger nesting model
-set_fhor_default(&amp;b)	# default 1-step horizon (tau in CW)
-if b.fhor == 0
-  printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
-endif
 series e1 = b.y - b.f1
 series e2 = b.y - b.f2
 smpl e1 e2 --no-missing
 series fhathalf = e1 * (e1 - e2) # equiv. to eq 2.1 hopefully
-if b.fhor == 1
-  ols fhathalf const --quiet
-else
-  set force_hc off	# ensure AC-consistency, not just HC
-  ols fhathalf const --robust --quiet
-endif
-# omit const  # doesn't work in gretl
+## for simplicity compute both standard and robust
+ols fhathalf const --quiet
+# ( omit const  # doesn't work in gretl)
 b.CWstat = $coeff(const) / $stderr(const)
 b.CWpval = pvalue(t, $df, b.CWstat) # one-sided test
+# robust
+set force_hc off	# ensure AC-consistency, not just HC
+ols fhathalf const --robust --quiet
+b.CWstat_rob = $coeff(const) / $stderr(const)
+b.CWpval_rob = pvalue(t, $df, b.CWstat_rob) # one-sided test
 if b.verb
   printf &quot;\n***********************************************\n&quot;
-  printf &quot;*** Clark &amp; West (2006) test\n&quot;
-  printf &quot;*** on equal forecast accuracy in nested models\n&quot;
-  printf &quot;Forecast horizon: %d \n&quot;, b.fhor
+  printf &quot;*** Clark &amp; West (2006/7) test\n&quot;
+  printf &quot;*** of equal forecast accuracy in nested models\n&quot;
+  # printf &quot;Forecast horizon: %d \n&quot;, b.fhor
   printf &quot;H0: forecasts are equally accurate\n&quot;
-  printf &quot;Test stat.: %.4f\n&quot;, b.CWstat
-  printf &quot;p-value (t-distributed): %.4f\n&quot;, b.CWpval
+  printf &quot;Test stat = %.4f&quot;, b.CWstat
+  printf &quot; (p-val, t-distr: %.4f)\n&quot;, b.CWpval
+  printf &quot;Robust version\n&quot;
+  printf &quot;Test stat = %.4f&quot;, b.CWstat_rob
+  printf &quot; (p-val, t-distr: %.4f)\n&quot;, b.CWpval_rob
   printf &quot;***********************************************\n&quot;
 endif
 </code>
@@ -1490,18 +1499,20 @@ return defarray(Sg, SRg, Wg, effTs)
   <param name="which" type="string" const="true"/>
  </params>
 <code>printf &quot;Test choice: %s\n&quot;, which
-if (which==&quot;DM&quot; || which==&quot;GW&quot; || which==&quot;HP&quot; || which==&quot;MZ&quot; || which == &quot;CW&quot;) &amp;&amp; !inbundle(b, &quot;y&quot;)
+if (which==&quot;DM&quot; || which==&quot;GW&quot; || which==&quot;HP&quot; || which==&quot;MZ&quot;    || which == &quot;CW&quot;) &amp;&amp; !inbundle(b, &quot;y&quot;)
   funcerr &quot;Series of realizations 'y' is missing.&quot;
   # Strictly speaking: also need to check type of y
 elif (which==&quot;HP&quot; || which==&quot;MZ&quot;) &amp;&amp; !inbundle(b, &quot;fc&quot;)
   funcerr &quot;Series of forecasts values 'fc' is missing.&quot;
 elif (which==&quot;CG&quot; || which==&quot;EKT&quot;) &amp;&amp; !inbundle(b, &quot;E&quot;) &amp;&amp; ( !inbundle(b, &quot;y&quot;) || !inbundle(b, &quot;fc&quot;) )
-  funcerr &quot;Both series of realizations 'y' and of forecasts 'fc' must be passed. (Or errors 'E'.)&quot;
+  printf &quot;Both series realizations 'y' and forecasts 'fc'&quot;
+  printf &quot; must be passed. (Or errors 'E'.)&quot;
+  funcerr &quot;Missing input series&quot;
 elif (which==&quot;DM&quot; || which==&quot;GW&quot; || which == &quot;CW&quot;) &amp;&amp; !inbundle(b, &quot;f1&quot;)
   funcerr &quot;Series of forecast values 'f1' is missing.&quot;
 elif (which==&quot;DM&quot; || which==&quot;GW&quot; || which == &quot;CW&quot;) &amp;&amp; !inbundle(b, &quot;f2&quot;)
   funcerr &quot;Series of forecast values 'f1' is missing.&quot;
-elif (which==&quot;DL&quot; || which==&quot;KS&quot; || which==&quot;PT&quot; || which==&quot;PS&quot;) &amp;&amp; !inbundle(b, &quot;yup&quot;)
+elif (which==&quot;DL&quot; || which==&quot;KS&quot; || which==&quot;PT&quot; || which==&quot;PS&quot;)   &amp;&amp; !inbundle(b, &quot;yup&quot;)
   funcerr &quot;Binary indicator series of realizations 'yup' is missing.&quot;
 elif (which==&quot;DL&quot; || which==&quot;KS&quot; || which==&quot;PT&quot;) &amp;&amp; !inbundle(b, &quot;fcup&quot;)
   funcerr &quot;Binary indicator series of forecasts 'fcup' is missing.&quot;
@@ -1553,7 +1564,7 @@ endif
   <param name="fc" type="list" const="true"/>
  </params>
 <code>/* Check number of valid observations. Needed for ForecastMetrics(). */
-scalar ret = 0			# no. of fc-series which have less valid obs. than series y
+scalar ret = 0	# no. of fc-series with less valid obs. than series y
 scalar Ty = nobs(y)
 loop foreach i fc -q
   scalar d = nobs(fc.$i)-Ty
@@ -1565,7 +1576,8 @@ loop foreach i fc -q
     string case = &quot;more&quot;
   endif
   if d != 0
-    printf &quot;\nWarning: Forecast series '%s' has %d %s valid observations than your \n               series of realizations\n&quot;, varnames(fc)[i], abs(d), case
+    printf &quot;\nWarning: Forecast series '%s' has %d %s&quot;,     varnames(fc)[i], abs(d), case
+    printf &quot; valid observations than your series of realizations\n&quot;
   endif
 endloop
 return ret
@@ -1575,13 +1587,14 @@ return ret
  <params count="1">
   <param name="metrics" type="matrix" const="true"/>
  </params>
-<code>/* Helper function adding row- and column-labels. Needed for ForecastMetrics(). */
+<code>/* Helper function adding row- and column-labels.
+Needed for ForecastMetrics(). */
 strings cnames = array(cols(metrics))
 loop i=1..cols(metrics) -q
   cnames[i] = sprintf(&quot;Forecast_$i&quot;)
 endloop
 cnameset(metrics, cnames)
-strings rnames = names_of_basic_point_metrics() + names_of_udf_point_metrics()
+strings rnames = names_of_basic_point_metrics() +      names_of_udf_point_metrics()
 rnameset(metrics, rnames)
 return metrics
 </code>
@@ -1592,7 +1605,7 @@ return metrics
   <param name="fc" type="list" const="true"/>
  </params>
 <code>/* Call built-in gretl function. */
-return fcstats(y, fc)[1:5,]		# discard Theil's U + associated statistics
+return fcstats(y, fc)[1:5,]		# discard Theil's U + associated stats
 </code>
 </gretl-function>
 <gretl-function name="names_of_basic_point_metrics" type="strings" private="1">
@@ -1634,7 +1647,8 @@ return metrics
 <code>/* Mean (median) absolute error scaled by the sample mean (median)
 of realizations. Proposed by Kolassa and Schütz (2007):
 &quot;Advantages of the MAD/Mean Ratio over the MAPE&quot;, Foresight: The International Journal of Applied Forecasting, 6 (2007), pp. 40-43. See also:
-https://www.sciencedirect.com/science/article/pii/S0169207016000121#br000070 */
+https://www.sciencedirect.com/science/
+article/pii/S0169207016000121#br000070 */
 matrix metric = zeros(nelem(fc),1)
 loop foreach i fc -q
   if use_median
@@ -1698,9 +1712,9 @@ return metric
 matrix metric = zeros(nelem(fc),1)
 loop foreach i fc -q
   if use_median
-    metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) / abs((y+fc.$i)) )
+    metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) /      abs((y+fc.$i)) )
   else
-    metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) / abs((y+fc.$i)) )
+    metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) /      abs((y+fc.$i)) )
   endif
 endloop
 return metric
@@ -1712,7 +1726,8 @@ return metric
   <param name="fc_error" type="list" const="true"/>
   <param name="use_median" type="bool" default="0"/>
  </params>
-<code>/* Root mean/ median square percentage error -- based on percentage errors */
+<code>/* Root mean/ median square percentage error
+-- based on percentage errors */
 matrix metric = zeros(nelem(fc_error),1)
 loop foreach i fc_error -q
   if use_median
@@ -1804,16 +1819,22 @@ endif
   <param name="b" type="bundleref"/>
  </params>
 <code>printf &quot;********************************************************\n&quot;
+print &quot;*** Campbell &amp; Ghysels &quot;
 if !b.k &amp;&amp; !inbundle(b, &quot;CGX&quot;)
   printf &quot;You selected the test(s) of unbiasedness.\n&quot;
 elif !b.k &amp;&amp; inbundle(b, &quot;CGX&quot;)
   funcerr &quot;You set k=0 but provided CGX. Please set k&gt;0, and re-run.&quot;
 endif
 if b.k &gt; 0 &amp;&amp; !inbundle(b, &quot;CGX&quot;)
-  printf &quot;You selected the test(s) of (no) serial correlation at lag %d.\n&quot;, b.k
+  printf &quot;You selected the test(s) of (no) serial &quot;
+  printf &quot;correlation at lag %d.\n&quot;, b.k
 elif inbundle(b, &quot;CGX&quot;)
   printf &quot;You selected the test(s) of orthogonality at lag %d.\n&quot;, b.k
 endif
+printf &quot;Test stat (sign)        = %.1f &quot;, b.CGSIGNstat
+printf &quot;(p-val %.4f)\n&quot;, b.CGSIGNpval
+printf &quot;Test stat (signed rank) = %.1f &quot;, b.CGWILCstat
+printf &quot;(p-val %.4f)\n&quot;, b.CGWILCpval
 printf &quot;********************************************************\n&quot;
 </code>
 </gretl-function>
@@ -1845,9 +1866,10 @@ funcerr &quot;Code scode didn't match anything&quot;
 <description>Forecast horizon</description>
   </param>
  </params>
-<code>matrix stat = DMstat / sqrt( (T+1-2*h+h*(h-1)/T)/T )
-matrix pv = 2*pvalue(t,(T-1),abs(stat))
-return pv
+<code># coming from Harvey, Leybourne, Newbold 1997
+stat = DMstat / sqrt( (T+1 -2*h + h*(h-1) / T) /T )
+pv = 2 * pvalue(t, (T-1), abs(stat))
+return {stat; pv}
 </code>
 </gretl-function>
 <gretl-function name="try_invert" type="void" private="1">
@@ -1880,14 +1902,14 @@ err = $error
  </params>
 <code># Test the null hypothesis of symmetry: alfa = 0.5 #
 scalar TestSym = (aT - 0.5)/SE
-scalar ProbSym = 2*(pvalue(z,abs(TestSym)))	# alfa is asymptotically normal
+scalar ProbSym = 2*(pvalue(z,abs(TestSym)))	# alfa is asympt normal
 if verb==1
-  printf &quot;\n*********************************************\n&quot;
-  printf &quot;Test for Symmetry: H0: aT=0.5 vs. H1: aT!=0.5\n&quot;
-  printf &quot;\nEstim. alpha = %12.3g\n&quot;, aT
-  printf &quot;Test stat. = %12.3g\n&quot;, TestSym
-  printf &quot;P-value = %12.3g\n&quot;, ProbSym
-  printf &quot;\n*********************************************\n&quot;
+  printf &quot;\n*************************************************\n&quot;
+  printf &quot;Test for Symmetry: H0: aT = 0.5 vs. H1: aT != 0.5\n\n&quot;
+  printf &quot;Estimated alpha = %12.3g\n&quot;, aT
+  printf &quot;Test statistic  = %12.3g\n&quot;, TestSym
+  printf &quot;p-value         = %12.3g\n&quot;, ProbSym
+  printf &quot;\n*************************************************\n&quot;
 endif
 return TestSym ~ ProbSym
 </code>
@@ -1935,13 +1957,13 @@ if cols(s)&gt;1 &amp;&amp; err==0
   if cols(s)&gt;1 &amp;&amp; verb==1
     printf &quot;\n*********************************************\n&quot;
     printf &quot;Rationality Test\n&quot;
-    if iSym==1
+    if iSym == 1
       printf &quot;\nAlpha fixed to 0.5\n&quot;
     else
       printf &quot;\nEstim. alpha = %12.3g\n&quot;, aT
     endif
     printf &quot;J-statistics = %12.3g\n&quot;, J
-    printf &quot;P-value = %12.3g\n&quot;, pv
+    printf &quot;p-value      = %12.3g\n&quot;, pv
     printf &quot;\n*********************************************\n&quot;
   endif
   return J~pv

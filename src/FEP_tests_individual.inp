@@ -176,7 +176,8 @@ function void doHPtest (bundle *b)
             series S$i = mz[,i]
             Z += S$i
         endloop
-    elif typestr(typeof(b.z)) == "series" # workaround for apparent gretl bug
+    elif typestr(typeof(b.z)) == "series" 
+		# (workaround for apparent gretl bug)
         list Z = genseries("z", b.z)
 
     else	# standard list case
@@ -213,21 +214,21 @@ function void doHPtest (bundle *b)
     endif
 
     if b.verb
-        printf "\n***********************************************\n"
-        printf "*** Holden & Peel test\n"
-        printf "*** on forecast efficiency\n"
+        printf "\n*********************************************\n"
+        printf "*** Holden & Peel \n"
+        printf "*** test of forecast efficiency\n"
         if b.robust
-            printf "\nMethod: Approach using HAC robust VCV.\n"
+            printf "\nMethod: Approach using HAC robust VCV\n"
         else
-            printf "\nMethod: Approach using asymptotic VCV.\n"
+            printf "\nMethod: Approach using asymptotic VCV\n"
         endif
         if b.nboot > 0
             printf "Bootstrap p-value using %d iterations.\n", b.nboot
         endif
         printf "H0: forecasts are efficient\n"
-        printf "Test stat.: %.4f\n", $test
-        printf "p-value:   %.4f\n", $pvalue
-        printf "***********************************************\n"
+        printf "Test stat = %.4f ", $test
+        printf "(p-val %.4f)\n", $pvalue
+        printf "*********************************************\n"
     endif
     b.HPstat = $test
     b.HPpval = $pvalue
@@ -247,8 +248,8 @@ function void doDLtest (bundle *b)
     smpl L1 --no-missing
     if rows(values(y)) > 2 || rows(values(fc)) > 2
         printf "*** Note: Running the DL test requires that ***\n"
-        printf "*** yup and fcup are both binary variables! Check again! *** \n"
-        funcerr "Check that y and fc are both binary variables!"
+        printf "*** yup and fcup are both binary variables! *** \n"
+        funcerr "Check again that y and fc are both binary variables!"
     endif
     set_verbatim_flag(&b)
 
@@ -270,9 +271,11 @@ function void doDLtest (bundle *b)
        E_ij = O_idot*O_dotj/O		# expected cell count 1,2
        E_ji = O_jdot*O_doti/O		# expected cell count 2,1
        E_jj = O_jdot*O_dotj/O		# expected cell count 2,2
-       scalar chi_fc = (M[1,1]-E_ii)^2/E_ii + (M[1,2]-E_ij)^2/E_ij + (M[2,1]-E_ji)^2/E_ji + (M[2,2]-E_jj)^2/E_jj
+       scalar chi_fc = (M[1,1]-E_ii)^2/E_ii + (M[1,2]-E_ij)^2/E_ij + \
+			(M[2,1]-E_ji)^2/E_ji + (M[2,2]-E_jj)^2/E_jj
        scalar b.DLstat = chi_fc
-       scalar info_fc = M[1,1]/O_doti + M[2,2]/O_dotj	# > 1 indicates some positive information content
+       scalar info_fc = M[1,1]/O_doti + M[2,2]/O_dotj	
+		# > 1 indicates some positive information content
     */
     # Jack's version
     matrix M = mxtab(y,fc)
@@ -282,18 +285,18 @@ function void doDLtest (bundle *b)
     matrix E = c*r/n
     P = (M - E).^2 ./ E
     chi_fc = sumc(vec(P))
-    scalar info_fc = M[1,1]/r[1] + M[2,2]/r[2]	# > 1 indicates some positive information content
+    scalar info_fc = M[1,1]/r[1] + M[2,2]/r[2]	# > 1 indicates pos info content
     scalar b.DLstat = chi_fc
     scalar b.DLinfo = info_fc		# Information value
     scalar b.DLpval = pvalue(x,1,chi_fc)
     if b.verb
         printf "\n***********************************************\n"
-        printf "*** Diebold & Lopez test\n"
-        printf "*** on directional change\n"
+        printf "*** Diebold & Lopez \n"
+        printf "*** test of directional change\n"
         printf "\nH0: y(t) and fc(t) are independent \n"
-        printf "Info-value: %.4f\n", b.DLinfo
-        printf "Test stat.: %.4f\n", b.DLstat
-        printf "p-value:   %.4f\n", b.DLpval
+        printf "Info-value = %.4f\n", b.DLinfo
+        printf "Test stat  = %.4f ", b.DLstat
+        printf "(p-val %.4f)\n", b.DLpval
         printf "***********************************************\n"
     endif
 end function
@@ -341,21 +344,21 @@ function void doMZtest (bundle *b)
     endif
 
     if b.verb
-        printf "\n***********************************************\n"
-        printf "*** Mincer & Zarnowitz test\n"
-        printf "*** on forecast unbiasedness\n"
+        printf "\n*********************************************\n"
+        printf "*** Mincer & Zarnowitz \n"
+        printf "*** test of forecast unbiasedness\n"
         if b.robust
-            printf "\nMethod: Approach using HAC robust VCV.\n"
+            printf "\nMethod: Approach using HAC robust VCV\n"
         else
-            printf "\nMethod: Approach using asymptotic VCV.\n"
+            printf "\nMethod: Approach using asymptotic VCV\n"
         endif
         if b.nboot > 0
             printf "Bootstrap p-value using %d iterations.\n", b.nboot
         endif
         printf "H0: forecasts are unbiased\n"
-        printf "Test stat.: %.4f\n", $test
-        printf "p-value:   %.4f\n", $pvalue
-        printf "***********************************************\n"
+        printf "Test stat = %.4f ", $test
+        printf "(p-val %.4f)\n", $pvalue
+        printf "*********************************************\n"
     endif
 
     b.MZstat = $test
@@ -366,7 +369,8 @@ end function
 
 function void doPTtest (bundle *b)
     # compatibility treatment:
-    # PTmeth was old code for what is actually robustness: 1: not robust, 2: robust
+    # PTmeth was old code for what is actually robustness: 
+	# 1: not robust, 2: robust
     if inbundle(b, "PTmeth")
         print "Warning: PTmeth is deprecated, use 'robust' (0/1)"
 
@@ -385,9 +389,9 @@ function void doPTtest (bundle *b)
     series fc = b.fcup		# Binary of var. of forecasted ups
     smpl y fc --no-missing
     if rows(values(y)) > 2 || rows(values(fc)) > 2
-        printf "*** Note: Running the Pesaran & Timmermann test requires ***\n"
-        printf "*** that y and fc are both binary variables! Check again! *** \n"
-        funcerr "Check that y and fc are both binary variables."
+        printf "*** Note: the Pesaran & Timmermann test requires ***\n"
+        printf "*** that y and fc are both binary variables! *** \n"
+        funcerr "Check again that y and fc are both binary variables."
     endif
     if b.robust == 0  # PTmeth == 1
         scalar r = mcorr({y} ~ {fc})[1,2]
@@ -403,18 +407,18 @@ function void doPTtest (bundle *b)
     endif
 
     if b.verb
-        printf "\n***********************************************\n"
-        printf "*** Pesaran & Timmermann (1992, 2006) test\n"
-        printf "*** on directional change\n"
+        printf "\n************************************************\n"
+        printf "*** Pesaran & Timmermann (1992, 2006) \n"
+        printf "*** test of directional change\n"
         if b.robust    #  PTmeth == 2
-            printf "\nMethod: Regression approach using HAC robust VCV.\n"
+            printf "\nMethod: Regression approach using HAC robust VCV\n"
         else			# PTmeth == 1
-            printf "\nMethod: Correlation approach using asymptotic VCV.\n"
+            printf "\nMethod: Correlation approach using asymptotic VCV\n"
         endif
         printf "H0: y(t) and x(t) are distributed independently \n"
-        printf "Test stat.: %.4f\n", test
-        printf "p-value:   %.4f\n", pval
-        printf "***********************************************\n"
+        printf "Test stat = %.4f ", test
+        printf "(p-val %.4f)\n", pval
+        printf "************************************************\n"
     endif
     b.PTstat = test
     b.PTpval = pval

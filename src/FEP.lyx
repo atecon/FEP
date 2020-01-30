@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.4, December 2019
+ version 2.41, January 2020
 \end_layout
 
 \begin_layout Abstract
@@ -2747,8 +2747,6 @@ FC horizon
 
 \begin_layout Plain Layout
 
-\size small
-[fhor]
 \end_layout
 
 \end_inset
@@ -10900,7 +10898,7 @@ literal "true"
 
 \end_inset
 
- have suggested the following small-sample corrected degress-of-freedom
+ have suggested the following small-sample corrected degrees-of-freedom
  adjusted t-statistics 
 \begin_inset Formula 
 \[
@@ -10966,7 +10964,7 @@ Diebold-Mariano test
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="17" columns="3">
+<lyxtabular version="3" rows="18" columns="3">
 <features booktabs="true" tabularvalignment="bottom">
 <column alignment="left" valignment="top" width="2.5cm">
 <column alignment="left" valignment="top" width="3cm">
@@ -11364,7 +11362,7 @@ DMstat
 \begin_inset Text
 
 \begin_layout Plain Layout
-test statistics (not small-sample adjusted)
+test statistic (not small-sample adjusted)
 \end_layout
 
 \end_inset
@@ -11395,7 +11393,7 @@ DMpvaln
 \begin_inset Text
 
 \begin_layout Plain Layout
- p-value based on standard normal
+p-value based on standard normal
 \end_layout
 
 \end_inset
@@ -11427,6 +11425,37 @@ DMpvalt
 
 \begin_layout Plain Layout
 p-value based on t-distribution
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scalar 
+\emph on
+DMstatssc
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+test statistic w/ small-sample correction
 \end_layout
 
 \end_inset
@@ -12170,10 +12199,20 @@ literal "true"
 
 \begin_layout Subsection
 Clark-West test – doCWtest()
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+We gratefully acknowledge useful comments from Michał Rubaszek.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-Experimental implementation of 
+Implementation of 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "ClarkWest2007"
@@ -12190,6 +12229,24 @@ reference "tab:doCWtest"
 \end_inset
 
 .
+ If the test rejects, there is evidence that the smaller nested model is
+ significantly worse at forecasting.
+ It is the user's responsibility to ensure that the models are indeed nested,
+ since this cannot be determined from the forecast realizations.
+ Note that even though the test setup is one-sided, reverse outcomes may
+ occur in reality (finite samples); in those cases the given p-value is
+ still computed mechanically as the right-tail probability mass.
+ 
+\end_layout
+
+\begin_layout Standard
+Two test statistics are provided, where the second one is a autocorrelation-robu
+st variant of the first.
+ For example, if the forecast horizon exceeds 1 it is expected that the
+ forecast time series display serial correlation and thus robust inference
+ is usually advisable.
+ For a one-step forecast standard inference may be sufficient, depending
+ on the context and the application.
 \end_layout
 
 \begin_layout Standard
@@ -12208,7 +12265,7 @@ name "tab:doCWtest"
 
 \end_inset
 
-Clark-West test (experimental)
+Clark-West test
 \end_layout
 
 \end_inset
@@ -12219,7 +12276,7 @@ Clark-West test (experimental)
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="13" columns="3">
+<lyxtabular version="3" rows="14" columns="3">
 <features booktabs="true" tabularvalignment="bottom">
 <column alignment="left" valignment="top" width="2.5cm">
 <column alignment="left" valignment="top" width="3cm">
@@ -12454,37 +12511,6 @@ forecast values of model 2 (larger nesting model)
 \begin_layout Plain Layout
 scalar 
 \emph on
-fhor
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-forecast horizon (default 1)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-scalar 
-\emph on
 verb
 \end_layout
 
@@ -12582,6 +12608,68 @@ CWpval
 \end_inset
 </cell>
 <cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+p-value based on t-distribution (one-sided)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scalar 
+\emph on
+CWstat_rob
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+robustified test statistic
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scalar 
+\emph on
+CWpval_rob
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -14029,6 +14117,21 @@ status open
 Changelog
 \end_layout
 
+\begin_layout Itemize
+version 2.41 (January 2020)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+add some documentation for the Clark-West test and also provide robust test
+ statistics
+\end_layout
+
+\begin_layout Itemize
+fix missing printout of the CG tests
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 version 2.4 (December 2019)
 \end_layout
