@@ -1,7 +1,7 @@
 author = Artur Tarassow and Sven Schreiber
 email = atecon@posteo.de
-version = 2.41
-date = 2020-01-30
+version = 2.42
+date = 2020-07-24
 description = Forecast Evaluation Package
 tags = C12 C52 C53
 min-version = 2017a
@@ -9,8 +9,8 @@ data-requirement = no-data-ok
 public = doKS doEKTtest doHPtest applyFCtests doDLtest \
   getLoss doMZtest doPTtest \
   doCGtest doDMtest doGWtest doCWtest \
-  doPS probscore ForecastMetrics\
-  DrawLoss DrawLoss2 \
+  doPS probscore ForecastMetrics \
+  getForecastMetricsNames DrawLoss DrawLoss2 \
   GUI_FEP_print GUI_FEP \
   doEKTtest_matrix CamDufStats
 help = FEP.pdf

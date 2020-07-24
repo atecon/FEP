@@ -69,7 +69,16 @@ function matrix ForecastMetrics (const series y "Series of realizations",
     metrics = add_labels(metrics)
 
     return metrics
-end function 
+end function
+
+function strings getForecastMetricsNames (void)
+    /* Return the names of the computed forecast evaluation statistics in order.*/
+
+    strings names = names_of_basic_point_metrics() + \
+                    names_of_udf_point_metrics()
+
+    return names
+end function
 
 ###############
 

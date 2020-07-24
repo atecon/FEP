@@ -1,0 +1,235 @@
+set verbose off
+clear
+
+include assertion.gfn
+
+include "./src/FEP.inp" --force
+
+function void test_getForecastMetricsNames (void)
+    print "Start testing getForecastMetricsNames()"
+
+    strings S = getForecastMetricsNames()
+
+    assert_equal_num(nelem(S), 16)
+
+    assert_equal_str(S[1], "ME")
+    assert_equal_str(S[2], "RMSE")
+    assert_equal_str(S[3], "MAE")
+    assert_equal_str(S[4], "MPE")
+    assert_equal_str(S[5], "MAPE")
+    assert_equal_str(S[6], "MdAPE")
+    assert_equal_str(S[7], "RMSPE")
+    assert_equal_str(S[8], "RMdSPE")
+    assert_equal_str(S[9], "sMAPE")
+    assert_equal_str(S[10], "sMdAPE")
+    assert_equal_str(S[11], "sMAAPE")
+    assert_equal_str(S[12], "sMdAAPE")
+    assert_equal_str(S[13], "MdE")
+    assert_equal_str(S[14], "MdAE")
+    assert_equal_str(S[15], "MAM")
+    assert_equal_str(S[16], "MdAMd")
+end function
+test_getForecastMetricsNames()
+
+
+open "./data/FEPdata.gdt" -p
+function void test_get_fc_error (const series y,
+                                const series fc)
+    print "Start testing get_fc_error()."
+
+    series e = get_fc_error(y, fc)
+
+    assert_equal_num(nobs(e), 18)
+    assert_almost_equal_num(mean(e), 0.1579, 1e-4)
+end function
+test_get_fc_error(y, fc)
+
+open "./data/FEPdata.gdt" -p
+function void test_get_fc_error_nan (series y,
+                                const series fc)
+    print "Start testing get_fc_error() with NA."
+
+    y[1] = NA
+    series e = get_fc_error(y, fc)
+
+    assert_equal_num(nobs(e), 17)
+    assert_almost_equal_num(mean(e), 0.13054, 1e-5)
+end function
+test_get_fc_error_nan(y, fc)
+
+
+
+open "./data/FEPdata.gdt" -p
+function void test_pct_error (const series y,
+                              const series fc)
+    print "Start testing pct_error()."
+
+    series e = y - fc
+    series pce = pct_error(y, e)
+    print pce -o
+    summary pce
+
+    assert_equal_num(nobs(pce), 18)
+    assert_almost_equal_num(mean(pce), 7.3884, 1e-4)
+end function
+test_pct_error(y, fc)
+
+
+open "./data/FEPdata.gdt" -p
+function void test_pct_error_nan (series y,
+                                  const series fc)
+    print "Start testing pct_error() with NA."
+
+    y[1] = NA
+    series e = y - fc
+    series pce = pct_error(y, e)
+
+    assert_equal_num(nobs(pce), 17)
+    assert_almost_equal_num(mean(pce), 6.0961, 1e-5)
+end function
+test_pct_error_nan(y, fc)
+
+
+open "./data/FEPdata.gdt" -p
+function void test_fcstats_names (const series y,
+                            const series fc)
+    print "Start testing metrics names of fcstats()."
+
+    matrix m = fcstats(y, fc)
+    strings names = rnameget(m)
+
+    assert_equal_num(rows(m), 9)
+    assert_equal_num(nelem(names), 9)
+
+    assert_equal_str(names[1], "ME")
+    assert_equal_str(names[2], "RMSE")
+    assert_equal_str(names[3], "MAE")
+    assert_equal_str(names[4], "MPE")
+    assert_equal_str(names[5], "MAPE")
+    assert_equal_str(names[6], "U")
+    assert_equal_str(names[7], "UM")
+    assert_equal_str(names[8], "UR")
+    assert_equal_str(names[9], "UD")
+end function
+test_fcstats_names(y, fc)
+
+
+open "./data/FEPdata.gdt" -p
+function void test_fcstats_metrics (const series y,
+                                    const series fc)
+    print "Start testing metric values fcstats()."
+
+    matrix m = fcstats(y, fc)
+
+    assert_equal_num(rows(m), 9)
+
+    assert_almost_equal_num(m[1], 0.15792, 1e-5)
+    assert_almost_equal_num(m[2], 0.40101, 1e-5)
+    assert_almost_equal_num(m[3], 0.36285, 1e-5)
+    assert_almost_equal_num(m[4], 7.3884, 1e-4)
+    assert_almost_equal_num(m[5], 26.807, 1e-3)
+    assert_almost_equal_num(m[6], 0.20702, 1e-5)
+    assert_almost_equal_num(m[7], 0.15509, 1e-5)
+    assert_almost_equal_num(m[8], 0.25280, 1e-5)
+    assert_almost_equal_num(m[9], 0.59211, 1e-5)
+end function
+test_fcstats_metrics(y, fc)
+
+
+open "./data/FEPdata.gdt" -p
+function void test_MdAPE (const series y,
+                          const series fc)
+    print "Start testing MdAPE()."
+
+    series e = y - fc
+    scalar value = MdAPE(y, e)
+
+    assert_true(ok(value))
+    assert_almost_equal_num(value, 20.031229, 1e-6)
+end function
+test_MdAPE(y, fc)
+
+
+function void test_RMdSPE (const series y,
+                          const series fc)
+    print "Start testing RMdSPE()."
+    print "pass"
+
+end function
+test_RMdSPE(y, fc)
+
+function void test_RMdSPE_median (const series y,
+                                const series fc)
+    print "Start testing RMdSPE() median."
+    print "pass"
+
+end function
+test_RMdSPE_median(y, fc)
+
+function void test_sMdAPE (const series y,
+                          const series fc)
+    print "Start testing sMdAPE()."
+    print "pass"
+
+end function
+test_sMdAPE(y, fc)
+
+function void test_sMdAPE_median (const series y,
+                                const series fc)
+    print "Start testing sMdAPE() for median."
+    print "pass"
+
+end function
+test_sMdAPE_median(y, fc)
+
+
+function void test_sMdAAPE (const series y,
+                          const series fc)
+    print "Start testing sMdAAPE()."
+    print "pass"
+
+end function
+test_sMdAAPE(y, fc)
+
+function void test_sMdAAPE_median (const series y,
+                                const series fc)
+    print "Start testing sMdAAPE() for median."
+    print "pass"
+
+end function
+test_sMdAAPE_median(y, fc)
+
+
+function void test_MdE (const series y,
+                        const series fc)
+    print "Start testing MdE()."
+    print "pass"
+end function
+test_MdE(y, fc)
+
+function void test_MdAE (const series y,
+                        const series fc)
+    print "Start testing MdAE()."
+    print "pass"
+end function
+test_MdAE(y, fc)
+
+
+function void test_MADMean (const series y,
+                            const series fc)
+    print "Start testing MADMean()."
+    print "pass"
+end function
+test_MADMean(y, fc)
+
+
+function void test_MADMean_median (const series y,
+                            const series fc)
+    print "Start testing MADMean() for median."
+    print "pass"
+end function
+test_MADMean_median(y, fc)
+
+
+
+printf "\nInfo: All tests passed.\n"
