@@ -144,7 +144,6 @@ function void test_MdAPE (const series y,
     series e = y - fc
     scalar value = MdAPE(y, e)
 
-    assert_true(ok(value))
     assert_almost_equal_num(value, 20.031229, 1e-6)
 end function
 test_MdAPE(y, fc)
@@ -153,32 +152,44 @@ test_MdAPE(y, fc)
 function void test_RMdSPE (const series y,
                           const series fc)
     print "Start testing RMdSPE()."
-    print "pass"
 
+    series e = y - fc
+    scalar value = RMdSPE(y, e, FALSE)
+
+    assert_almost_equal_num(value, 33.748554, 1e-6)
 end function
 test_RMdSPE(y, fc)
+
 
 function void test_RMdSPE_median (const series y,
                                 const series fc)
     print "Start testing RMdSPE() median."
-    print "pass"
+
+    series e = y - fc
+    scalar value = RMdSPE(y, e, TRUE)
+
+    assert_almost_equal_num(value, 20.102812, 1e-6)
 
 end function
 test_RMdSPE_median(y, fc)
 
+
 function void test_sMdAPE (const series y,
                           const series fc)
     print "Start testing sMdAPE()."
-    print "pass"
 
+    scalar value = sMdAPE(y, fc, FALSE)
+    assert_almost_equal_num(value, 13.782535, 1e-6)
 end function
 test_sMdAPE(y, fc)
+
 
 function void test_sMdAPE_median (const series y,
                                 const series fc)
     print "Start testing sMdAPE() for median."
-    print "pass"
 
+    scalar value = sMdAPE(y, fc, TRUE)
+    assert_almost_equal_num(value, 17.974963, 1e-6)
 end function
 test_sMdAPE_median(y, fc)
 
@@ -186,16 +197,18 @@ test_sMdAPE_median(y, fc)
 function void test_sMdAAPE (const series y,
                           const series fc)
     print "Start testing sMdAAPE()."
-    print "pass"
 
+    scalar value = sMdAAPE(y, fc, FALSE)
+    assert_almost_equal_num(value, 27.144854, 1e-6)
 end function
 test_sMdAAPE(y, fc)
 
 function void test_sMdAAPE_median (const series y,
                                 const series fc)
     print "Start testing sMdAAPE() for median."
-    print "pass"
 
+    scalar value = sMdAAPE(y, fc, TRUE)
+    assert_almost_equal_num(value, 22.280499, 1e-6)
 end function
 test_sMdAAPE_median(y, fc)
 
@@ -203,14 +216,23 @@ test_sMdAAPE_median(y, fc)
 function void test_MdE (const series y,
                         const series fc)
     print "Start testing MdE()."
-    print "pass"
+
+    series e = y - fc
+
+    scalar value = MdE(e)
+    assert_almost_equal_num(value, 0.22011449, 1e-8)
 end function
 test_MdE(y, fc)
+
 
 function void test_MdAE (const series y,
                         const series fc)
     print "Start testing MdAE()."
-    print "pass"
+
+    series e = y - fc
+
+    scalar value = MdAE(e)
+    assert_almost_equal_num(value, 0.37605234, 1e-8)
 end function
 test_MdAE(y, fc)
 
@@ -218,7 +240,9 @@ test_MdAE(y, fc)
 function void test_MADMean (const series y,
                             const series fc)
     print "Start testing MADMean()."
-    print "pass"
+
+    scalar value = MADMean(y, fc)
+    assert_almost_equal_num(value, 0.29630472, 1e-8)
 end function
 test_MADMean(y, fc)
 
@@ -226,7 +250,9 @@ test_MADMean(y, fc)
 function void test_MADMean_median (const series y,
                             const series fc)
     print "Start testing MADMean() for median."
-    print "pass"
+
+    scalar value = MADMean(y, fc, TRUE)
+    assert_almost_equal_num(value, 0.21548623, 1e-8)
 end function
 test_MADMean_median(y, fc)
 
