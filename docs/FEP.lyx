@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.41, January 2020
+ version 2.42, July 2020
 \end_layout
 
 \begin_layout Abstract
@@ -14117,6 +14117,30 @@ status open
 Changelog
 \end_layout
 
+\begin_layout Itemize
+version 2.42 (July 2020)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Fix bug in MADmean(): passed forecast errors instead of point forecast values.
+\end_layout
+
+\begin_layout Itemize
+Add unit-tests for forecasting statistics.
+\end_layout
+
+\begin_layout Itemize
+Add new public function getForecastMetricsNames() for returning array of
+ names of forecasting statistics in the same order as returned by the ForecastMe
+trics() function.
+\end_layout
+
+\begin_layout Itemize
+Minor clean ups of source code.
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 version 2.41 (January 2020)
 \end_layout

@@ -2,8 +2,8 @@
 <gretl-functions>
 <gretl-function-package name="FEP" no-data-ok="true" minver="2017a" lives-in-subdir="true">
 <author email="atecon@posteo.de">Artur Tarassow and Sven Schreiber</author>
-<version>2.41</version>
-<date>2020-01-30</date>
+<version>2.42</version>
+<date>2020-07-25</date>
 <description>Forecast Evaluation Package</description>
 <tags>C12 C52 C53</tags>
 <label>Forecast evaluations</label>
@@ -882,6 +882,12 @@ metrics = add_labels(metrics)
 return metrics
 </code>
 </gretl-function>
+<gretl-function name="getForecastMetricsNames" type="strings">
+<code>/* Return the names of the computed forecast evaluation statistics in order.*/
+strings names = names_of_basic_point_metrics() + names_of_udf_point_metrics()
+return names
+</code>
+</gretl-function>
 <gretl-function name="DrawLoss" type="void">
  <params count="4">
   <param name="p" type="int" min="1" max="2" default="1">
@@ -1609,11 +1615,13 @@ return fcstats(y, fc)[1:5,]		# discard Theil's U + associated stats
 </code>
 </gretl-function>
 <gretl-function name="names_of_basic_point_metrics" type="strings" private="1">
-<code>return defarray(&quot;ME&quot;, &quot;RMSE&quot;, &quot;MAE&quot;, &quot;MPE&quot;, &quot;MAPE&quot;)
+<code>/* Names of forecast statistics as returned by built-in gretl function fcstats() -- let's hope the ordering won't change. */
+return defarray(&quot;ME&quot;, &quot;RMSE&quot;, &quot;MAE&quot;, &quot;MPE&quot;, &quot;MAPE&quot;)
 </code>
 </gretl-function>
 <gretl-function name="names_of_udf_point_metrics" type="strings" private="1">
-<code>return defarray(&quot;MdAPE&quot;, &quot;RMSPE&quot;, &quot;RMdSPE&quot;, &quot;sMAPE&quot;, &quot;sMdAPE&quot;, &quot;sMAAPE&quot;, &quot;sMdAAPE&quot;, &quot;MdE&quot;, &quot;MdAE&quot;, &quot;MAM&quot;, &quot;MdAMd&quot;)
+<code>/* Names of forecast statistics as programmed on our own. The ordering should match the function calls in function get_pct_error_metrics(). */
+return defarray(&quot;MdAPE&quot;, &quot;RMSPE&quot;, &quot;RMdSPE&quot;, &quot;sMAPE&quot;, &quot;sMdAPE&quot;, &quot;sMAAPE&quot;, &quot;sMdAAPE&quot;, &quot;MdE&quot;, &quot;MdAE&quot;, &quot;MAM&quot;, &quot;MdAMd&quot;)
 </code>
 </gretl-function>
 <gretl-function name="get_pct_error_metrics" type="matrix" private="1">
@@ -1641,7 +1649,7 @@ return metrics
 <gretl-function name="MADMean" type="matrix" private="1">
  <params count="3">
   <param name="y" type="series" const="true"/>
-  <param name="fc" type="list" const="true"/>
+  <param name="fc_error" type="list" const="true"/>
   <param name="use_median" type="bool" default="0"/>
  </params>
 <code>/* Mean (median) absolute error scaled by the sample mean (median)
@@ -1649,12 +1657,12 @@ of realizations. Proposed by Kolassa and Schütz (2007):
 &quot;Advantages of the MAD/Mean Ratio over the MAPE&quot;, Foresight: The International Journal of Applied Forecasting, 6 (2007), pp. 40-43. See also:
 https://www.sciencedirect.com/science/
 article/pii/S0169207016000121#br000070 */
-matrix metric = zeros(nelem(fc),1)
-loop foreach i fc -q
+matrix metric = zeros(nelem(fc_error),1)
+loop foreach i fc_error -q
   if use_median
-    metric[i] = median(abs(get_fc_error(y, fc.$i))) / median(y)
+    metric[i] = MdAE(fc_error)[i] / median(y)
   else
-    metric[i] = mean(abs(get_fc_error(y, fc.$i))) / mean(y)
+    metric[i] = mean(abs(fc_error.$i)) / mean(y)
   endif
 endloop
 return metric
@@ -1693,10 +1701,12 @@ return metric
 <code>/* Symmetric mean/ median absolute percentage error */
 matrix metric = zeros(nelem(fc),1)
 loop foreach i fc -q
+  series AE = abs(get_fc_error(y, fc.$i))
+  series SUM = y + fc.$i
   if use_median
-    metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) / (y+fc.$i) )
+    metric[i] = median(200 * AE / SUM)
   else
-    metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) / (y+fc.$i) )
+    metric[i] = mean(200 * AE / SUM)
   endif
 endloop
 return metric
@@ -1711,10 +1721,12 @@ return metric
 <code>/* Symmetric mean/ median absolute absolute percentage error */
 matrix metric = zeros(nelem(fc),1)
 loop foreach i fc -q
+  series AE = abs(get_fc_error(y, fc.$i))
+  series ABS_SUM = abs(y + fc.$i)
   if use_median
-    metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) /      abs((y+fc.$i)) )
+    metric[i] = median(200 * AE / ABS_SUM )
   else
-    metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) /      abs((y+fc.$i)) )
+    metric[i] = mean(200 * AE / ABS_SUM )
   endif
 endloop
 return metric
@@ -1730,10 +1742,11 @@ return metric
 -- based on percentage errors */
 matrix metric = zeros(nelem(fc_error),1)
 loop foreach i fc_error -q
+  series PE_SQ = pct_error(y, fc_error.$i)^2
   if use_median
-    metric[i] = sqrt(median(pct_error(y, fc_error.$i)^2))
+    metric[i] = sqrt(median(PE_SQ))
   else
-    metric[i] = sqrt(mean(pct_error(y, fc_error.$i)^2))
+    metric[i] = sqrt(mean(PE_SQ))
   endif
 endloop
 return metric
