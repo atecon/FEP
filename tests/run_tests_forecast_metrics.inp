@@ -149,6 +149,7 @@ end function
 test_MdAPE(y, fc)
 
 
+open "./data/FEPdata.gdt" -p
 function void test_RMdSPE (const series y,
                           const series fc)
     print "Start testing RMdSPE()."
@@ -161,6 +162,7 @@ end function
 test_RMdSPE(y, fc)
 
 
+open "./data/FEPdata.gdt" -p
 function void test_RMdSPE_median (const series y,
                                 const series fc)
     print "Start testing RMdSPE() median."
@@ -173,7 +175,7 @@ function void test_RMdSPE_median (const series y,
 end function
 test_RMdSPE_median(y, fc)
 
-
+open "./data/FEPdata.gdt" -p
 function void test_sMdAPE (const series y,
                           const series fc)
     print "Start testing sMdAPE()."
@@ -183,7 +185,7 @@ function void test_sMdAPE (const series y,
 end function
 test_sMdAPE(y, fc)
 
-
+open "./data/FEPdata.gdt" -p
 function void test_sMdAPE_median (const series y,
                                 const series fc)
     print "Start testing sMdAPE() for median."
@@ -194,6 +196,7 @@ end function
 test_sMdAPE_median(y, fc)
 
 
+open "./data/FEPdata.gdt" -p
 function void test_sMdAAPE (const series y,
                           const series fc)
     print "Start testing sMdAAPE()."
@@ -203,6 +206,7 @@ function void test_sMdAAPE (const series y,
 end function
 test_sMdAAPE(y, fc)
 
+open "./data/FEPdata.gdt" -p
 function void test_sMdAAPE_median (const series y,
                                 const series fc)
     print "Start testing sMdAAPE() for median."
@@ -213,6 +217,7 @@ end function
 test_sMdAAPE_median(y, fc)
 
 
+open "./data/FEPdata.gdt" -p
 function void test_MdE (const series y,
                         const series fc)
     print "Start testing MdE()."
@@ -225,6 +230,7 @@ end function
 test_MdE(y, fc)
 
 
+open "./data/FEPdata.gdt" -p
 function void test_MdAE (const series y,
                         const series fc)
     print "Start testing MdAE()."
@@ -237,21 +243,27 @@ end function
 test_MdAE(y, fc)
 
 
+open "./data/FEPdata.gdt" -p
 function void test_MADMean (const series y,
                             const series fc)
     print "Start testing MADMean()."
 
-    scalar value = MADMean(y, fc)
+    series e = y - fc
+
+    scalar value = MADMean(y, e)
     assert_almost_equal_num(value, 0.29630472, 1e-8)
 end function
 test_MADMean(y, fc)
 
 
+open "./data/FEPdata.gdt" -p
 function void test_MADMean_median (const series y,
                             const series fc)
     print "Start testing MADMean() for median."
 
-    scalar value = MADMean(y, fc, TRUE)
+    series e = y - fc
+
+    scalar value = MADMean(y, e, TRUE)
     assert_almost_equal_num(value, 0.21548623, 1e-8)
 end function
 test_MADMean_median(y, fc)

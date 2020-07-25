@@ -166,7 +166,7 @@ function matrix get_pct_error_metrics (const series y, const list fc)
 end function
 
 
-function matrix MADMean (const series y, const list fc, bool use_median[0])
+function matrix MADMean (const series y, const list fc_error, bool use_median[0])
     /* Mean (median) absolute error scaled by the sample mean (median)
     of realizations. Proposed by Kolassa and Schütz (2007):
     "Advantages of the MAD/Mean Ratio over the MAPE",
@@ -175,12 +175,12 @@ function matrix MADMean (const series y, const list fc, bool use_median[0])
       https://www.sciencedirect.com/science/
 		article/pii/S0169207016000121#br000070 */
 
-    matrix metric = zeros(nelem(fc),1)
-    loop foreach i fc -q
+    matrix metric = zeros(nelem(fc_error),1)
+    loop foreach i fc_error -q
         if use_median
-            metric[i] = median(abs(get_fc_error(y, fc.$i))) / median(y)
+            metric[i] = MdAE(fc_error)[i] / median(y)
         else
-            metric[i] = mean(abs(get_fc_error(y, fc.$i))) / mean(y)
+            metric[i] = mean(abs(fc_error.$i)) / mean(y)
         endif
     endloop
 
@@ -217,10 +217,12 @@ function matrix sMdAPE (const series y, const list fc, bool use_median[0])
 
     matrix metric = zeros(nelem(fc),1)
     loop foreach i fc -q
+        series AE = abs(get_fc_error(y, fc.$i))
+        series SUM = y + fc.$i
         if use_median
-            metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) / (y+fc.$i) )
+            metric[i] = median(200 * AE / SUM)
         else
-            metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) / (y+fc.$i) )
+            metric[i] = mean(200 * AE / SUM)
         endif
     endloop
 
@@ -233,12 +235,13 @@ function matrix sMdAAPE (const series y, const list fc, bool use_median[0])
 
     matrix metric = zeros(nelem(fc),1)
     loop foreach i fc -q
+
+        series AE = abs(get_fc_error(y, fc.$i))
+        series ABS_SUM = abs(y + fc.$i)
         if use_median
-            metric[i] = median( 200* abs(get_fc_error(y, fc.$i)) / \
-					abs((y+fc.$i)) )
+            metric[i] = median(200 * AE / ABS_SUM )
         else
-            metric[i] = mean( 200* abs(get_fc_error(y, fc.$i)) / \
-					abs((y+fc.$i)) )
+            metric[i] = mean(200 * AE / ABS_SUM )
         endif
     endloop
 
@@ -253,10 +256,11 @@ function matrix RMdSPE (const series y, const list fc_error,
 
     matrix metric = zeros(nelem(fc_error),1)
     loop foreach i fc_error -q
+        series PE_SQ = pct_error(y, fc_error.$i)^2
         if use_median
-            metric[i] = sqrt(median(pct_error(y, fc_error.$i)^2))
+            metric[i] = sqrt(median(PE_SQ))
         else
-            metric[i] = sqrt(mean(pct_error(y, fc_error.$i)^2))
+            metric[i] = sqrt(mean(PE_SQ))
         endif
     endloop
 
