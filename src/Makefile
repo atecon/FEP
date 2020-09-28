@@ -9,7 +9,7 @@ $(PKG).gfn: $(PKG).inp $(PKG).spec $(PKG)_sample.inp
 #	pdflatex $<
 #	pdflatex $<
 
-$(PKG).zip: $(PKG).gfn $(PKG).pdf FEPdata.gdt
+$(PKG).zip: $(PKG).gfn ../docs/$(PKG).pdf ../data/FEPdata.gdt
 	echo makepkg $(PKG).zip | gretlcli -b -
 
 # Only if the manual is a pdf file or you provide an external dataset
