@@ -10,7 +10,7 @@ function void test_getForecastMetricsNames (void)
 
     strings S = getForecastMetricsNames()
 
-    assert_equal_num(nelem(S), 16)
+    assert_equal_num(nelem(S), 17)
 
     assert_equal_str(S[1], "ME")
     assert_equal_str(S[2], "RMSE")
@@ -28,6 +28,7 @@ function void test_getForecastMetricsNames (void)
     assert_equal_str(S[14], "MdAE")
     assert_equal_str(S[15], "MAM")
     assert_equal_str(S[16], "MdAMd")
+    assert_equal_str(S[17], "MSLE")
 end function
 test_getForecastMetricsNames()
 
@@ -46,7 +47,7 @@ test_get_fc_error(y, fc)
 
 open "./data/FEPdata.gdt" -p
 function void test_get_fc_error_nan (series y,
-                                const series fc)
+                                     const series fc)
     print "Start testing get_fc_error() with NA."
 
     y[1] = NA
@@ -66,8 +67,6 @@ function void test_pct_error (const series y,
 
     series e = y - fc
     series pce = pct_error(y, e)
-    print pce -o
-    summary pce
 
     assert_equal_num(nobs(pce), 18)
     assert_almost_equal_num(mean(pce), 7.3884, 1e-4)
@@ -151,7 +150,7 @@ test_MdAPE(y, fc)
 
 open "./data/FEPdata.gdt" -p
 function void test_RMdSPE (const series y,
-                          const series fc)
+                           const series fc)
     print "Start testing RMdSPE()."
 
     series e = y - fc
@@ -250,7 +249,7 @@ function void test_MADMean (const series y,
 
     series e = y - fc
 
-    scalar value = MADMean(y, e)
+    scalar value = MADMean(y, e, FALSE)
     assert_almost_equal_num(value, 0.29630472, 1e-8)
 end function
 test_MADMean(y, fc)
@@ -258,7 +257,7 @@ test_MADMean(y, fc)
 
 open "./data/FEPdata.gdt" -p
 function void test_MADMean_median (const series y,
-                            const series fc)
+                                   const series fc)
     print "Start testing MADMean() for median."
 
     series e = y - fc
@@ -268,6 +267,81 @@ function void test_MADMean_median (const series y,
 end function
 test_MADMean_median(y, fc)
 
+
+open "./data/FEPdata.gdt" -p
+nulldata 4 --preserve
+function void test_MSLE (void)
+    print "Start testing MSLE()."
+
+    series y = {3, 5, 2.5, 7}'
+    series fc = {2.5, 5, 4, 8}'
+
+    value = MSLE(y, fc)
+    assert_almost_equal_num(value, 0.03973, 1e-4)
+end function
+test_MSLE()
+
+
+open "./data/FEPdata.gdt" -p
+function void test_ForecastMetrics (const series y,
+                                    const series fc)
+    print "Start testing ForecastMetrics()."
+
+    strings names = getForecastMetricsNames()
+    matrix values = ForecastMetrics(y, fc)
+
+    scalar value = values[instrings(names, "ME")]
+    assert_almost_equal_num(value, 0.15792, 1e-5)
+
+    scalar value = values[instrings(names, "MdE")]
+    assert_almost_equal_num(value, 0.22011, 1e-5)
+
+    scalar value = values[instrings(names, "RMSE")]
+    assert_almost_equal_num(value, 0.40101, 1e-5)
+
+    scalar value = values[instrings(names, "MAE")]
+    assert_almost_equal_num(value, 0.36285, 1e-5)
+
+    scalar value = values[instrings(names, "MPE")]
+    assert_almost_equal_num(value, 7.3884, 1e-4)
+
+    scalar value = values[instrings(names, "MAPE")]
+    assert_almost_equal_num(value, 26.807, 1e-3)
+
+    scalar value = values[instrings(names, "MdAPE")]
+    assert_almost_equal_num(value, 20.031229, 1e-6)
+
+    scalar value = values[instrings(names, "RMSPE")]
+    assert_almost_equal_num(value, 33.748554, 1e-6)
+
+    scalar value = values[instrings(names, "RMdSPE")]
+    assert_almost_equal_num(value, 20.102812, 1e-6)
+
+    scalar value = values[instrings(names, "sMAPE")]
+    assert_almost_equal_num(value, 13.782535, 1e-6)
+
+    scalar value = values[instrings(names, "sMdAPE")]
+    assert_almost_equal_num(value, 17.974963, 1e-6)
+
+    scalar value = values[instrings(names, "sMAAPE")]
+    assert_almost_equal_num(value, 27.144854, 1e-6)
+
+    scalar value = values[instrings(names, "sMdAAPE")]
+    assert_almost_equal_num(value, 22.280499, 1e-6)
+
+    scalar value = values[instrings(names, "MdAE")]
+    assert_almost_equal_num(value, 0.37605234, 1e-8)
+
+    scalar value = values[instrings(names, "MAM")]
+    assert_almost_equal_num(value, 0.29630472, 1e-8)
+
+    scalar value = values[instrings(names, "MdAMd")]
+    assert_almost_equal_num(value, 0.21548623, 1e-8)
+
+    scalar value = values[instrings(names, "MSLE")]
+    assert_almost_equal_num(value, 0.15320, 1e-5)
+end function
+test_ForecastMetrics(y, fc)
 
 
 printf "\nInfo: All tests passed.\n"

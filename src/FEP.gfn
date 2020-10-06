@@ -3,7 +3,7 @@
 <gretl-function-package name="FEP" no-data-ok="true" minver="2017a" lives-in-subdir="true">
 <author email="atecon@posteo.de">Artur Tarassow and Sven Schreiber</author>
 <version>2.42</version>
-<date>2020-07-25</date>
+<date>2020-10-06</date>
 <description>Forecast Evaluation Package</description>
 <tags>C12 C52 C53</tags>
 <label>Forecast evaluations</label>
@@ -1621,7 +1621,7 @@ return defarray(&quot;ME&quot;, &quot;RMSE&quot;, &quot;MAE&quot;, &quot;MPE&quo
 </gretl-function>
 <gretl-function name="names_of_udf_point_metrics" type="strings" private="1">
 <code>/* Names of forecast statistics as programmed on our own. The ordering should match the function calls in function get_pct_error_metrics(). */
-return defarray(&quot;MdAPE&quot;, &quot;RMSPE&quot;, &quot;RMdSPE&quot;, &quot;sMAPE&quot;, &quot;sMdAPE&quot;, &quot;sMAAPE&quot;, &quot;sMdAAPE&quot;, &quot;MdE&quot;, &quot;MdAE&quot;, &quot;MAM&quot;, &quot;MdAMd&quot;)
+return defarray(&quot;MdAPE&quot;, &quot;RMSPE&quot;, &quot;RMdSPE&quot;, &quot;sMAPE&quot;, &quot;sMdAPE&quot;, &quot;sMAAPE&quot;, &quot;sMdAAPE&quot;, &quot;MdE&quot;, &quot;MdAE&quot;, &quot;MAM&quot;, &quot;MdAMd&quot;, &quot;MSLE&quot;)
 </code>
 </gretl-function>
 <gretl-function name="get_pct_error_metrics" type="matrix" private="1">
@@ -1635,14 +1635,15 @@ matrix metrics = {}
 metrics |= MdAPE(y, fc_error)'
 metrics |= RMdSPE(y, fc_error)'
 metrics |= RMdSPE(y, fc_error, 1)'
-metrics |= sMdAPE(y, fc_error)'
-metrics |= sMdAPE(y, fc_error, 1)'
-metrics |= sMdAAPE(y, fc_error)'
-metrics |= sMdAAPE(y, fc_error, 1)'
+metrics |= sMdAPE(y, fc)'
+metrics |= sMdAPE(y, fc, 1)'
+metrics |= sMdAAPE(y, fc)'
+metrics |= sMdAAPE(y, fc, 1)'
 metrics |= MdE(fc_error)'
 metrics |= MdAE(fc_error)'
 metrics |= MADMean(y, fc_error)'
 metrics |= MADMean(y, fc_error, 1)'
+metrics |= MSLE(y, fc)'
 return metrics
 </code>
 </gretl-function>
@@ -1655,9 +1656,8 @@ return metrics
 <code>/* Mean (median) absolute error scaled by the sample mean (median)
 of realizations. Proposed by Kolassa and Schütz (2007):
 &quot;Advantages of the MAD/Mean Ratio over the MAPE&quot;, Foresight: The International Journal of Applied Forecasting, 6 (2007), pp. 40-43. See also:
-https://www.sciencedirect.com/science/
-article/pii/S0169207016000121#br000070 */
-matrix metric = zeros(nelem(fc_error),1)
+https://www.sciencedirect.com/science/article/pii/S0169207016000121#br000070 */
+matrix metric = zeros(nelem(fc_error), 1)
 loop foreach i fc_error -q
   if use_median
     metric[i] = MdAE(fc_error)[i] / median(y)
@@ -1673,7 +1673,7 @@ return metric
   <param name="fc_error" type="list" const="true"/>
  </params>
 <code>/* Median error */
-matrix metric = zeros(nelem(fc_error),1)
+matrix metric = zeros(nelem(fc_error), 1)
 loop foreach i fc_error -q
   metric[i] = median(fc_error.$i)
 endloop
@@ -1685,7 +1685,7 @@ return metric
   <param name="fc_error" type="list" const="true"/>
  </params>
 <code>/* Median absolute error */
-matrix metric = zeros(nelem(fc_error),1)
+matrix metric = zeros(nelem(fc_error), 1)
 loop foreach i fc_error -q
   metric[i] = median(abs(fc_error.$i))
 endloop
@@ -1740,7 +1740,7 @@ return metric
  </params>
 <code>/* Root mean/ median square percentage error
 -- based on percentage errors */
-matrix metric = zeros(nelem(fc_error),1)
+matrix metric = zeros(nelem(fc_error), 1)
 loop foreach i fc_error -q
   series PE_SQ = pct_error(y, fc_error.$i)^2
   if use_median
@@ -1758,9 +1758,23 @@ return metric
   <param name="fc_error" type="list" const="true"/>
  </params>
 <code>/* Median absolute percentage error -- based on percentage errors */
-matrix metric = zeros(nelem(fc_error),1)
+matrix metric = zeros(nelem(fc_error), 1)
 loop foreach i fc_error -q
   metric[i] = median( abs( pct_error(y, fc_error.$i) ) )
+endloop
+return metric
+</code>
+</gretl-function>
+<gretl-function name="MSLE" type="matrix" private="1">
+ <params count="2">
+  <param name="y" type="series" const="true"/>
+  <param name="fc" type="list" const="true"/>
+ </params>
+<code>/* Mean Squared Logarithmic Error.
+Reference: https://scikit-learn.org/stable/modules/model_evaluation.html#mean-squared-log-error */
+matrix metric = zeros(nelem(fc), 1)
+loop foreach i fc -q
+  metric[i] = mean(( log(y + 1) - log(fc.$i + 1) )^2)
 endloop
 return metric
 </code>

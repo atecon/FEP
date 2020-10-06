@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.42, July 2020
+ version 2.42, October 2020
 \end_layout
 
 \begin_layout Abstract
@@ -6068,7 +6068,7 @@ Computations of point forecast evaluation measures
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="17" columns="3">
+<lyxtabular version="3" rows="18" columns="3">
 <features booktabs="true" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="3.5cm">
 <column alignment="left" valignment="top" width="3.5cm">
@@ -6612,6 +6612,38 @@ sMdAAPE
 
 \begin_layout Plain Layout
 \begin_inset Formula $median\left(\frac{|y_{t}-f_{t}|}{|y_{t}+f_{t}|}\times200\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean Squared Logarithmic Error
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MSLE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $mean\left(\left[\log(y_{t}+1)-\log(f_{t}+1)\right]^{2}\right)$
 \end_inset
 
 
@@ -14118,7 +14150,7 @@ Changelog
 \end_layout
 
 \begin_layout Itemize
-version 2.42 (July 2020)
+version 2.42 (October 2020)
 \end_layout
 
 \begin_deeper
@@ -14127,7 +14159,24 @@ Fix bug in MADmean(): passed forecast errors instead of point forecast values.
 \end_layout
 
 \begin_layout Itemize
-Add unit-tests for forecasting statistics.
+Fix bug in ForecastMetrics().
+ When calling each of the following evaluation functions, the forecast error
+ instead of the point forecast was passed as a variable: sMdAPE(), sMdAPE(),
+ sMdAAPE(), sMdAAPE().
+\end_layout
+
+\begin_layout Itemize
+Add new evaluation metric for point forecasts: Mean Squared Logarithmic
+ Error (MSLE).
+\end_layout
+
+\begin_layout Itemize
+Add unit-tests for 
+\emph on
+all 
+\emph default
+functions computing point forecast evaluation statistics incl.
+ ForecastMetrics().
 \end_layout
 
 \begin_layout Itemize
