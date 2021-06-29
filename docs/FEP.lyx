@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.5, October 2020
+ version 2.6, June 2021
 \end_layout
 
 \begin_layout Abstract
@@ -14149,6 +14149,16 @@ status open
 Changelog
 \end_layout
 
+\begin_layout Itemize
+version 2.6 (June 2021)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+internally replace deprecated syntax, require gretl 2018a because of that
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 version 2.5 (October 2020)
 \end_layout
