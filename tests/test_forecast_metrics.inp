@@ -10,25 +10,32 @@ function void test_getForecastMetricsNames (void)
 
     strings S = getForecastMetricsNames()
 
-    assert_equal_num(nelem(S), 17)
+    expected_n = 17
+    strings expected_names = defarray(\
+                                      "ME",\
+                                      "RMSE",\
+                                      "MAE",\
+                                      "MPE",\
+                                      "MAPE",\
+                                      "MdAPE",\
+                                      "RMSPE",\
+                                      "RMdSPE",\
+                                      "sMAPE",\
+                                      "sMdAPE",\
+                                      "sMAAPE",\
+                                      "sMdAAPE",\
+                                      "MdE",\
+                                      "MdAE",\
+                                      "MAM",\
+                                      "MdAMd",\
+                                      "MSLE"\
+                                      )
 
-    assert_equal_str(S[1], "ME")
-    assert_equal_str(S[2], "RMSE")
-    assert_equal_str(S[3], "MAE")
-    assert_equal_str(S[4], "MPE")
-    assert_equal_str(S[5], "MAPE")
-    assert_equal_str(S[6], "MdAPE")
-    assert_equal_str(S[7], "RMSPE")
-    assert_equal_str(S[8], "RMdSPE")
-    assert_equal_str(S[9], "sMAPE")
-    assert_equal_str(S[10], "sMdAPE")
-    assert_equal_str(S[11], "sMAAPE")
-    assert_equal_str(S[12], "sMdAAPE")
-    assert_equal_str(S[13], "MdE")
-    assert_equal_str(S[14], "MdAE")
-    assert_equal_str(S[15], "MAM")
-    assert_equal_str(S[16], "MdAMd")
-    assert_equal_str(S[17], "MSLE")
+    assert(nelem(S) == expected_n)
+
+    loop foreach i expected_names
+        assert(S[1] == "$i")
+    endloop
 end function
 test_getForecastMetricsNames()
 
@@ -40,10 +47,11 @@ function void test_get_fc_error (const series y,
 
     series e = get_fc_error(y, fc)
 
-    assert_equal_num(nobs(e), 18)
+    assert(nobs(e) == 18)
     assert_almost_equal_num(mean(e), 0.1579, 1e-4)
 end function
 test_get_fc_error(y, fc)
+
 
 open "./data/FEPdata.gdt" -p
 function void test_get_fc_error_nan (series y,
@@ -53,7 +61,7 @@ function void test_get_fc_error_nan (series y,
     y[1] = NA
     series e = get_fc_error(y, fc)
 
-    assert_equal_num(nobs(e), 17)
+    assert(nobs(e) == 17)
     assert_almost_equal_num(mean(e), 0.13054, 1e-5)
 end function
 test_get_fc_error_nan(y, fc)
@@ -68,7 +76,7 @@ function void test_pct_error (const series y,
     series e = y - fc
     series pce = pct_error(y, e)
 
-    assert_equal_num(nobs(pce), 18)
+    assert(nobs(pce) == 18)
     assert_almost_equal_num(mean(pce), 7.3884, 1e-4)
 end function
 test_pct_error(y, fc)
@@ -83,7 +91,7 @@ function void test_pct_error_nan (series y,
     series e = y - fc
     series pce = pct_error(y, e)
 
-    assert_equal_num(nobs(pce), 17)
+    assert(nobs(pce) == 17)
     assert_almost_equal_num(mean(pce), 6.0961, 1e-5)
 end function
 test_pct_error_nan(y, fc)
@@ -97,18 +105,24 @@ function void test_fcstats_names (const series y,
     matrix m = fcstats(y, fc)
     strings names = rnameget(m)
 
-    assert_equal_num(rows(m), 9)
-    assert_equal_num(nelem(names), 9)
+    strings expected_names = defarray(\
+                                      "ME",\
+                                      "RMSE",\
+                                      "MAE",\
+                                      "MPE",\
+                                      "MAPE",\
+                                      "U",\
+                                      "UM",\
+                                      "UR",\
+                                      "UD"\
+                                      )
 
-    assert_equal_str(names[1], "ME")
-    assert_equal_str(names[2], "RMSE")
-    assert_equal_str(names[3], "MAE")
-    assert_equal_str(names[4], "MPE")
-    assert_equal_str(names[5], "MAPE")
-    assert_equal_str(names[6], "U")
-    assert_equal_str(names[7], "UM")
-    assert_equal_str(names[8], "UR")
-    assert_equal_str(names[9], "UD")
+    assert(rows(m) == 9)
+    assert(nelem(names) == 9)
+
+    loop foreach i expected_names
+        assert(names[1] == "$i")
+    endloop
 end function
 test_fcstats_names(y, fc)
 
@@ -120,7 +134,7 @@ function void test_fcstats_metrics (const series y,
 
     matrix m = fcstats(y, fc)
 
-    assert_equal_num(rows(m), 9)
+    assert(rows(m) == 9)
 
     assert_almost_equal_num(m[1], 0.15792, 1e-5)
     assert_almost_equal_num(m[2], 0.40101, 1e-5)

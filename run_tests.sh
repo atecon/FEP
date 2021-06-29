@@ -4,7 +4,7 @@ set -e
 DIR=$(dirname $(realpath "$0")) 	# locate folder where this sh-script is located in
 
 PROJECT="FEP"
-SCRIPT_1="./tests/run_tests_forecast_metrics.inp"
+SCRIPT_1="./tests/test_forecast_metrics.inp"
 
 
 cd $DIR
