@@ -16,10 +16,6 @@ $(PKG).zip: $(PKG).gfn ../docs/$(PKG).pdf ../data/FEPdata.gdt
 install: $(PKG).zip
 	echo pkg install $(PKG).zip --local | gretlcli -b -
 
-# Only of the manual is a txt-file
-#install: $(PKG).gfn
-#	echo pkg install $(PKG).gfn --local | gretlcli -b -
-
 # Only for zip-file
 clean:
 	rm -f $(PKG).zip
