@@ -1,9 +1,11 @@
 # public functions
 function void applyFCtests (bundle *b, string which)
+    /* */
 
     strings testcodes = strsplit(strstrip(which))
+
     loop i = 1..nelem(testcodes) --quiet
-        # I hope no earlier test overwrites bundle elements
+        # TODO: I hope no earlier test overwrites bundle elements
         # that would confuse the later tests...?
 
         which = testcodes[i]
@@ -82,10 +84,10 @@ end function
 
 ###############
 
-function matrix getLoss (matrix fce "FC (errors)",
-      string LF[null] "Loss function",
-      matrix param[null] "Loss func parameter(s)",
-      const matrix realiz[null] "Realizations")
+function matrix getLoss (matrix fce "forecast errors",
+                         string LF[null] "Loss function",
+                         matrix param[null] "Loss func parameters",
+                         const matrix realiz[null] "Realizations")
     /*
        Returns a matrix with forecast error losses, of the same (T x k)
        dimension as the input matrix fce.
@@ -183,38 +185,40 @@ end function
 function void DrawLoss (int p[1:2:1] "Loss type",
                         scalar aT[0:1:0.5] "AlphaHat",
                         scalar V "Variance of aT",
-                        string fpath[null] "Path ...")
-    if !exists(fpath)
-        fpath = "display"
-    endif
-    string S = (fpath == "display") ? "png" : "pdf"
+                        string fpath[null] "Full path")
+    /* Draw loss function. */
+
+    scalar FONTSIZE = 15
+
+    string fpath = exists(fpath) ? fpath : "display"
     string ltype = (p == 1) ? "Lin.-Lin." : "Quad.-Quad."
-    matrix vE = seq(-1,1,0.01)'
+    matrix vE = seq(-1, 1, 0.01)'
     matrix vBin = (vE .< 0)
     matrix LF = (p == 1) ? abs(vE) : vE .^2 # spart Berechnungen
     if aT == 0.5
-        LF = LF*0.5
+        LF = LF * 0.5
     else
         LF = LF.* (aT + (1 - 2 * aT) * (vE .< 0) )
     endif
-    if V!=0
-        scalar aTlow = aT-2*sqrt(V)		# -2 S.E.
-        matrix LFlow = (aTlow + vBin.*(1-aTlow*2)).*abs(vE).^p
-        scalar aTup = aT+2*sqrt(V)		# +2 S.E.
-        matrix LFup = (aTup + vBin.*(1-aTup*2)).*abs(vE).^p
-        matrix mplot = LF~LFlow~LFup~vE
-        sprintf optt "set title '%s, alpha-hat=%.3g (±2 S.E.)", ltype, aT
+
+    string title = sprintf("%s, alpha-hat=%.3g", ltype, aT)
+    if V != 0
+        scalar aTlow = aT - 2 * sqrt(V)		# -2 S.E.
+        matrix LFlow = (aTlow + vBin .* (1 - aTlow * 2)) .* abs(vE).^p
+        scalar aTup = aT + 2 * sqrt(V)		# +2 S.E.
+        matrix LFup = (aTup + vBin.*(1 - aTup * 2)) .* abs(vE).^p
+        matrix mplot = LF ~ LFlow ~ LFup ~ vE
+        title ~= " (±2 S.E.)"
     else
-        matrix mplot = LF~vE
-        sprintf optt "set title '%s, alpha-hat=%.3g", ltype, aT
+        matrix mplot = LF ~ vE
     endif
+
     plot mplot
         options with-lines fit=none --single-yaxis
         literal set nokey
-        #printf "set term @S font 'Helvetica,15' lw 1.5"
-        printf "%s", optt
-        printf "set ylabel 'Loss' font ',15'"
-        printf "set xlabel 'Forecast Error' offset 0,0.75 font ',15'"
+        printf "set title '%s' font ',%d'", title, FONTSIZE
+        printf "set ylabel 'Loss' font ',%d'", FONTSIZE
+        printf "set xlabel 'Forecast Error' offset 0,0.75 font ',%d'", FONTSIZE
         literal set y2tics
         #add a slight grid to make it easier to follow the exact position of the curves
         literal set style line 12 lc rgb "#808080" lt 0 lw 1	# light grey color
@@ -229,54 +233,61 @@ end function
 #################
 
 function void DrawLoss2 (int p[1:2:1] "Loss type",
-                         scalar aT1[0:1:0.5] "AlphaHat(1)",
-      scalar V1 "Variance of aT(1)",
-      scalar aT2[0:1:0.5] "AlphaHat(2)",
-      scalar V2 "Variance of aT(2)",
-      string fpath[null] "Path ...")
-    if !exists(fpath)
-        fpath = "display"
-    endif
-    string S = (fpath == "display") ? "png" : "pdf"
+                         scalar aT1[0:1:0.5] "AlphaHat[1]",
+                         scalar V1 "Variance of aT[1]",
+                         scalar aT2[0:1:0.5] "AlphaHat[2]",
+                         scalar V2 "Variance of aT[2]",
+                         string fpath[null] "Full path to file")
+    /* Draw two loss functions jointly.
+
+    # TODO: get rid of a lot of code which is already written in DrawLoss(). */
+
+    scalar FONTSIZE = 15
+
+    string fpath = exists(fpath) ? fpath : "display"
     string ltype = (p == 1) ? "Lin.-Lin." : "Quad.-Quad."
-    matrix vE = seq(-1,1,0.01)'
+    matrix vE = seq(-1, 1, 0.01)'
     matrix vBin = (vE .< 0)
+
     loop i=1..2 -q
         #matrix LF$i  = (aT$i + vBin.*(1-aT$i*2)).*abs(vE).^p
         matrix LF$i = (p == 1) ? abs(vE) : vE .^2
     endloop
+
     loop i=1..2 -q
         if aT$i == 0.5
-            LF$i = LF$i*0.5
+            LF$i = LF$i * 0.5
         else
             LF$i = LF$i.* (aT$i + (1 - 2 * aT$i) * (vE .< 0) )
         endif
     endloop
-    if V1!=0 && V2!=0
+
+    if V1 != 0 && V2 != 0
         matrix mplot = {}
         loop i=1..2 -q
-            scalar aTlow$i = aT$i-2*sqrt(V$i) 	# -2 S.E.
-            matrix LFlow$i = (aTlow$i + vBin.*(1-aTlow$i*2)).*abs(vE).^p
-            scalar aTup$i = aT$i+2*sqrt(V$i)		# +2 S.E.
-            matrix LFup$i = (aTup$i + vBin.*(1-aTup$i*2)).*abs(vE).^p
-            matrix mplot ~= LF$i~LFlow$i~LFup$i
+            scalar aTlow$i = aT$i - 2 * sqrt(V$i) 	# -2 S.E.
+            matrix LFlow$i = (aTlow$i + vBin .* (1 - aTlow$i * 2)) .* abs(vE).^p
+            scalar aTup$i = aT$i + 2 * sqrt(V$i)		# +2 S.E.
+            matrix LFup$i = (aTup$i + vBin .* (1 - aTup$i * 2)) .*abs(vE).^p
+            matrix mplot ~= LF$i ~ LFlow$i ~ LFup$i
         endloop
     endif
-    if V1!=0 && V2!=0
-        mplot~=vE
-        sprintf optt "set title '%s, a1=%.3g, a2=%.3g (±2 S.E.)", ltype, aT1, aT2
+
+    string title = sprintf("%s, a1=%.3g, a2=%.3g", ltype, aT1, aT2)
+    if V1 != 0 && V2 != 0
+        mplot ~= vE
+        title ~= " (±2 S.E.)"
     else
         matrix mplot = LF~vE
-        sprintf optt "set title '%s, a1=%.3g, a2=%.3g", ltype, aT1, aT2
     endif
+
     plot mplot
         options with-lp fit=none --single-yaxis
         #options band=B,2 band-style=fill
         literal set nokey
-        #printf "set term @S font 'Helvetica,15' lw 1.5"
-        printf "%s", optt
-        printf "set ylabel 'Loss' font ',15'"
-        printf "set xlabel 'Forecast Error' offset 0,0.75 font ',15'"
+        printf "set title '%s' font ',%d'", title, FONTSIZE
+        printf "set ylabel 'Loss' font ',%d'", FONTSIZE
+        printf "set xlabel 'Forecast Error' offset 0,0.75 font ',%d'", FONTSIZE
         literal set y2tics
         #add a slight grid to make it easier to follow the exact position of the curves
         literal set style line 12 lc rgb "#808080" lt 0 lw 1	# light grey color
@@ -328,8 +339,8 @@ function void doKS (bundle *b)
     b.KShit = hi
     b.KSfalse = fa
     b.KSstat = hi-fa
-    colnames(M, "Y=1 Y=0")
-    rownames(M, "Yhat=1 Yhat=0")
+    cnameset(M, "Y=1 Y=0")
+    rnameset(M, "Yhat=1 Yhat=0")
     b.KSmat = M
 end function
 
@@ -372,7 +383,7 @@ function matrix probscore (matrix y "Binary of actuals",
             matrix LPS = zeros(1,1)
         endif
         matrix mout = QPS ~ LPS
-        colnames(mout, "QPS LPS")
+        cnameset(mout, "QPS LPS")
     else
         printf "\nError probscore function:\n"
         printf "The series are not of the same length.\n"
