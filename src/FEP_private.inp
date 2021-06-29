@@ -53,7 +53,7 @@ function scalar loadextra(void)
 
     catch include extra.gfn
     if $error
-        catch install extra
+        catch pkg install extra
         if $error
             print "Fatal problem getting the 'extra' package."
             print "Please install it manually and try again."

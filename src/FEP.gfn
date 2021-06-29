@@ -2,8 +2,8 @@
 <gretl-functions>
 <gretl-function-package name="FEP" no-data-ok="true" minver="2017a" lives-in-subdir="true">
 <author email="atecon@posteo.de">Artur Tarassow and Sven Schreiber</author>
-<version>2.5</version>
-<date>2020-10-09</date>
+<version>2.6</version>
+<date>2021-06-29</date>
 <description>Forecast Evaluation Package</description>
 <tags>C12 C52 C53</tags>
 <label>Forecast evaluations</label>
@@ -49,8 +49,8 @@ endif
 b.KShit = hi
 b.KSfalse = fa
 b.KSstat = hi-fa
-colnames(M, &quot;Y=1 Y=0&quot;)
-rownames(M, &quot;Yhat=1 Yhat=0&quot;)
+cnameset(M, &quot;Y=1 Y=0&quot;)
+rnameset(M, &quot;Yhat=1 Yhat=0&quot;)
 b.KSmat = M
 </code>
 </gretl-function>
@@ -168,9 +168,10 @@ b.HPpval = $pvalue
   <param name="b" type="bundleref"/>
   <param name="which" type="string"/>
  </params>
-<code>strings testcodes = strsplit(strstrip(which))
+<code>/* */
+strings testcodes = strsplit(strstrip(which))
 loop i = 1..nelem(testcodes) --quiet
-  # I hope no earlier test overwrites bundle elements
+  # TODO: I hope no earlier test overwrites bundle elements
   # that would confuse the later tests...?
   which = testcodes[i]
   check_series_in_b(b, which)
@@ -280,13 +281,13 @@ endif
 <gretl-function name="getLoss" type="matrix">
  <params count="4">
   <param name="fce" type="matrix">
-<description>FC (errors)</description>
+<description>forecast errors</description>
   </param>
   <param name="LF" type="string" optional="true">
 <description>Loss function</description>
   </param>
   <param name="param" type="matrix" optional="true">
-<description>Loss func parameter(s)</description>
+<description>Loss func parameters</description>
   </param>
   <param name="realiz" type="matrix" optional="true" const="true">
 <description>Realizations</description>
@@ -852,7 +853,7 @@ if rows(Pr) == rows(y)
     matrix LPS = zeros(1,1)
   endif
   matrix mout = QPS ~ LPS
-  colnames(mout, &quot;QPS LPS&quot;)
+  cnameset(mout, &quot;QPS LPS&quot;)
 else
   printf &quot;\nError probscore function:\n&quot;
   printf &quot;The series are not of the same length.\n&quot;
@@ -900,40 +901,38 @@ return names
 <description>Variance of aT</description>
   </param>
   <param name="fpath" type="string" optional="true">
-<description>Path ...</description>
+<description>Full path</description>
   </param>
  </params>
-<code>if !exists(fpath)
-  fpath = &quot;display&quot;
-endif
-string S = (fpath == &quot;display&quot;) ? &quot;png&quot; : &quot;pdf&quot;
+<code>/* Draw loss function. */
+scalar FONTSIZE = 15
+string fpath = exists(fpath) ? fpath : &quot;display&quot;
 string ltype = (p == 1) ? &quot;Lin.-Lin.&quot; : &quot;Quad.-Quad.&quot;
-matrix vE = seq(-1,1,0.01)'
+matrix vE = seq(-1, 1, 0.01)'
 matrix vBin = (vE .&lt; 0)
 matrix LF = (p == 1) ? abs(vE) : vE .^2 # spart Berechnungen
 if aT == 0.5
-  LF = LF*0.5
+  LF = LF * 0.5
 else
   LF = LF.* (aT + (1 - 2 * aT) * (vE .&lt; 0) )
 endif
-if V!=0
-  scalar aTlow = aT-2*sqrt(V)		# -2 S.E.
-  matrix LFlow = (aTlow + vBin.*(1-aTlow*2)).*abs(vE).^p
-  scalar aTup = aT+2*sqrt(V)		# +2 S.E.
-  matrix LFup = (aTup + vBin.*(1-aTup*2)).*abs(vE).^p
-  matrix mplot = LF~LFlow~LFup~vE
-  sprintf optt &quot;set title '%s, alpha-hat=%.3g (±2 S.E.)&quot;, ltype, aT
+string title = sprintf(&quot;%s, alpha-hat=%.3g&quot;, ltype, aT)
+if V != 0
+  scalar aTlow = aT - 2 * sqrt(V)		# -2 S.E.
+  matrix LFlow = (aTlow + vBin .* (1 - aTlow * 2)) .* abs(vE).^p
+  scalar aTup = aT + 2 * sqrt(V)		# +2 S.E.
+  matrix LFup = (aTup + vBin.*(1 - aTup * 2)) .* abs(vE).^p
+  matrix mplot = LF ~ LFlow ~ LFup ~ vE
+  title ~= &quot; (±2 S.E.)&quot;
 else
-  matrix mplot = LF~vE
-  sprintf optt &quot;set title '%s, alpha-hat=%.3g&quot;, ltype, aT
+  matrix mplot = LF ~ vE
 endif
 plot mplot
   options with-lines fit=none --single-yaxis
   literal set nokey
-  #printf &quot;set term @S font 'Helvetica,15' lw 1.5&quot;
-  printf &quot;%s&quot;, optt
-  printf &quot;set ylabel 'Loss' font ',15'&quot;
-  printf &quot;set xlabel 'Forecast Error' offset 0,0.75 font ',15'&quot;
+  printf &quot;set title '%s' font ',%d'&quot;, title, FONTSIZE
+  printf &quot;set ylabel 'Loss' font ',%d'&quot;, FONTSIZE
+  printf &quot;set xlabel 'Forecast Error' offset 0,0.75 font ',%d'&quot;, FONTSIZE
   literal set y2tics
   #add a slight grid to make it easier to follow the exact position of the curves
   literal set style line 12 lc rgb &quot;#808080&quot; lt 0 lw 1	# light grey color
@@ -951,27 +950,27 @@ end plot --output=&quot;@fpath&quot;
 <description>Loss type</description>
   </param>
   <param name="aT1" type="scalar" min="0" max="1" default="0.5">
-<description>AlphaHat(1)</description>
+<description>AlphaHat[1]</description>
   </param>
   <param name="V1" type="scalar">
-<description>Variance of aT(1)</description>
+<description>Variance of aT[1]</description>
   </param>
   <param name="aT2" type="scalar" min="0" max="1" default="0.5">
-<description>AlphaHat(2)</description>
+<description>AlphaHat[2]</description>
   </param>
   <param name="V2" type="scalar">
-<description>Variance of aT(2)</description>
+<description>Variance of aT[2]</description>
   </param>
   <param name="fpath" type="string" optional="true">
-<description>Path ...</description>
+<description>Full path to file</description>
   </param>
  </params>
-<code>if !exists(fpath)
-  fpath = &quot;display&quot;
-endif
-string S = (fpath == &quot;display&quot;) ? &quot;png&quot; : &quot;pdf&quot;
+<code>/* Draw two loss functions jointly.
+# TODO: get rid of a lot of code which is already written in DrawLoss(). */
+scalar FONTSIZE = 15
+string fpath = exists(fpath) ? fpath : &quot;display&quot;
 string ltype = (p == 1) ? &quot;Lin.-Lin.&quot; : &quot;Quad.-Quad.&quot;
-matrix vE = seq(-1,1,0.01)'
+matrix vE = seq(-1, 1, 0.01)'
 matrix vBin = (vE .&lt; 0)
 loop i=1..2 -q
   #matrix LF$i  = (aT$i + vBin.*(1-aT$i*2)).*abs(vE).^p
@@ -979,36 +978,35 @@ loop i=1..2 -q
 endloop
 loop i=1..2 -q
   if aT$i == 0.5
-    LF$i = LF$i*0.5
+    LF$i = LF$i * 0.5
   else
     LF$i = LF$i.* (aT$i + (1 - 2 * aT$i) * (vE .&lt; 0) )
   endif
 endloop
-if V1!=0 &amp;&amp; V2!=0
+if V1 != 0 &amp;&amp; V2 != 0
   matrix mplot = {}
   loop i=1..2 -q
-    scalar aTlow$i = aT$i-2*sqrt(V$i) 	# -2 S.E.
-    matrix LFlow$i = (aTlow$i + vBin.*(1-aTlow$i*2)).*abs(vE).^p
-    scalar aTup$i = aT$i+2*sqrt(V$i)		# +2 S.E.
-    matrix LFup$i = (aTup$i + vBin.*(1-aTup$i*2)).*abs(vE).^p
-    matrix mplot ~= LF$i~LFlow$i~LFup$i
+    scalar aTlow$i = aT$i - 2 * sqrt(V$i) 	# -2 S.E.
+    matrix LFlow$i = (aTlow$i + vBin .* (1 - aTlow$i * 2)) .* abs(vE).^p
+    scalar aTup$i = aT$i + 2 * sqrt(V$i)		# +2 S.E.
+    matrix LFup$i = (aTup$i + vBin .* (1 - aTup$i * 2)) .*abs(vE).^p
+    matrix mplot ~= LF$i ~ LFlow$i ~ LFup$i
   endloop
 endif
-if V1!=0 &amp;&amp; V2!=0
-  mplot~=vE
-  sprintf optt &quot;set title '%s, a1=%.3g, a2=%.3g (±2 S.E.)&quot;, ltype, aT1, aT2
+string title = sprintf(&quot;%s, a1=%.3g, a2=%.3g&quot;, ltype, aT1, aT2)
+if V1 != 0 &amp;&amp; V2 != 0
+  mplot ~= vE
+  title ~= &quot; (±2 S.E.)&quot;
 else
   matrix mplot = LF~vE
-  sprintf optt &quot;set title '%s, a1=%.3g, a2=%.3g&quot;, ltype, aT1, aT2
 endif
 plot mplot
   options with-lp fit=none --single-yaxis
   #options band=B,2 band-style=fill
   literal set nokey
-  #printf &quot;set term @S font 'Helvetica,15' lw 1.5&quot;
-  printf &quot;%s&quot;, optt
-  printf &quot;set ylabel 'Loss' font ',15'&quot;
-  printf &quot;set xlabel 'Forecast Error' offset 0,0.75 font ',15'&quot;
+  printf &quot;set title '%s' font ',%d'&quot;, title, FONTSIZE
+  printf &quot;set ylabel 'Loss' font ',%d'&quot;, FONTSIZE
+  printf &quot;set xlabel 'Forecast Error' offset 0,0.75 font ',%d'&quot;, FONTSIZE
   literal set y2tics
   #add a slight grid to make it easier to follow the exact position of the curves
   literal set style line 12 lc rgb &quot;#808080&quot; lt 0 lw 1	# light grey color
@@ -1539,7 +1537,7 @@ warn = sprintf(&quot;%s\nOtherwise expect errors,&quot;, warn)
 warn = sprintf(&quot;%s then install a newer version of 'extra'.)\n&quot;, warn)
 catch include extra.gfn
 if $error
-  catch install extra
+  catch pkg install extra
   if $error
     print &quot;Fatal problem getting the 'extra' package.&quot;
     print &quot;Please install it manually and try again.&quot;
@@ -2032,7 +2030,7 @@ return omegahat
 <sample-script>
 clear
 set verbose off
-include FEP.gfn --force
+include FEP.gfn
 open FEPdata.gdt --frompkg=FEP
 
 #--------

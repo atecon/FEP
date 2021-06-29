@@ -1,6 +1,6 @@
 clear
 set verbose off
-include FEP.gfn --force
+include FEP.gfn
 open FEPdata.gdt --frompkg=FEP
 
 #--------
