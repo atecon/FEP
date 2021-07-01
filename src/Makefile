@@ -3,11 +3,6 @@ PKG = FEP
 $(PKG).gfn: $(PKG).inp $(PKG).spec $(PKG)_sample.inp
 	gretlcli --makepkg $(PKG).inp
 
-#$(PKG).pdf: $(PKG).tex
-#	pdflatex $<
-#	bibtex $(PKG)
-#	pdflatex $<
-#	pdflatex $<
 
 $(PKG).zip: $(PKG).gfn ../docs/$(PKG).pdf ../data/FEPdata.gdt
 	echo makepkg $(PKG).zip | gretlcli -b -

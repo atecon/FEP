@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gretl-functions>
-<gretl-function-package name="FEP" no-data-ok="true" minver="2017a" lives-in-subdir="true">
+<gretl-function-package name="FEP" no-data-ok="true" minver="2018a" lives-in-subdir="true">
 <author email="atecon@posteo.de">Artur Tarassow and Sven Schreiber</author>
 <version>2.6</version>
 <date>2021-06-29</date>
