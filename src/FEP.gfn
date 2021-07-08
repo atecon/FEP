@@ -3,7 +3,7 @@
 <gretl-function-package name="FEP" no-data-ok="true" minver="2018a" lives-in-subdir="true">
 <author email="atecon@posteo.de">Artur Tarassow and Sven Schreiber</author>
 <version>2.6</version>
-<date>2021-06-29</date>
+<date>2021-07-08</date>
 <description>Forecast Evaluation Package</description>
 <tags>C12 C52 C53</tags>
 <label>Forecast evaluations</label>
