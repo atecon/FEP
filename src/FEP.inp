@@ -47,8 +47,10 @@ function bundle GUI_FEP(
 		"DM","GW","CW")
 
     bundle b
+    
     ## process args
     string b.code = sarr[which]
+    
     # process realiz
     if b.code == "KS" || b.code == "PT" || b.code == "DL"
         series b.yup = realiz
@@ -100,7 +102,7 @@ function bundle GUI_FEP(
     if b.code == "MZ" || b.code == "HP" || b.code == "PT"
         scalar b.robust = robortype
 
-    elif b.code == "DM" || b.code == "EKT"
+    elif b.code == "DM" || b.code == "EKT" || b.code == "GW"
         b.loss = robortype + 1
         # for EKT we had: q-q-shape (p0=2) / lin-lin-shape (p0=1)
     endif
@@ -114,9 +116,14 @@ function bundle GUI_FEP(
     scalar b.verb = verbosity
 
     # process zli
-    if b.code == "HP"
+    if b.code == "HP" || b.code == "GW"
         list b.z = zli
-
+        
+        # For GW: Even though b.cond may be switched off, it may 
+        # make sense to inject the conditioning list into the main
+        # bundle to somehow use it later. So we do not check for
+        # b.cond here.
+        
     elif b.code == "CG" # needs series
         if !nelem(zli) || nelem(zli) > 1
             funcerr "CG needs one-element zli list input"

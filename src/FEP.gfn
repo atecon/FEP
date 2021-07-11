@@ -3,7 +3,7 @@
 <gretl-function-package name="FEP" no-data-ok="true" minver="2018a" lives-in-subdir="true">
 <author email="atecon@posteo.de">Artur Tarassow and Sven Schreiber</author>
 <version>2.6</version>
-<date>2021-07-08</date>
+<date>2021-07-11</date>
 <description>Forecast Evaluation Package</description>
 <tags>C12 C52 C53</tags>
 <label>Forecast evaluations</label>
@@ -1197,7 +1197,7 @@ endif
 # process robortype
 if b.code == &quot;MZ&quot; || b.code == &quot;HP&quot; || b.code == &quot;PT&quot;
   scalar b.robust = robortype
-elif b.code == &quot;DM&quot; || b.code == &quot;EKT&quot;
+elif b.code == &quot;DM&quot; || b.code == &quot;EKT&quot; || b.code == &quot;GW&quot;
   b.loss = robortype + 1
   # for EKT we had: q-q-shape (p0=2) / lin-lin-shape (p0=1)
 endif
@@ -1208,8 +1208,12 @@ endif
 # copy verbosity setting
 scalar b.verb = verbosity
 # process zli
-if b.code == &quot;HP&quot;
+if b.code == &quot;HP&quot; || b.code == &quot;GW&quot;
   list b.z = zli
+  # For GW: Even though b.cond may be switched off, it may
+  # make sense to inject the conditioning list into the main
+  # bundle to somehow use it later. So we do not check for
+  # b.cond here.
 elif b.code == &quot;CG&quot; # needs series
   if !nelem(zli) || nelem(zli) &gt; 1
     funcerr &quot;CG needs one-element zli list input&quot;
