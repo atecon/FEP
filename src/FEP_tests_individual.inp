@@ -57,7 +57,7 @@ function void doEKTtest_matrix (bundle *b) # was doEKTtest
     scalar nfail = 0
     scalar failed = 0
 
-    loop while diffmax > convcrit -q
+    loop while diffmax > convcrit 
         scalar err1 = 0
         try_invert(sOLD, &err1)
         if !err1
@@ -172,7 +172,7 @@ function void doHPtest (bundle *b)
     if typestr(typeof(b.z)) == "matrix"
         matrix mz = b.z
         list Z = null
-        loop i = 1..cols(mz) -q
+        loop i = 1..cols(mz)
             series S$i = mz[,i]
             Z += S$i
         endloop

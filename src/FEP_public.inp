@@ -4,7 +4,7 @@ function void applyFCtests (bundle *b, string which)
 
     strings testcodes = strsplit(strstrip(which))
 
-    loop i = 1..nelem(testcodes) --quiet
+    loop i = 1..nelem(testcodes)
         # TODO: I hope no earlier test overwrites bundle elements
         # that would confuse the later tests...?
 
@@ -122,26 +122,26 @@ function matrix getLoss (matrix fce "forecast errors",
     # process user choice / internal notation
     if !exists(LF)
         string LF = "sq"	# default
-    elif strlen(strstr("square", LF)) # includes sq
+    elif instring("square", LF) # includes sq
         LF = "sq"
-    elif strlen(strstr("ll linlin", LF))
+    elif instring("ll linlin", LF)
         LF = "ll"
-    elif strlen(strstr("qq quadquad", LF))
+    elif instring("qq quadquad", LF)
         LF = "qq"
-    elif strlen(strstr("abs linex", LF))
+    elif instring("abs linex", LF)
         # OK, no action needed, use "abs" or "linex" directly
-    elif strlen(strstr("dlinex dle", LF)) # attention, must come after linex
+    elif instring("dlinex dle", LF) # attention, must come after linex
         LF = "dle"	# double linex
     else
         funcerr "Loss function choice not recognized."
     endif
     # process parameters
-    if strlen(strstr("sq abs ll qq linex", LF))
+    if instring("sq abs ll qq linex", LF)
         if exists(param)
             param = param[1,1] # only one parameter
             if (LF != "linex") && ( param[1] < 0 )
                 funcerr "Parameter must be non-negative."
-            elif strlen(strstr("ll qq", LF)) && ( param[1] > 1 )
+            elif instring("ll qq", LF) && ( param[1] > 1 )
                 funcerr "Parameter too large (>1) for linlin or quadquad."
             endif
         else
@@ -249,12 +249,12 @@ function void DrawLoss2 (int p[1:2:1] "Loss type",
     matrix vE = seq(-1, 1, 0.01)'
     matrix vBin = (vE .< 0)
 
-    loop i=1..2 -q
+    loop i=1..2
         #matrix LF$i  = (aT$i + vBin.*(1-aT$i*2)).*abs(vE).^p
         matrix LF$i = (p == 1) ? abs(vE) : vE .^2
     endloop
 
-    loop i=1..2 -q
+    loop i=1..2
         if aT$i == 0.5
             LF$i = LF$i * 0.5
         else
@@ -264,11 +264,11 @@ function void DrawLoss2 (int p[1:2:1] "Loss type",
 
     if V1 != 0 && V2 != 0
         matrix mplot = {}
-        loop i=1..2 -q
+        loop i=1..2
             scalar aTlow$i = aT$i - 2 * sqrt(V$i) 	# -2 S.E.
             matrix LFlow$i = (aTlow$i + vBin .* (1 - aTlow$i * 2)) .* abs(vE).^p
             scalar aTup$i = aT$i + 2 * sqrt(V$i)		# +2 S.E.
-            matrix LFup$i = (aTup$i + vBin .* (1 - aTup$i * 2)) .*abs(vE).^p
+            matrix LFup$i = (aTup$i + vBin .* (1 - aTup$i * 2)) .* abs(vE).^p
             matrix mplot ~= LF$i ~ LFlow$i ~ LFup$i
         endloop
     endif
@@ -478,9 +478,9 @@ function matrices CamDufStats( matrix mdat,
     # cf. C&G97 p. 9
     if recenter
 
-        matrix Xc = zeros(rows(X) -  1, cols(X))	# hold re-centered values
+        matrix Xc = zeros(rows(X) - 1, cols(X))	# hold re-centered values
 
-        loop i = 2..rows(X) -q	# at least 2 obs., re-centering procedure
+        loop i = 2..rows(X) # at least 2 obs., re-centering procedure
             if recenter == 1
                 Xc[i - 1,] = X[i, ] - quantile(X[1:i, ], 0.5)
 
@@ -499,7 +499,7 @@ function matrices CamDufStats( matrix mdat,
     matrix SRg = {} 	# to hold their own sign-rank stat (eq (9))
     # (empty for convenience case)
     matrix Wg = {} 	# Wilcoxon, eq(8)
-    loop lix = 1..nelem(whichlags) -q
+    loop lix = 1..nelem(whichlags) 
         lag = int(whichlags[lix])
 
         # do it for all g_t 's in parallel
@@ -533,7 +533,7 @@ function matrices CamDufStats( matrix mdat,
 
         # the ranking of the products, i.e. R+1
         matrix Rplus1 = {}
-        loop i=1..cols(prod) -q
+        loop i=1..cols(prod) 
             Rplus1 ~= ranking( abs(prod[, i]) )
         endloop
         Wg |= sumc( prodsigns .* Rplus1 )

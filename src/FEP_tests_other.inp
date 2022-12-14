@@ -141,7 +141,7 @@ function void doGWtest (bundle *b)
             # compatibility for matrix input of z
             if typestr(typeof(b.z)) == "matrix"
                 matrix mz = b.z
-                loop i = 1..cols(mz) -q
+                loop i = 1..cols(mz) 
                     series S$i = mz[,i]
                     h_inst += S$i
                 endloop
@@ -158,7 +158,7 @@ function void doGWtest (bundle *b)
 
     # create the reg matrix given by L*ht', where ht is matrix of instr
     list reg = null
-    loop foreach i h_inst -q
+    loop foreach i h_inst 
         series r$i = h_inst.$i * L
         reg += r$i
     endloop 
@@ -166,7 +166,7 @@ function void doGWtest (bundle *b)
     # Run regression
     if b.fhor == 1
         # calc the test stat as n*R^2 from the regression of one on L*ht
-        ols 0 reg -q
+        ols 0 reg --quiet
         scalar Thmn_stat = $T * $rsq			# this only works for fhor=1!
     else
         matrix zbar = meanc({reg})'
