@@ -508,6 +508,9 @@ function matrix rattest (matrix Y,
 end function
 
 
+/*
+# not needed anymore, replaced by native lrcovar
+
 function matrix NeweyWest (matrix Z, int nlags)
     # For Giacomini-White test
     # Returns the Newey-West estimator of the asymptotic variance matrix
@@ -536,3 +539,5 @@ function matrix NeweyWest (matrix Z, int nlags)
     endif
     return omegahat
 end function
+
+*/
