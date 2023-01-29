@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.6, July 2021
+ version 2.7, January 2023
 \end_layout
 
 \begin_layout Abstract
@@ -14149,6 +14149,25 @@ status open
 Changelog
 \end_layout
 
+\begin_layout Itemize
+version 2.7 (January 2023)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+modernize syntax again, require gretl 2020c
+\end_layout
+
+\begin_layout Itemize
+fix a bug with the GW test when the instrument data was passed as series
+ type
+\end_layout
+
+\begin_layout Itemize
+replace own long-run (co)variance calculation with native lrcovar() function
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 version 2.6 (July 2021)
 \end_layout
