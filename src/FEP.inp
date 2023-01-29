@@ -55,7 +55,7 @@ function bundle GUI_FEP(
     if b.code == "KS" || b.code == "PT" || b.code == "DL"
         series b.yup = realiz
 
-    elif strlen(strstr("CG EKT" , b.code))
+    elif instring("CG EKT" , b.code)
         if exists(fc)	# expected case
             series b.E = realiz - fc # calculate FC errors, input for CG*/EKT
         else
@@ -83,7 +83,7 @@ function bundle GUI_FEP(
             series b.fc = fc
         endif
 
-    elif strlen(strstr("DL HP MZ KS PT DM GW CW", b.code))	# and here: fc is null
+    elif instring("DL HP MZ KS PT DM GW CW", b.code)	# and here: fc is null
         funcerr "Need forecast (fc) input!"
     endif
 

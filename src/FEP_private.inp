@@ -90,8 +90,8 @@ function scalar check_y_fc_length (const series y, const list fc)
     scalar ret = 0	# no. of fc-series with less valid obs. than series y
     scalar Ty = nobs(y)
 
-    loop foreach i fc -q
-        scalar d = nobs(fc.$i)-Ty
+    loop foreach i fc 
+        scalar d = nobs(fc.$i) - Ty
 
         if d < 0
             ret++
@@ -115,7 +115,7 @@ function matrix add_labels (const matrix metrics)
 	Needed for ForecastMetrics(). */
 
     strings cnames = array(cols(metrics))
-    loop i=1..cols(metrics) -q
+    loop i=1..cols(metrics) 
         cnames[i] = sprintf("Forecast_$i")
     endloop
     cnameset(metrics, cnames)
@@ -178,7 +178,7 @@ function matrix MADMean (const series y,
       https://www.sciencedirect.com/science/article/pii/S0169207016000121#br000070 */
 
     matrix metric = zeros(nelem(fc_error), 1)
-    loop foreach i fc_error -q
+    loop foreach i fc_error 
         if use_median
             metric[i] = MdAE(fc_error)[i] / median(y)
         else
@@ -194,7 +194,7 @@ function matrix MdE (const list fc_error)
     /* Median error */
 
     matrix metric = zeros(nelem(fc_error), 1)
-    loop foreach i fc_error -q
+    loop foreach i fc_error 
         metric[i] = median(fc_error.$i)
     endloop
 
@@ -206,7 +206,7 @@ function matrix MdAE (const list fc_error)
     /* Median absolute error */
 
     matrix metric = zeros(nelem(fc_error), 1)
-    loop foreach i fc_error -q
+    loop foreach i fc_error 
         metric[i] = median(abs(fc_error.$i))
     endloop
 
@@ -220,7 +220,7 @@ function matrix sMdAPE (const series y,
     /* Symmetric mean/ median absolute percentage error */
 
     matrix metric = zeros(nelem(fc),1)
-    loop foreach i fc -q
+    loop foreach i fc 
         series AE = abs(get_fc_error(y, fc.$i))
         series SUM = y + fc.$i
         if use_median
@@ -240,7 +240,7 @@ function matrix sMdAAPE (const series y,
     /* Symmetric mean/ median absolute absolute percentage error */
 
     matrix metric = zeros(nelem(fc),1)
-    loop foreach i fc -q
+    loop foreach i fc 
 
         series AE = abs(get_fc_error(y, fc.$i))
         series ABS_SUM = abs(y + fc.$i)
@@ -262,7 +262,7 @@ function matrix RMdSPE (const series y,
 		-- based on percentage errors */
 
     matrix metric = zeros(nelem(fc_error), 1)
-    loop foreach i fc_error -q
+    loop foreach i fc_error 
         series PE_SQ = pct_error(y, fc_error.$i)^2
         if use_median
             metric[i] = sqrt(median(PE_SQ))
@@ -279,7 +279,7 @@ function matrix MdAPE (const series y, const list fc_error)
     /* Median absolute percentage error -- based on percentage errors */
 
     matrix metric = zeros(nelem(fc_error), 1)
-    loop foreach i fc_error -q
+    loop foreach i fc_error
         metric[i] = median( abs( pct_error(y, fc_error.$i) ) )
     endloop
 
@@ -292,7 +292,7 @@ function matrix MSLE (const series y, const list fc)
     Reference: https://scikit-learn.org/stable/modules/model_evaluation.html#mean-squared-log-error */
 
     matrix metric = zeros(nelem(fc), 1)
-    loop foreach i fc -q
+    loop foreach i fc 
         metric[i] = mean(( log(y + 1) - log(fc.$i + 1) )^2)
     endloop
 
@@ -304,7 +304,7 @@ function list get_fc_error_list (const series y, const list fc)
     /* Compute list of forecast errors */
 
     list fc_error = null
-    loop foreach i fc -q
+    loop foreach i fc 
         series err_$i = get_fc_error(y, fc.$i)
         list fc_error += err_$i
     endloop
@@ -401,7 +401,7 @@ function string fullname(string scode)
       "Campbell-Ghysels (CG)",
       "Clark-West (CW)")
 
-    loop i=1..nelem(codes) -q
+    loop i=1..nelem(codes) 
         if scode == codes[i]
             return fulls[i]
         endif
@@ -438,7 +438,7 @@ end function
 ###############
 
 function matrix symtest (scalar aT "AlphaHat",
-                         scalar SE "S.D. of  Alpha",
+                         scalar SE "S.D. of Alpha",
                          int verb)
     # Test the null hypothesis of symmetry: alfa = 0.5 #
     scalar TestSym = (aT - 0.5)/SE
@@ -474,7 +474,7 @@ function matrix rattest (matrix Y,
         else
             df = cols(s)-1
         endif
-        A = sumc( iv.*((Y.<0)-aT).*vMod)
+        A = sumc( iv .* ((Y.<0) - aT) .* vMod)
         err = 0
         try_invert(s,&err)
         if err==0
@@ -501,12 +501,15 @@ function matrix rattest (matrix Y,
             printf "p-value      = %12.3g\n", pv
             printf "\n*********************************************\n"
         endif
-        return J~pv
+        return J ~ pv
     else
         return {NA}~{NA}
     endif
 end function
 
+
+/*
+# not needed anymore, replaced by native lrcovar
 
 function matrix NeweyWest (matrix Z, int nlags)
     # For Giacomini-White test
@@ -536,3 +539,5 @@ function matrix NeweyWest (matrix Z, int nlags)
     endif
     return omegahat
 end function
+
+*/
