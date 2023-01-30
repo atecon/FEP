@@ -5,26 +5,9 @@
 
 ##############
 function void doDMtest (bundle *b)
-    # TODO: Allow for further loss functions in future
-    /* Idea for an interface (Sven, December 2022):
-    
-    -- The string b.lossfunc = "<funcname>" would refer to an 
-      active/loaded user func 
-     (errorif( b.loss == 0 && (!inbundle(b,"lossfunc") || b.lossfunc=="")))
-    -- Such a user func would have to have the following signature:
-      args: series y (realization), series f (forecasts)
-      return value: series loss  
-    -- b.lossfunc == "U" (or quad) could be used instead of b.loss == 1, 
-      and b.lossfunc == "V" instead of b.loss == 2 
-    -- Then for the non-U and non-V cases we would simply do: 
-      series L = feval(b.lossfunc, e1, e2)
-    */
-    
+      
     # apply defaults
     set_verbatim_flag(&b)
-    if !inbundle(b, "loss")
-        b.loss = 1	# U-shape
-    endif
     set_fhor_default(&b)
 
     series e1 = b.y - b.f1
@@ -32,22 +15,13 @@ function void doDMtest (bundle *b)
     smpl e1 e2 --no-missing
 
     # Construct loss differential
-    
-    if b.loss == 1		# U-shape quadratic loss
-        series L = e1^2 - e2^2
-    elif b.loss == 2		# V-shape
-        series L = abs(e1) - abs(e2)
-    else
-        printf "\n*** You can choose only between loss=1 (U-shape)"
-		printf " and loss=2 (V-shape). ***\n"
-        printf "*** Please re-specify b.loss.\n"
-        funcerr "Loss can only be 1 or 2."
-    endif
+    series LD = getLossDiff(b, e1, e2)
 
     # Run regression based HAC robust DM test
-    ols L 0 --robust --quiet
+    ols LD 0 --robust --quiet
     # Return test statistics and p-value
-    b.L = L									# series of loss differentials
+    b.L = LD									# series of loss differentials
+                                                # (maybe use b.LD as alias?)
     scalar tstat = $coeff / $stderr
     b.DMstat = tstat
     b.pvaln = 2 * pvalue(z, abs(tstat))			# stand. normal

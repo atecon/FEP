@@ -40,6 +40,67 @@ function void check_series_in_b (const bundle b, const string which)
     endif
 end function
 
+####################################
+
+function series getLossDiff (const bundle b, const series e1, const series e2)
+    # Calculates the loss differential between two forecasts.
+    
+    # The newer interface is to accept the string b.lossfunc,
+    # along with a conditionally required matrix b.lossparam.
+    # (This interface takes precedence.)
+    # 
+    # 'b.lossfunc' can be anything recognized by getLoss(),
+    #  plus it can be a user-specified function which is then 
+    #  processed with feval(). In this case it is the user's 
+    #  responsibility that the matrix 'b.lossparam' is compatible 
+    #  with the function named in 'b.lossfunc'. 
+    
+    # The older interface (up to 2.6/2.7) is to have the integer b.loss.
+    # (can be 1 (U-shape, default) or 2 (V-shape))
+    
+    # check the optional lossparam input 
+    if inbundle(b,"lossparam")
+        string type = typestr(typeof(b.lossparam))
+        errorif(type != "scalar" && type != "matrix", "'lossparam' must be scalar or matrix")
+    endif  
+        
+    # process the user options
+    if inbundle(b,"lossfunc")
+        errorif(typeof(b.lossfunc) != typeof("a string"), "'lossfunc' must be string code")
+        
+        if instring("ll linlin qq quadquad square sq abs linex dlinex dle", b.lossfunc)
+            # The main reason to treat these known codes specially is 
+            # because we then use a default param of 1 
+            # (to override the internal default of getLoss) 
+            matrix losses = getLoss({e1}~{e2}, lossfunc, inbundle(b.lossparam) ? \
+              b.lossparam : 1)
+        
+        else	# the case of user-def'd function 
+            # Here the user really must input the params if any are needed.  
+            matrix losses = getLoss({e1}~{e2}, lossfunc, inbundle(b.lossparam) ? \
+              b.lossparam : null)
+        endif
+           
+    elif inbundle(b,"loss")
+        errorif(typeof(b.loss) != typeof(1), "'loss' must be integer code")
+        errorif(b.loss != 1 && b.loss != 2, "'loss' can only be 1 or 2")
+        string lossfunc = b.loss==1 ? "square" : "abs"
+        matrix losses = getLoss({e1}~{e2}, lossfunc, 1) 
+        
+    else	# default case
+        matrix losses = getLoss({e1}~{e2}, "square", 1)
+         
+    endif
+    
+    series LD = losses[,1] - losses[,2]
+    return LD
+end function
+
+################
+
+
+# The following function should be redundant after Jan 30, 2023,
+# given that "extra" is now a dependency. 
 
 function scalar loadextra(void)
     # Pull in the extra pkg for the Wilcoxon p-values

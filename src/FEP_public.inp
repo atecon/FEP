@@ -1,12 +1,21 @@
 # public functions
+# index:
+# applyFCtests
+# ForecastMetrics
+# getForecastMetricsNames
+# getLoss
+# DrawLoss
+# DrawLoss2
+# doKS
+# probscore
+# CamDufStats
+
 function void applyFCtests (bundle *b, string which)
     /* */
 
     strings testcodes = strsplit(strstrip(which))
 
     loop i = 1..nelem(testcodes)
-        # TODO: I hope no earlier test overwrites bundle elements
-        # that would confuse the later tests...?
 
         which = testcodes[i]
         check_series_in_b(b, which)
@@ -77,38 +86,65 @@ function strings getForecastMetricsNames (void)
     /* Return the names of the computed forecast evaluation statistics in order.*/
 
     strings names = names_of_basic_point_metrics() + \
-                    names_of_udf_point_metrics()
+      names_of_udf_point_metrics()
 
     return names
 end function
 
-###############
+################
 
-function matrix getLoss (matrix fce "forecast errors",
-                         string LF[null] "Loss function",
-                         matrix param[null] "Loss func parameters",
-                         const matrix realiz[null] "Realizations")
+function matrix getLoss (matrix fce "forecast errors (or forecasts)",
+      string LF[null] "Loss function",
+      matrix param[null] "Loss func parameters",
+      const matrix realiz[null] "Realizations",
+      bool verbose[TRUE])
     /*
        Returns a matrix with forecast error losses, of the same (T x k)
        dimension as the input matrix fce.
-       'LF' can be:
-       "ll" (or "linlin"), "qq" (or "quadquad"), "square" (or "sq"), "abs", "linex" (Varian 1975), "dlinex" (or "dle") for double linex (Granger 1999).
+
+       - 'LF' can be:
+       "ll" (or "linlin"), "qq" (or "quadquad"), "square" (or "sq"),
+       "abs", "linex" (Varian 1975),
+       "dlinex" (or "dle") for double linex (Granger 1999).
        default: squared errors
-       'fce' is understood to be a matrix (Txk) of forecast errors, except if 'realiz' is also given: then 'fce' must be the
+       (Plus a new option of passing in 'LF' the name of an external function.)
+
+       - 'fce' is understood to be a matrix (Txk) of forecast errors,
+       except if 'realiz' is also given: then 'fce' must be the
        forecasts themselves, and the errors are calculated as realiz - fce.
-       'param' must be a 1-element or 2-element vector. Note: where only
-       one input parameter is needed, gretl accepts a scalar as a 1x1 matrix.
+
+       - 'param' must be a 1-element or 2-element vector. 
+       Note: where only one input parameter is needed, gretl accepts a scalar
+       as a 1x1 matrix.
        The default parameters (if param is left as null) are 0.5.
        (Also for the two-param case: {0.5; 0.5}.)
+       Exception: For user-def'd loss function param could also be a longer matrix. 
+
        For comparability between asymmetric linlin and symmetric abs on the
        one hand, and between asymm. quadquad and symm. square on the other
        hand, the symmetric losses are multiplied with 0.5 by default.
        (Such that for example getLoss(fce, "linlin") and getLoss(fce, "abs")
        give the same result.)
+
        To override this set param==1 explicitly, e.g. to get the pure squared
        error loss use getLoss(fce, "sq", 1), or use 2 * getLoss(fce)
        -- hey, in those simple cases you could also do fce.^2 yourself!
+       
+       ---- For a user-defined loss function, note:
+       Must have the following signature:
+       args: 
+       1) numeric vector (matrix) e (forecast errors), 
+       2) optional: a single matrix with any parameters that are needed
+       Return value: 
+       a vector (matrix) of loss realizations, matching the 'e' dims 
+       
+       (For the future we could also think of separate inputs of forecasts 
+       and realizations in order to accommodate nonlinearities and/or 
+       a separate dependence on the levels of the realizations or so.) 
+  
     */
+    
+
     # calculate FC errors if realiz are given
     if exists(realiz)
         if rows(realiz) != rows(fce)
@@ -117,8 +153,9 @@ function matrix getLoss (matrix fce "forecast errors",
             funcerr "Realizations must be a column vector."
         endif
         # repeat realizations if several FCs are given
-        fce = mshape(realiz, rows(fce), cols(fce)) - fce
+        fce = realiz .- fce
     endif
+
     # process user choice / internal notation
     if !exists(LF)
         string LF = "sq"	# default
@@ -133,8 +170,13 @@ function matrix getLoss (matrix fce "forecast errors",
     elif instring("dlinex dle", LF) # attention, must come after linex
         LF = "dle"	# double linex
     else
-        funcerr "Loss function choice not recognized."
+        if verbose
+            printf "Treating %s as an external loss function specification;\n", LF
+            printf "errors will occur if that function is not loaded or if\n"
+            printf "the given parameters are not compatible.\n"
+        endif
     endif
+
     # process parameters
     if instring("sq abs ll qq linex", LF)
         if exists(param)
@@ -159,12 +201,13 @@ function matrix getLoss (matrix fce "forecast errors",
             matrix param = {0.5; 0.5}
         endif
     endif
+
     # actual calculation
     matrix loss
     if LF == "sq"
         loss = param * (fce .^2)	# trivial except for scaling
     elif LF == "abs"
-        loss = param * abs(fce)	# also trivial
+        loss = param * abs(fce)		# also trivial
     elif LF == "ll"
         loss = fce .* ( param - (fce .< 0) )
         # old: loss = abs(fce) .* ( param + (1 - 2 * param) * (fce .< 0) )
@@ -175,7 +218,18 @@ function matrix getLoss (matrix fce "forecast errors",
     elif LF == "dle"
         loss = exp(param[1] .* fce) + exp(-param[2] .* fce) - (param[1] - param[2]) .* fce - 2
     else
-        funcerr "shouldn't happen"
+        # We pass the function spec on to feval(), do it col-by-col 
+        loss = mshape(NA, rows(fce), cols(fce))
+        loop i = 1..cols(fce)
+            if exists(param)
+                catch matrix temp = feval(LF, fce[,i], param)
+            else
+                catch matrix temp = feval(LF, fce[,i])
+            endif
+            errorif($error, "Applying user-def'd loss function failed, check your input")
+            errorif(rows(temp) != rows(fce) || cols(temp)!=1, "user-def'd loss gave wrong dim")
+            loss[,i] = temp 
+        endloop
     endif
     return loss
 end function
@@ -191,14 +245,14 @@ function void DrawLoss (int p[1:2:1] "Loss type",
     scalar FONTSIZE = 15
 
     string fpath = exists(fpath) ? fpath : "display"
-    string ltype = (p == 1) ? "Lin.-Lin." : "Quad.-Quad."
+    string ltype = (p==1) ? "Lin.-Lin." : "Quad.-Quad."
     matrix vE = seq(-1, 1, 0.01)'
     matrix vBin = (vE .< 0)
-    matrix LF = (p == 1) ? abs(vE) : vE .^2 # spart Berechnungen
+    matrix LF = (p==1) ? abs(vE) : vE .^2 # spart Berechnungen
     if aT == 0.5
         LF = LF * 0.5
     else
-        LF = LF.* (aT + (1 - 2 * aT) * (vE .< 0) )
+        LF = LF .* (aT + (1 - 2 * aT) * (vE .< 0) )
     endif
 
     string title = sprintf("%s, alpha-hat=%.3g", ltype, aT)
@@ -245,16 +299,16 @@ function void DrawLoss2 (int p[1:2:1] "Loss type",
     scalar FONTSIZE = 15
 
     string fpath = exists(fpath) ? fpath : "display"
-    string ltype = (p == 1) ? "Lin.-Lin." : "Quad.-Quad."
+    string ltype = (p==1) ? "Lin.-Lin." : "Quad.-Quad."
     matrix vE = seq(-1, 1, 0.01)'
     matrix vBin = (vE .< 0)
 
     loop i=1..2
         #matrix LF$i  = (aT$i + vBin.*(1-aT$i*2)).*abs(vE).^p
-        matrix LF$i = (p == 1) ? abs(vE) : vE .^2
+        matrix LF$i = (p==1) ? abs(vE) : vE .^2
     endloop
 
-    loop i=1..2
+    loop i = 1..2
         if aT$i == 0.5
             LF$i = LF$i * 0.5
         else
@@ -264,7 +318,7 @@ function void DrawLoss2 (int p[1:2:1] "Loss type",
 
     if V1 != 0 && V2 != 0
         matrix mplot = {}
-        loop i=1..2
+        loop i = 1..2
             scalar aTlow$i = aT$i - 2 * sqrt(V$i) 	# -2 S.E.
             matrix LFlow$i = (aTlow$i + vBin .* (1 - aTlow$i * 2)) .* abs(vE).^p
             scalar aTup$i = aT$i + 2 * sqrt(V$i)		# +2 S.E.
@@ -449,7 +503,7 @@ function matrices CamDufStats( matrix mdat,
 
     # some checks
     r = rows(mdat)
-    if max(whichlags) >= r - 1
+    if max(whichlags) >= r-1
         funcerr "lag is too large for sample length"
 
     elif min(whichlags) < 0
@@ -478,14 +532,14 @@ function matrices CamDufStats( matrix mdat,
     # cf. C&G97 p. 9
     if recenter
 
-        matrix Xc = zeros(rows(X) - 1, cols(X))	# hold re-centered values
+        matrix Xc = zeros(rows(X)-1, cols(X))	# hold re-centered values
 
         loop i = 2..rows(X) # at least 2 obs., re-centering procedure
             if recenter == 1
-                Xc[i - 1,] = X[i, ] - quantile(X[1:i, ], 0.5)
+                Xc[i-1,] = X[i, ] - quantile(X[1:i, ], 0.5)
 
             elif recenter == 2
-                Xc[i - 1,] = X[i, ] - meanc( X[1:i, ] )
+                Xc[i-1,] = X[i, ] - meanc( X[1:i, ] )
 
                 # elif recenter == 3	# linear trend
                 # TODO: could be implemented by running a simple regression
@@ -499,17 +553,17 @@ function matrices CamDufStats( matrix mdat,
     matrix SRg = {} 	# to hold their own sign-rank stat (eq (9))
     # (empty for convenience case)
     matrix Wg = {} 	# Wilcoxon, eq(8)
-    loop lix = 1..nelem(whichlags) 
+    loop lix = 1..nelem(whichlags)
         lag = int(whichlags[lix])
 
         # do it for all g_t 's in parallel
         if lag
             matrix temp = recenter ? Xc : X
-            matrix glag = mlag(temp, lag)[1 + lag : ,]
+            matrix glag = mlag(temp, lag)[1+lag : ,]
 
             # adjust the common sample length
             delta = rows(mdat) - rows(glag)
-            matrix ycut = mdat[1 + delta :, 1]
+            matrix ycut = mdat[1+delta :, 1]
             effTs |= rows(ycut)
             matrix prod = ycut .* glag
 
@@ -533,7 +587,7 @@ function matrices CamDufStats( matrix mdat,
 
         # the ranking of the products, i.e. R+1
         matrix Rplus1 = {}
-        loop i=1..cols(prod) 
+        loop i = 1..cols(prod)
             Rplus1 ~= ranking( abs(prod[, i]) )
         endloop
         Wg |= sumc( prodsigns .* Rplus1 )
