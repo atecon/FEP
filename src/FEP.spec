@@ -1,10 +1,10 @@
 author = Artur Tarassow and Sven Schreiber
 email = atecon@posteo.de
-version = 2.7
-date = 2023-01-29
+version = 2.8
+date = 2023-03-21
 description = Forecast Evaluation Package
 tags = C12 C52 C53
-min-version = 2020c # 2019b because of feval(), 2020b for errorif(), 2020c because of quiet loops
+min-version = 2020c
 data-requirement = no-data-ok
 public = doKS doEKTtest doHPtest applyFCtests doDLtest \
   getLoss doMZtest doPTtest \
