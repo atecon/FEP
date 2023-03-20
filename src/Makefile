@@ -23,3 +23,4 @@ clean:
 	rm -rf $(PKG).zip # $(GFN)
 	rm -rf session.inp
 	rm -rf ./$(PKG).pdf
+	rm -rf ./FEPdata.gdt
