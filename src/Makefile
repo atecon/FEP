@@ -4,13 +4,23 @@ $(PKG).gfn: $(PKG).inp $(PKG).spec $(PKG)_sample.inp
 	gretlcli --makepkg $(PKG).inp
 
 
-$(PKG).zip: $(PKG).gfn ../docs/$(PKG).pdf ../data/FEPdata.gdt
+$(PKG).zip: $(PKG).gfn  copy_pdf copy_data
 	echo makepkg $(PKG).zip | gretlcli -b -
 
-# Only if the manual is a pdf file or you provide an external dataset
-install: $(PKG).zip
-	echo pkg install $(PKG).zip --local | gretlcli -b -
+copy_pdf : ../docs/$(PKG).pdf
+	cp -r ../docs/$(PKG).pdf ./
 
-# Only for zip-file
+copy_data : ../data/FEPdata.gdt
+	cp -r ../data/FEPdata.gdt ./
+
+install: $(PKG).zip
+	echo "pkg install $(PKG).zip --local" | gretlcli -b -
+
+tarball : clean
+	tar -cvzf ../$(PKG).zip *
+
 clean:
-	rm -f $(PKG).zip
+	rm -rf $(PKG).zip # $(GFN)
+	rm -rf session.inp
+	rm -rf ./$(PKG).pdf
+	rm -rf ./FEPdata.gdt
