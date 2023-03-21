@@ -3,7 +3,7 @@
 <gretl-function-package name="FEP" no-data-ok="true" minver="2020c" lives-in-subdir="true">
 <author email="atecon@posteo.de">Artur Tarassow and Sven Schreiber</author>
 <version>2.8</version>
-<date>2023-03-20</date>
+<date>2023-03-21</date>
 <description>Forecast Evaluation Package</description>
 <tags>C12 C52 C53</tags>
 <label>Forecast evaluations</label>
@@ -18,10 +18,8 @@ FEPdata.gdt </data-files>
   <param name="b" type="bundleref"/>
  </params>
 <code># FIXME: change this to use scores2x2 from extra.gfn once it's ready!
-
 # apply defaults
 set_verbatim_flag(&amp;b)
-
 series y = b.yup		# Binary of var. of actual ups
 series fc = b.fcup		# Binary of var. of forecasted ups
 smpl y fc --no-missing
@@ -64,13 +62,11 @@ b.KSmat = M
 # as expected by doEKTtest.
 # Since the matrix x for doEKTtest can be n-dim (I think),
 # the corresponding input will be a list.
-
 # apply default value
 if !inbundle(b, &quot;lossdraw&quot;)
   string b.lossdraw = &quot;no&quot;
 endif
 set_verbatim_flag(&amp;b)
-
 if inbundle(b, &quot;E&quot;)
   if typestr(typeof(b.E)) == &quot;series&quot;
     series sertemp = b.E  # fc error, series
@@ -80,14 +76,11 @@ elif inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;)
 else
   funcerr &quot;Suitable input missing.&quot;
 endif
-
 matrix b.fcerrors = {sertemp}
 matrix b.x = {b.z}			# z should be a list -&gt; TODO: Shall we test this?
-
 if rows(b.fcerrors) != rows(b.x)
   funcerr &quot;Obs of forecasts and instruments don't match.&quot;
 endif
-
 doEKTtest_matrix(&amp;b)
 </code>
 </gretl-function>
@@ -96,21 +89,18 @@ doEKTtest_matrix(&amp;b)
   <param name="b" type="bundleref"/>
  </params>
 <code># renamed from KG (Kirchgaessner) at v2.0
-
 # apply defaults
 set_robust_flag(&amp;b)
 if !inbundle(b, &quot;nboot&quot;)
   b.nboot = 0
 endif
 set_verbatim_flag(&amp;b)
-
 # acommodate old variant
 if inbundle(b, &quot;strrob&quot;)
   string strrob = b.strrob
 else
   string strrob = (b.robust == 1) ? &quot;--robust&quot; : &quot;&quot;
 endif
-
 # compatibility for matrix input of z
 if typestr(typeof(b.z)) == &quot;matrix&quot;
   matrix mz = b.z
@@ -122,18 +112,15 @@ if typestr(typeof(b.z)) == &quot;matrix&quot;
 elif typestr(typeof(b.z)) == &quot;series&quot;
   # (workaround for apparent gretl bug)
   list Z = genseries(&quot;z&quot;, b.z)
-
 else	# standard list case
   list Z = b.z
 endif
-
 series fc = b.fc
 series y = b.y
 list lreg = fc
 if nelem(Z)
   lreg += Z
 endif
-
 scalar nv = 2 + nelem(Z)
 matrix Rmat = I(nv)
 matrix qvec = zeros(nv,1)
@@ -155,7 +142,6 @@ if $error
     q = qvec
   end restrict
 endif
-
 if b.verb
   printf &quot;\n*********************************************\n&quot;
   printf &quot;*** Holden &amp; Peel \n&quot;
@@ -183,16 +169,12 @@ b.HPpval = $pvalue
   <param name="which" type="string"/>
  </params>
 <code>/* */
-
 strings testcodes = strsplit(strstrip(which))
-
 loop i = 1..nelem(testcodes)
   # TODO: I hope no earlier test overwrites bundle elements
   # that would confuse the later tests...?
-
   which = testcodes[i]
   check_series_in_b(b, which)
-
   if which == &quot;DM&quot;
     doDMtest(&amp;b)	# Diebold &amp; Mariano
   elif which == &quot;GW&quot;
@@ -203,7 +185,6 @@ loop i = 1..nelem(testcodes)
     doHPtest(&amp;b)	# Holden-Peel (ex-Kirchgässner)
   elif which == &quot;CG&quot;
     doCGtest(&amp;b)	# Campbell &amp; Ghysels
-
   elif which == &quot;EKT&quot;
     scalar alreadyEKT = 0
     if inbundle(b, &quot;y&quot;)
@@ -217,7 +198,6 @@ loop i = 1..nelem(testcodes)
     if !alreadyEKT
       doEKTtest(&amp;b)
     endif
-
   elif which == &quot;DL&quot;
     doDLtest(&amp;b)	# Diebold &amp; Lopez
   elif which == &quot;KS&quot;
@@ -229,7 +209,6 @@ loop i = 1..nelem(testcodes)
   elif which == &quot;CW&quot;	# Clark-West
     doCWtest(&amp;b)
   endif
-
 endloop
 </code>
 </gretl-function>
@@ -252,7 +231,6 @@ if rows(values(y)) &gt; 2 || rows(values(fc)) &gt; 2
   funcerr &quot;Check again that y and fc are both binary variables!&quot;
 endif
 set_verbatim_flag(&amp;b)
-
 /* Artur's version
 # M has the form:
 # 		 | Up (Y=1) Down (Y=0)
@@ -412,26 +390,22 @@ return loss
   <param name="b" type="bundleref"/>
  </params>
 <code># Intercept automatically added
-
 # apply default
 if !inbundle(b, nboot)
   b.nboot = 0
 endif
 set_robust_flag(&amp;b)
 set_verbatim_flag(&amp;b)
-
 # acommodate old variant
 if inbundle(b, &quot;strrob&quot;)
   string strrob = b.strrob
 else
   string strrob = (b.robust == 1) ? &quot;--robust&quot; : &quot;&quot;
 endif
-
 series fc = b.fc
 series y = b.y
 Rmat = {1,0;0,1}
 qvec = {0,1}'
-
 if b.nboot &gt; 0
   set bootrep b.nboot
   string strboot = &quot;--bootstrap&quot;
@@ -449,7 +423,6 @@ if $error
     q = qvec
   end restrict
 endif
-
 if b.verb
   printf &quot;\n*********************************************\n&quot;
   printf &quot;*** Mincer &amp; Zarnowitz \n&quot;
@@ -467,7 +440,6 @@ if b.verb
   printf &quot;(p-val %.4f)\n&quot;, $pvalue
   printf &quot;*********************************************\n&quot;
 endif
-
 b.MZstat = $test
 b.MZpval = $pvalue
 </code>
@@ -481,18 +453,15 @@ b.MZpval = $pvalue
 # 1: not robust, 2: robust
 if inbundle(b, &quot;PTmeth&quot;)
   print &quot;Warning: PTmeth is deprecated, use 'robust' (0/1)&quot;
-
   if b.PTmeth == 1 || b.PTmeth == 2
     scalar b.robust = b.PTmeth - 1
   else
     funcerr &quot;PTmeth can only be 1 or 2&quot;
   endif
 endif
-
 # apply defaults
 set_robust_flag(&amp;b)
 set_verbatim_flag(&amp;b)
-
 series y = b.yup		# Binary of var. of actual ups
 series fc = b.fcup		# Binary of var. of forecasted ups
 smpl y fc --no-missing
@@ -513,7 +482,6 @@ elif b.robust == 1  # PTmeth == 2
 else
   print &quot;Warning: Invalid PTmeth input&quot;
 endif
-
 if b.verb
   printf &quot;\n************************************************\n&quot;
   printf &quot;*** Pesaran &amp; Timmermann (1992, 2006) \n&quot;
@@ -537,21 +505,16 @@ b.PTpval = pval
   <param name="b" type="bundleref"/>
  </params>
 <code># consolidating all CG test variants
-
 /* Computes both Campbell &amp; Ghysels sign and signed rank
 (Wilcoxon-type) nonparam. statistics, going back to Campbell &amp; Dufour who also showed that in
 general it's not exactly identical to a Wilcoxon test, but the distribution of the test stat is identical.
-
 # series E: series of forecast errors
 # int k: Lag at which to construct the cross product
 # series CGX: variables for orthogonality test (optional)
-
 # plain test: H0: Median of E = 0, H1: Median of E != 0
 # other variants: substitute E with a cross-product
-
 # Additional assumption that E is symmetric about 0 under the null
 */
-
 # handle various ways to provide the needed input
 if inbundle(b, &quot;y&quot;) &amp;&amp; inbundle(b, &quot;fc&quot;)
   series E = b.y - b.fc
@@ -563,9 +526,7 @@ elif inbundle(b, &quot;E&quot;)
 else
   funcerr &quot;Suitable input missing.&quot;
 endif
-
 matrix mE = {E}
-
 # apply defaults
 if !inbundle(b, &quot;k&quot;) 	# default: test unbiasedness
   b.k = 0				# means no test for lag effects
@@ -573,14 +534,11 @@ elif b.k &lt; 0 || (b.k != int(b.k))
   funcerr &quot;lag number k must be non-negative integer&quot;
 endif
 scalar k = b.k	 # (scalar treated by gretl as 1x1 matrix, should be OK)
-
 if !k &amp;&amp; inbundle(b, &quot;CGX&quot;)
   print &quot;You provide X [CGX] but set k=0 (lag order).&quot;
   print &quot;Please set k&gt;0 for running the orthogonality test.&quot;
   print &quot;(And make sure the CGX themselves are given without lags.)&quot;
-
   funcerr &quot;X [CGX] together with k == 0 impossible.&quot;
-
 elif inbundle(b, &quot;CGX&quot;)
   matrix mCGX = {b.CGX}
   if rows(mE) != rows(mCGX)
@@ -590,7 +548,6 @@ elif inbundle(b, &quot;CGX&quot;)
   endif
 endif
 set_verbatim_flag(&amp;b)
-
 # Either test on (a) unbiasedness, (b) serial correlation,
 # or (c) orthogonality
 if !inbundle(b, &quot;CGX&quot;)
@@ -600,36 +557,29 @@ else
   # orthogonality test, with recursive median recentering
   matrices testout = CamDufStats(mE ~ mCGX, k, 1)
 endif
-
 ### process results
 scalar T = testout[4][1]
-
 ## sign test
 scalar b.CGSIGNstat = testout[1][1,1]
-
 # Binomial dist
 if b.CGSIGNstat &lt; (T + 1) / 2 # left tail of the distribution
   temp = pvalue(B, 0.5, T, b.CGSIGNstat)
   # (gretl does &gt; x, not &gt;= x here!)
   b.CGSIGNpval = 2 * (1 - temp) # because of symmetry under p=0.5
-
 else	# right tail
   # (force X &gt;= x by passing x' = x-1, since gretl does &gt; x)
   b.CGSIGNpval = 2 * pvalue(B, 0.5, T, b.CGSIGNstat - 1)
   # (again, because of symmetry)
 endif
-
 ## signed rank test
 if !inbundle(b, &quot;CGX&quot;) # serial correlation, or unbiasedness
   # here we can use the standard variant
   scalar b.CGWILCstat = testout[3][1,1]
-
 else	# orthogonality test
   #... must use Campbell&amp;Dufour's special signed-rank variant
   # (we argue that strict exogeneity is very unrealistic)
   scalar b.CGWILCstat = testout[2][1,1]
 endif
-
 ## p-value calc with functions from extra
 err = loadextra()
 if !err
@@ -637,16 +587,13 @@ if !err
     # (force X &gt; x by passing x' = x+1 since this func does &gt;= x)
     temp = WSRpvalue(T, b.CGWILCstat + 1)
     b.CGWILCpval = 2 * (1 - temp) # because of symmetry
-
   else # right tail
     # (this func does X &gt;= x)
     b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
   endif
-
 else	# extra.gfn package not available/loadable
   scalar b.CGWILCpval = NA
 endif
-
 if b.verb
   CGprint(&amp;b)	# (lives in FEP_private.inp)
 endif
@@ -658,7 +605,6 @@ endif
  </params>
 <code># TODO: Allow for further loss functions in future
 /* Idea for an interface (Sven, December 2022):
-
 -- The string b.lossfunc = &quot;&lt;funcname&gt;&quot; would refer to an
 active/loaded user func
 (errorif( b.loss == 0 &amp;&amp; (!inbundle(b,&quot;lossfunc&quot;) || b.lossfunc==&quot;&quot;)))
@@ -669,20 +615,16 @@ return value: series loss
 -- Then for the non-U and non-V cases we would simply do:
 series L = feval(b.lossfunc, e1, e2)
 */
-
 # apply defaults
 set_verbatim_flag(&amp;b)
 if !inbundle(b, &quot;loss&quot;)
   b.loss = 1	# U-shape
 endif
 set_fhor_default(&amp;b)
-
 series e1 = b.y - b.f1
 series e2 = b.y - b.f2
 smpl e1 e2 --no-missing
-
 # Construct loss differential
-
 if b.loss == 1		# U-shape quadratic loss
   series L = e1^2 - e2^2
 elif b.loss == 2		# V-shape
@@ -693,7 +635,6 @@ else
   printf &quot;*** Please re-specify b.loss.\n&quot;
   funcerr &quot;Loss can only be 1 or 2.&quot;
 endif
-
 # Run regression based HAC robust DM test
 ols L 0 --robust --quiet
 # Return test statistics and p-value
@@ -705,7 +646,6 @@ b.pvalt = 2 * pvalue(t, ($T-1), abs(tstat))	# t-distribution
 matrix ssc = HLN(tstat, $T, b.fhor)		# small-sample correction
 b.DMstatssc = ssc[1]
 b.DMpvalssc = ssc[2]
-
 if b.verb
   printf &quot;\n***********************************************\n&quot;
   printf &quot;*** Diebold &amp; Mariano (1995) \n&quot;
@@ -739,13 +679,11 @@ This function performs the asymptotic Conditional Predictive Ability Test
 Raffaella Giacomini &amp; Halbert White, 2006. &quot;Tests of Conditional
 Predictive Ability,&quot; Econometrica, Econometric Society, vol. 74(6),	pages 1545-1578, November.
 &lt;https://ideas.repec.org/a/ecm/emetrp/v74y2006i6p1545-1578.html&gt;
-
 &quot;As a result, whereas the unconditional tests restrict attention to
 the forecast model, the conditional approach allows evaluation of
 the forecasting method, which includes the model, the estimation
 procedure and the possible cond of estimation window.&quot;
 */
-
 # apply defaults
 set_verbatim_flag(&amp;b)
 if !inbundle(b, &quot;loss&quot;)
@@ -755,15 +693,12 @@ set_fhor_default(&amp;b)
 if b.fhor == 0
   printf &quot;\n*** Warning: You have set the forecast horizon to h=0.\n&quot;
 endif
-
 if !inbundle(b, &quot;cond&quot;)
   b.cond = 0	# 0: unconditional test
 endif
-
 series e1 = b.y - b.f1
 series e2 = b.y - b.f2
 smpl e1 e2 --no-missing
-
 # Construct loss differential
 # TODO: Allow for further loss functions in future
 if b.loss == 1			# U-shape quadratic loss
@@ -771,19 +706,15 @@ if b.loss == 1			# U-shape quadratic loss
 elif b.loss == 2		# V-shape
   series L = abs(e1) - abs(e2)
 endif
-
 scalar T = nobs(L) - b.fhor
-
 list h_inst = const	# was z before, but Z is sth. else in GW (Sven)
 # (and wouldn't it also have conflicted with the generated &quot;z&quot;
 #  below in case a series is passed in b.z??)
-
 ## Set up the instruments for a conditional analysis
 if b.cond
   # add lagged loss values --
   # info set available in period t for the t+tau forecast
   h_inst += L(-b.fhor to -b.fhor)
-
   # add additional regressors
   if inbundle(b, &quot;z&quot;)
     # compatibility for matrix input of z
@@ -793,24 +724,20 @@ if b.cond
         series S$i = mz[,i]
         h_inst += S$i
       endloop
-
     elif typestr(typeof(b.z)) == &quot;series&quot;
       # (workaround for apparent gretl bug)
       list h_inst += genseries(&quot;z&quot;, b.z)
-
     else	# standard list case
       list h_inst += b.z
     endif
   endif
 endif
-
 # create the reg matrix given by L*ht', where ht is matrix of instr
 list reg = null
 loop foreach i h_inst
   series r$i = h_inst.$i * L
   reg += r$i
 endloop
-
 # Run regression
 if b.fhor == 1
   # calc the test stat as n*R^2 from the regression of one on L*ht
@@ -818,22 +745,18 @@ if b.fhor == 1
   scalar Thmn_stat = $T * $rsq			# this only works for fhor=1!
 else
   matrix zbar = meanc({reg})'
-
   # old:
   # matrix omega = NeweyWest({reg},(b.fhor-1))
   # new:
   set hac_lag b.fhor-1
   matrix omega = lrcovar({reg})
-
   scalar Thmn_stat = T * qform(zbar', invpd(omega)) # *zbar
 endif
-
 # Return test statistics and p-value
 b.L = L								# series of loss differentials
 b.GWstat = Thmn_stat
 b.GWpval = pvalue(c, nelem(reg), abs(Thmn_stat))  # Chi^2 distributed
 b.sign = mean(L)
-
 if b.verb
   printf &quot;\n***********************************************\n&quot;
   printf &quot;*** Giacomini &amp; White (2006) \n&quot;
@@ -872,13 +795,10 @@ endif
 <code># All: b.y,
 # Model 1: b.f1, parsimonious model
 # Model 2: b.f2, larger nesting model
-
 series e1 = b.y - b.f1
 series e2 = b.y - b.f2
 smpl e1 e2 --no-missing
-
 series fhathalf = e1 * (e1 - e2) # equiv. to eq 2.1 hopefully
-
 ## for simplicity compute both standard and robust
 ols fhathalf const --quiet
 # ( omit const  # doesn't work in gretl)
@@ -889,7 +809,6 @@ set force_hc off	# ensure AC-consistency, not just HC
 ols fhathalf const --robust --quiet
 b.CWstat_rob = $coeff(const) / $stderr(const)
 b.CWpval_rob = pvalue(t, $df, b.CWstat_rob) # one-sided test
-
 if b.verb
   printf &quot;\n***********************************************\n&quot;
   printf &quot;*** Clark &amp; West (2006/7) test\n&quot;
@@ -910,13 +829,10 @@ endif
   <param name="b" type="bundleref"/>
  </params>
 <code># wrap the probscore(function) for bundle/series use
-
 if !inbundle(b, &quot;yup&quot;) || !inbundle(b, &quot;pfc&quot;)
   funcerr &quot;Suitable input missing&quot;
 endif
-
 matrix ps = probscore({b.yup}, {b.pfc})
-
 scalar b.qps = ps[1]
 scalar b.lps = ps[2]
 </code>
@@ -932,16 +848,13 @@ scalar b.lps = ps[2]
  </params>
 <code># By Artur
 # Returns a 1x2 vector with QPS, LPS
-
 # check for vector
 if xmin(rows(y), cols(y)) &gt; 1 || xmin(rows(Pr), cols(Pr)) &gt; 1
   funcerr &quot;Need vector inputs!&quot;
 endif
-
 # work with column vector
 y = vec(y)
 Pr = vec(Pr)
-
 if rows(Pr) == rows(y)
   matrix B = ok(Pr)						# Check for NAs
   matrix Pr2 = (Pr .&gt; 0.9999) ? 0.999 : Pr	# relevant for comp. log(1-Pr2) for LPS-comput.
@@ -976,26 +889,19 @@ return mout
  </params>
 <code>/* Compute several metrics for the evaluation of point forecasts. For 5 metrics
 gretl's built-in fcstats() function is used. */
-
 scalar check = check_y_fc_length(y, fc)
-
 if check &gt; 0
   smpl --no-missing y fc
   printf &quot;\nInfo: The effective sample comprises %d valid observations\n&quot;, $nobs
 endif
-
 matrix metrics = basic_point_metrics(y, fc) | get_pct_error_metrics(y, fc)
-
 metrics = add_labels(metrics)
-
 return metrics
 </code>
 </gretl-function>
 <gretl-function name="getForecastMetricsNames" type="strings">
 <code>/* Return the names of the computed forecast evaluation statistics in order.*/
-
 strings names = names_of_basic_point_metrics() + names_of_udf_point_metrics()
-
 return names
 </code>
 </gretl-function>
@@ -1015,9 +921,7 @@ return names
   </param>
  </params>
 <code>/* Draw loss function. */
-
 scalar FONTSIZE = 15
-
 string fpath = exists(fpath) ? fpath : &quot;display&quot;
 string ltype = (p == 1) ? &quot;Lin.-Lin.&quot; : &quot;Quad.-Quad.&quot;
 matrix vE = seq(-1, 1, 0.01)'
@@ -1028,7 +932,6 @@ if aT == 0.5
 else
   LF = LF.* (aT + (1 - 2 * aT) * (vE .&lt; 0) )
 endif
-
 string title = sprintf(&quot;%s, alpha-hat=%.3g&quot;, ltype, aT)
 if V != 0
   scalar aTlow = aT - 2 * sqrt(V)		# -2 S.E.
@@ -1040,7 +943,6 @@ if V != 0
 else
   matrix mplot = LF ~ vE
 endif
-
 plot mplot
   options with-lines fit=none --single-yaxis
   literal set nokey
@@ -1080,21 +982,16 @@ end plot --output=&quot;@fpath&quot;
   </param>
  </params>
 <code>/* Draw two loss functions jointly.
-
 # TODO: get rid of a lot of code which is already written in DrawLoss(). */
-
 scalar FONTSIZE = 15
-
 string fpath = exists(fpath) ? fpath : &quot;display&quot;
 string ltype = (p == 1) ? &quot;Lin.-Lin.&quot; : &quot;Quad.-Quad.&quot;
 matrix vE = seq(-1, 1, 0.01)'
 matrix vBin = (vE .&lt; 0)
-
 loop i=1..2
   #matrix LF$i  = (aT$i + vBin.*(1-aT$i*2)).*abs(vE).^p
   matrix LF$i = (p == 1) ? abs(vE) : vE .^2
 endloop
-
 loop i=1..2
   if aT$i == 0.5
     LF$i = LF$i * 0.5
@@ -1102,7 +999,6 @@ loop i=1..2
     LF$i = LF$i.* (aT$i + (1 - 2 * aT$i) * (vE .&lt; 0) )
   endif
 endloop
-
 if V1 != 0 &amp;&amp; V2 != 0
   matrix mplot = {}
   loop i=1..2
@@ -1113,7 +1009,6 @@ if V1 != 0 &amp;&amp; V2 != 0
     matrix mplot ~= LF$i ~ LFlow$i ~ LFup$i
   endloop
 endif
-
 string title = sprintf(&quot;%s, a1=%.3g, a2=%.3g&quot;, ltype, aT1, aT2)
 if V1 != 0 &amp;&amp; V2 != 0
   mplot ~= vE
@@ -1121,7 +1016,6 @@ if V1 != 0 &amp;&amp; V2 != 0
 else
   matrix mplot = LF~vE
 endif
-
 plot mplot
   options with-lp fit=none --single-yaxis
   #options band=B,2 band-style=fill
@@ -1149,14 +1043,12 @@ end plot --output=&quot;@fpath&quot;
  </params>
 <code># This refers to the bundle returned by GUI_FEP.
 printf &quot;Your choice: %s test\n&quot;, fullname(b.code)
-
 if b.code == &quot;KS&quot;
   printf &quot;Hit Rate        = %.3f\n&quot;, b.KShit
   printf &quot;False Alarm Rate = %.3f\n&quot;, b.KSfalse
   printf &quot;Kuipers Score   = %.3f\n&quot;, b.KSstat
   matrix mtemp = b.KSmat
   print mtemp
-
 elif b.code == &quot;EKT&quot;
   print &quot;Test the null hypothesis of symmetry (alfa = 0.5):&quot;
   printf &quot;  test stat %g (p-value %g)\n&quot;, b.SymTest, b.SymPval
@@ -1164,7 +1056,6 @@ elif b.code == &quot;EKT&quot;
   printf &quot;  test stat %g (p-value %g)\n&quot;, b.RatTest, b.RatPv
   print &quot;Rationality test (under symmetry):&quot;
   printf &quot;  test stat %g (p-value %g)\n&quot;, b.RatTest05, b.RatPv05
-
 elif b.code == &quot;HP&quot;
   if b.nboot
     printf &quot;(bootstrapped) &quot;
@@ -1173,11 +1064,9 @@ elif b.code == &quot;HP&quot;
     printf &quot;(robust SE)&quot;
   endif
   printf &quot;\nTest stat %g (p-value %g)\n&quot;, b.HPstat, b.HPpval
-
 elif b.code == &quot;DL&quot;
   printf &quot;Test stat %g (p-value %g)\n&quot;, b.DLstat, b.DLpval
   printf &quot; (additional info better/worse: %g)\n&quot;, b.DLinfo
-
 elif b.code == &quot;DM&quot;
   if b.loss == 1
     string shape = &quot;U&quot;
@@ -1187,7 +1076,6 @@ elif b.code == &quot;DM&quot;
   printf &quot;(Loss function shape: %s)\n&quot;, shape
   printf &quot;Test stat %g, p-value %g (t-dist based)\n&quot;, b.DMstat, b.pvalt
   printf &quot;  (small-sample corrected p-value %g)\n&quot;, b.DMpvalssc
-
 elif b.code == &quot;GW&quot;
   if b.loss == 1
     string shape = &quot;U&quot;
@@ -1201,11 +1089,9 @@ elif b.code == &quot;GW&quot;
   else
     printf &quot;Sign of the mean of the loss is (+) -- 2nd model dominates\n&quot;
   endif
-
 elif b.code == &quot;CW&quot;	# Clark-West
   print &quot;FIXME: The null hypothesis is... the smaller model dominates...?&quot;
   printf &quot;Test stat %g, p-value %g\n&quot;, b.CWstat, b.CWpval
-
 elif b.code == &quot;MZ&quot;
   if b.nboot
     printf &quot;(bootstrapped) &quot;
@@ -1214,7 +1100,6 @@ elif b.code == &quot;MZ&quot;
     printf &quot;(robust SE)&quot;
   endif
   printf &quot;Test stat %g (p-value %g)\n&quot;, b.MZstat, b.MZpval
-
 elif b.code == &quot;PT&quot;
   if b.robust
     print &quot;(Regression approach using HAC robust VCV.)&quot;
@@ -1223,7 +1108,6 @@ elif b.code == &quot;PT&quot;
   endif
   print &quot;H0: y(t) and x(t) are distributed independently&quot;
   printf &quot;Test stat %.4f (p-value: %.4f)\n&quot;, b.PTstat, b.PTpval
-
 elif b.code == &quot;CG&quot;
   print &quot;Signed rank test (Wilcoxon-type)&quot;
   print &quot;H0: Median = 0, H1: Median != 0&quot;
@@ -1233,7 +1117,6 @@ elif b.code == &quot;CG&quot;
   print &quot;Sign test&quot;
   print &quot;H0: Median = 0, H1: Median != 0&quot;
   printf &quot;Test stat %g (p-value %g)\n&quot;, b.CGSIGNstat, b.CGSIGNpval
-
 else
   funcerr &quot;The choice in b.code didn't match anything&quot;
 endif
@@ -1286,16 +1169,12 @@ endif
 <code>###
 # copy the choice to string code
 strings sarr = defarray(&quot;MZ&quot;,&quot;HP&quot;,&quot;DL&quot;,&quot;EKT&quot;,&quot;KS&quot;,&quot;PT&quot;,&quot;CG&quot;,   &quot;DM&quot;,&quot;GW&quot;,&quot;CW&quot;)
-
 bundle b
-
 ## process args
 string b.code = sarr[which]
-
 # process realiz
 if b.code == &quot;KS&quot; || b.code == &quot;PT&quot; || b.code == &quot;DL&quot;
   series b.yup = realiz
-
 elif instring(&quot;CG EKT&quot; , b.code)
   if exists(fc)	# expected case
     series b.E = realiz - fc # calculate FC errors, input for CG*/EKT
@@ -1303,11 +1182,9 @@ elif instring(&quot;CG EKT&quot; , b.code)
     print &quot;No forecasts given, treating single input as errors.&quot;
     series b.E = realiz
   endif
-
 else
   series b.y = realiz
 endif
-
 # process fc (and also fc2)
 if exists(fc)
   if b.code == &quot;KS&quot; || b.code == &quot;PT&quot; || b.code == &quot;DL&quot;
@@ -1319,68 +1196,53 @@ if exists(fc)
     else
       funcerr &quot;Need 2nd forecast (fc2) input!&quot;
     endif
-
   else
     series b.fc = fc
   endif
-
 elif instring(&quot;DL HP MZ KS PT DM GW CW&quot;, b.code)	# and here: fc is null
   msg = sprintf(&quot;Need forecast (fc) input for the %s test!&quot;, b.code)
   funcerr msg
 endif
-
 # process flexarg
 if b.code == &quot;MZ&quot; || b.code == &quot;HP&quot;
   b.nboot = flexarg	# bootstrap replications
-
 elif b.code == &quot;CG&quot;
   b.k = flexarg	# lag at which to test
-
 elif b.code == &quot;DM&quot; || b.code == &quot;GW&quot; || b.code == &quot;CW&quot;
   b.fhor = flexarg	# horizon
 endif
-
 # process robortype
 if b.code == &quot;MZ&quot; || b.code == &quot;HP&quot; || b.code == &quot;PT&quot;
   scalar b.robust = robortype
-
 elif b.code == &quot;DM&quot; || b.code == &quot;EKT&quot; || b.code == &quot;GW&quot;
   b.loss = robortype + 1
   # for EKT we had: q-q-shape (p0=2) / lin-lin-shape (p0=1)
 endif
-
 # conditional test argument
 if b.code == &quot;GW&quot;
   scalar b.cond = cond
 endif
-
 # copy verbosity setting
 scalar b.verb = verbosity
-
 # process zli
 if b.code == &quot;HP&quot; || b.code == &quot;GW&quot;
   list b.z = zli
-
   # For GW: Even though b.cond may be switched off, it may
   # make sense to inject the conditioning list into the main
   # bundle to somehow use it later. So we do not check for
   # b.cond here.
-
 elif b.code == &quot;CG&quot; # needs series
   if !nelem(zli) || nelem(zli) &gt; 1
     funcerr &quot;CG needs one-element zli list input&quot;
   else
     series b.CGX = zli[1]
   endif
-
 elif b.code == &quot;EKT&quot;
   if !nelem(zli)
     funcerr &quot;EKT needs some instruments (zli)&quot;
   endif
-
   list b.z = zli
 endif
-
 # process other args
 if exists(lossdraw)
   string b.lossdraw = lossdraw # EKT
@@ -1388,11 +1250,8 @@ else
   string b.lossdraw = &quot;no&quot; # default
 endif
 b.a0 = shape # EKT only
-
 applyFCtests(&amp;b, b.code)
-
 GUI_FEP_print(&amp;b)	# new to accommodate removal of no-print
-
 return b
 </code>
 </gretl-function>
@@ -1403,14 +1262,12 @@ return b
 <code># Reference paper: Elliott, Komunjer, and Timmermann, 2005,
 # Estimation and Testing of Forecast Rationality under Flexible Loss,
 # Review of Economic Studies, 72, 1107 - 1125.
-
 # compatibility treatment of loss type
 if inbundle(b, &quot;p0&quot;)	# 2: quad shape, 1: V shape
   if b.p0 == 1 || b.p0 == 2
     scalar b.loss = 3 - b.p0
   endif
 endif
-
 # compatibility handling of non-harmonized earlier input
 if inbundle(b, &quot;fcerrors&quot;) # new internal interface for wrapper func
   matrix Y = b.fcerrors
@@ -1421,7 +1278,6 @@ elif inbundle(b, &quot;y&quot;)
     funcerr &quot;Suitable input missing.&quot;
   endif
 endif
-
 # apply default values
 if !inbundle(b, &quot;loss&quot;)
   scalar b.loss = 1	# U-shape
@@ -1433,13 +1289,10 @@ set_verbatim_flag(&amp;b)
 if !inbundle(b, &quot;a0&quot;)
   scalar b.a0 = 0.5
 endif
-
 # infer loss shape parameter
 scalar p0 = (b.loss == 1) ? 2 : 1
-
 matrix X = b.x # dito (matrix)
 a0 = b.a0
-
 scalar diffmax = 1000
 scalar convcrit = 0.00001
 # --------------------------------------
@@ -1457,13 +1310,11 @@ matrix sOLD = I(cols(iv))				# k by k
 scalar niter = 0
 scalar nfail = 0
 scalar failed = 0
-
 loop while diffmax &gt; convcrit
   scalar err1 = 0
   try_invert(sOLD, &amp;err1)
   if !err1
     IsOLD = inv(sOLD)
-
     Nom = a1'IsOLD * a2
     Den = qform(a1', IsOLD)
     scalar aNEW = Nom / Den
@@ -1532,7 +1383,6 @@ if !failed
       if b.lossdraw != &quot;no&quot;
         DrawLoss(p0, aNEW, V, b.lossdraw)
       endif
-
       b.alpha = aNEW	# shape parameter alpha
       b.niter = niter
     endif
@@ -1562,93 +1412,72 @@ Function to calculate the test statistics from
 Campbell &amp; Dufour 1995 (C&amp;D), which are sign statistics
 and related --but not all identical-- to
 Wilcoxon test statistics.
-
 'mdat': The first column is Y_t in C&amp;D, the remaining columns are different X_t 's (or g_t 's).
 (If only a single column exists in mdat, then it is assumed
 that g_t = Y_t; effectively Y_t is tested against its own lags.)
-
 'whichlags': Specify which lags for the X_t (g_t) should be
 used. The lags apply to all the X_t (g_t)'s. Negative lags
 are an error. Each lags needs to be given separately, e.g. {1,2,3}.
 Optional; the default is to use just the first lag.
-
 Special convenience case for unbiasedness test:
 Put a single column in 'mdat' and set 'whichlags' to {0}
 (gretl also accepts scalar 0), then:
 The sign and signed-rank statistics then refer directly to Y_t.
-
 'recenter': If 1, then subtracts a recursively calculated
 median from the X_t (g_t)'s;
 If 2, a mean.
 If 3 (not yet implemented), some trend
-
 For a single set of test statistics, only 2 columns (or 1)
 and a one-element matrix 'whichlags' are needed.
 With more columns or more lags, this is not a joint test, but just several tests in one go. (The first column against
 all others.)
-
 Output are 3 matrices in an array:
 (L: number of chosen lag specs in whichlags, K: number of X_t (g_t)'s, i.e. max(cols(mdat)-1, 1) )
-
 First: L x K matrix of sign stats Sg
 Second: L x K matrix of special signed rank stats SRg
 Third: L x K matrix of standard Wilcoxon signed rank stats Wg
 Fourth: L x 1 vector of effective sample lengths used
 */
-
 # basic choices
 if !exists(whichlags)
   matrix whichlags = {1} # the default
 else
   whichlags = vec(whichlags)	# ensure vector
 endif
-
 # some checks
 r = rows(mdat)
 if max(whichlags) &gt;= r - 1
   funcerr &quot;lag is too large for sample length&quot;
-
 elif min(whichlags) &lt; 0
   funcerr &quot;lags must not be negative&quot;
-
 elif min(whichlags) == 0 &amp;&amp; cols(mdat) &gt; 1
   funcerr &quot;unbiasedness test on itself only valid for single variable&quot;
-
 endif
-
 # handle special case unbiasedness of Y_t
 if !min(whichlags)
   whichlags = {0}	# just to be on the safe side
   if recenter
     funcerr &quot;unbiasedness test incompatible with recentering&quot;
   endif
-
   # handle the convenience case of own lags
 elif cols(mdat) == 1
   mdat = mdat ~ mdat # copy 1st col to 2nd col
 endif
-
 matrix X = (cols(mdat) &gt; 1) ? mdat[, 2:] : mdat[, 1]
-
 ## recursive recentering, at least 2 obs. required
 # cf. C&amp;G97 p. 9
 if recenter
-
   matrix Xc = zeros(rows(X) - 1, cols(X))	# hold re-centered values
-
   loop i = 2..rows(X) # at least 2 obs., re-centering procedure
     if recenter == 1
       Xc[i - 1,] = X[i, ] - quantile(X[1:i, ], 0.5)
-
     elif recenter == 2
       Xc[i - 1,] = X[i, ] - meanc( X[1:i, ] )
-
       # elif recenter == 3	# linear trend
       # TODO: could be implemented by running a simple regression
     endif
   endloop
 endif	# recentering
-
 # go over all lags
 matrix effTs = {} # to hold effective sample lengths
 matrix Sg = {} 	# will hold the sign stats (eq (7))
@@ -1657,45 +1486,35 @@ matrix SRg = {} 	# to hold their own sign-rank stat (eq (9))
 matrix Wg = {} 	# Wilcoxon, eq(8)
 loop lix = 1..nelem(whichlags)
   lag = int(whichlags[lix])
-
   # do it for all g_t 's in parallel
   if lag
     matrix temp = recenter ? Xc : X
     matrix glag = mlag(temp, lag)[1 + lag : ,]
-
     # adjust the common sample length
     delta = rows(mdat) - rows(glag)
     matrix ycut = mdat[1 + delta :, 1]
     effTs |= rows(ycut)
     matrix prod = ycut .* glag
-
   else # the convenience case, do it on itself!
     effTs |= rows(mdat)
     matrix prod = mdat
   endif
-
   matrix prodsigns = (prod .&gt; 0)
-
   # stack the new sign stats vertically
   Sg |= sumc(prodsigns)
-
   if lag # not for unbiasedness
     # the ranking of abs Y, i.e. R+2
     matrix Rplus2 = ranking(abs(ycut))
-
     # stack the new signed-rank stats vertically
     SRg |= sumc( prodsigns .* Rplus2 )
   endif
-
   # the ranking of the products, i.e. R+1
   matrix Rplus1 = {}
   loop i=1..cols(prod)
     Rplus1 ~= ranking( abs(prod[, i]) )
   endloop
   Wg |= sumc( prodsigns .* Rplus1 )
-
 endloop # through the lag indices
-
 return defarray(Sg, SRg, Wg, effTs)
 </code>
 </gretl-function>
@@ -1705,51 +1524,38 @@ return defarray(Sg, SRg, Wg, effTs)
   <param name="which" type="string" const="true"/>
  </params>
 <code>printf &quot;Test choice: %s\n&quot;, which
-
 if (which==&quot;DM&quot; || which==&quot;GW&quot; || which==&quot;HP&quot; || which==&quot;MZ&quot;    || which == &quot;CW&quot;) &amp;&amp; !inbundle(b, &quot;y&quot;)
-
   funcerr &quot;Series of realizations 'y' is missing.&quot;
   # Strictly speaking: also need to check type of y
-
 elif (which==&quot;HP&quot; || which==&quot;MZ&quot;) &amp;&amp; !inbundle(b, &quot;fc&quot;)
   funcerr &quot;Series of forecasts values 'fc' is missing.&quot;
-
 elif (which==&quot;CG&quot; || which==&quot;EKT&quot;) &amp;&amp; !inbundle(b, &quot;E&quot;) &amp;&amp; ( !inbundle(b, &quot;y&quot;) || !inbundle(b, &quot;fc&quot;) )
   printf &quot;Both series realizations 'y' and forecasts 'fc'&quot;
   printf &quot; must be passed. (Or errors 'E'.)&quot;
   funcerr &quot;Missing input series&quot;
-
 elif (which==&quot;DM&quot; || which==&quot;GW&quot; || which == &quot;CW&quot;) &amp;&amp; !inbundle(b, &quot;f1&quot;)
   funcerr &quot;Series of forecast values 'f1' is missing.&quot;
-
 elif (which==&quot;DM&quot; || which==&quot;GW&quot; || which == &quot;CW&quot;) &amp;&amp; !inbundle(b, &quot;f2&quot;)
   funcerr &quot;Series of forecast values 'f1' is missing.&quot;
-
 elif (which==&quot;DL&quot; || which==&quot;KS&quot; || which==&quot;PT&quot; || which==&quot;PS&quot;)   &amp;&amp; !inbundle(b, &quot;yup&quot;)
   funcerr &quot;Binary indicator series of realizations 'yup' is missing.&quot;
-
 elif (which==&quot;DL&quot; || which==&quot;KS&quot; || which==&quot;PT&quot;) &amp;&amp; !inbundle(b, &quot;fcup&quot;)
   funcerr &quot;Binary indicator series of forecasts 'fcup' is missing.&quot;
-
 elif which==&quot;PS&quot; &amp;&amp; !inbundle(b, &quot;pfc&quot;)
   funcerr &quot;Probability forecast series 'pfc' is missing.&quot;
-
 elif (which==&quot;EKT&quot; || which==&quot;HP&quot;) &amp;&amp; !inbundle(b, &quot;z&quot;)
   funcerr &quot;List of exogenous / instruments 'z' is missing.&quot;
-
 endif
 </code>
 </gretl-function>
 <gretl-function name="loadextra" type="scalar" private="1">
 <code># Pull in the extra pkg for the Wilcoxon p-values
 # needed in the doCGtest
-
 # (Until extra.gfn allows introspection for its version,
 # we use this warning workaround).
 string warn = &quot;(FEP needs extra.gfn version 0.41 or higher.&quot;
 warn = sprintf(&quot;%s\nOtherwise expect errors,&quot;, warn)
 warn = sprintf(&quot;%s then install a newer version of 'extra'.)\n&quot;, warn)
-
 catch include extra.gfn
 if $error
   catch pkg install extra
@@ -1759,7 +1565,6 @@ if $error
     print &quot;(Tests except CG should still work,&quot;
     print &quot;  otherwise expect more errors ahead...)&quot;
     return 2
-
   else
     catch include extra.gfn
     if $error
@@ -1767,14 +1572,11 @@ if $error
       print &quot;(Tests except CG should still work,&quot;
       print &quot;  otherwise expect more errors ahead...)&quot;
       return 1
-
     else
       print warn
       return 0
     endif
-
   endif
-
 else
   print warn
   return 0
@@ -1787,13 +1589,10 @@ endif
   <param name="fc" type="list" const="true"/>
  </params>
 <code>/* Check number of valid observations. Needed for ForecastMetrics(). */
-
 scalar ret = 0	# no. of fc-series with less valid obs. than series y
 scalar Ty = nobs(y)
-
 loop foreach i fc
   scalar d = nobs(fc.$i) - Ty
-
   if d &lt; 0
     ret++
     string case = &quot;less&quot;
@@ -1806,7 +1605,6 @@ loop foreach i fc
     printf &quot; valid observations than your series of realizations\n&quot;
   endif
 endloop
-
 return ret
 </code>
 </gretl-function>
@@ -1816,16 +1614,13 @@ return ret
  </params>
 <code>/* Helper function adding row- and column-labels.
 Needed for ForecastMetrics(). */
-
 strings cnames = array(cols(metrics))
 loop i=1..cols(metrics)
   cnames[i] = sprintf(&quot;Forecast_$i&quot;)
 endloop
 cnameset(metrics, cnames)
-
 strings rnames = names_of_basic_point_metrics() +      names_of_udf_point_metrics()
 rnameset(metrics, rnames)
-
 return metrics
 </code>
 </gretl-function>
@@ -1840,7 +1635,6 @@ return fcstats(y, fc)[1:5,]		# discard Theil's U + associated stats
 </gretl-function>
 <gretl-function name="names_of_basic_point_metrics" type="strings" private="1">
 <code>/* Names of forecast statistics as returned by built-in gretl function fcstats() -- let's hope the ordering won't change. */
-
 return defarray(&quot;ME&quot;, &quot;RMSE&quot;, &quot;MAE&quot;, &quot;MPE&quot;, &quot;MAPE&quot;)
 </code>
 </gretl-function>
@@ -1855,10 +1649,8 @@ return defarray(&quot;MdAPE&quot;, &quot;RMSPE&quot;, &quot;RMdSPE&quot;, &quot;
   <param name="fc" type="list" const="true"/>
  </params>
 <code>/* Wrapper retrieving various percentage error metrics */
-
 list fc_error = get_fc_error_list(y, fc)
 matrix metrics = {}
-
 metrics |= MdAPE(y, fc_error)'
 metrics |= RMdSPE(y, fc_error)'
 metrics |= RMdSPE(y, fc_error, 1)'
@@ -1871,7 +1663,6 @@ metrics |= MdAE(fc_error)'
 metrics |= MADMean(y, fc_error)'
 metrics |= MADMean(y, fc_error, 1)'
 metrics |= MSLE(y, fc)'
-
 return metrics
 </code>
 </gretl-function>
@@ -1885,7 +1676,6 @@ return metrics
 of realizations. Proposed by Kolassa and Schütz (2007):
 &quot;Advantages of the MAD/Mean Ratio over the MAPE&quot;, Foresight: The International Journal of Applied Forecasting, 6 (2007), pp. 40-43. See also:
 https://www.sciencedirect.com/science/article/pii/S0169207016000121#br000070 */
-
 matrix metric = zeros(nelem(fc_error), 1)
 loop foreach i fc_error
   if use_median
@@ -1894,7 +1684,6 @@ loop foreach i fc_error
     metric[i] = mean(abs(fc_error.$i)) / mean(y)
   endif
 endloop
-
 return metric
 </code>
 </gretl-function>
@@ -1903,12 +1692,10 @@ return metric
   <param name="fc_error" type="list" const="true"/>
  </params>
 <code>/* Median error */
-
 matrix metric = zeros(nelem(fc_error), 1)
 loop foreach i fc_error
   metric[i] = median(fc_error.$i)
 endloop
-
 return metric
 </code>
 </gretl-function>
@@ -1917,12 +1704,10 @@ return metric
   <param name="fc_error" type="list" const="true"/>
  </params>
 <code>/* Median absolute error */
-
 matrix metric = zeros(nelem(fc_error), 1)
 loop foreach i fc_error
   metric[i] = median(abs(fc_error.$i))
 endloop
-
 return metric
 </code>
 </gretl-function>
@@ -1933,7 +1718,6 @@ return metric
   <param name="use_median" type="bool" default="0"/>
  </params>
 <code>/* Symmetric mean/ median absolute percentage error */
-
 matrix metric = zeros(nelem(fc),1)
 loop foreach i fc
   series AE = abs(get_fc_error(y, fc.$i))
@@ -1944,7 +1728,6 @@ loop foreach i fc
     metric[i] = mean(200 * AE / SUM)
   endif
 endloop
-
 return metric
 </code>
 </gretl-function>
@@ -1955,10 +1738,8 @@ return metric
   <param name="use_median" type="bool" default="0"/>
  </params>
 <code>/* Symmetric mean/ median absolute absolute percentage error */
-
 matrix metric = zeros(nelem(fc),1)
 loop foreach i fc
-
   series AE = abs(get_fc_error(y, fc.$i))
   series ABS_SUM = abs(y + fc.$i)
   if use_median
@@ -1967,7 +1748,6 @@ loop foreach i fc
     metric[i] = mean(200 * AE / ABS_SUM )
   endif
 endloop
-
 return metric
 </code>
 </gretl-function>
@@ -1979,7 +1759,6 @@ return metric
  </params>
 <code>/* Root mean/ median square percentage error
 -- based on percentage errors */
-
 matrix metric = zeros(nelem(fc_error), 1)
 loop foreach i fc_error
   series PE_SQ = pct_error(y, fc_error.$i)^2
@@ -1989,7 +1768,6 @@ loop foreach i fc_error
     metric[i] = sqrt(mean(PE_SQ))
   endif
 endloop
-
 return metric
 </code>
 </gretl-function>
@@ -1999,12 +1777,10 @@ return metric
   <param name="fc_error" type="list" const="true"/>
  </params>
 <code>/* Median absolute percentage error -- based on percentage errors */
-
 matrix metric = zeros(nelem(fc_error), 1)
 loop foreach i fc_error
   metric[i] = median( abs( pct_error(y, fc_error.$i) ) )
 endloop
-
 return metric
 </code>
 </gretl-function>
@@ -2015,12 +1791,10 @@ return metric
  </params>
 <code>/* Mean Squared Logarithmic Error.
 Reference: https://scikit-learn.org/stable/modules/model_evaluation.html#mean-squared-log-error */
-
 matrix metric = zeros(nelem(fc), 1)
 loop foreach i fc
   metric[i] = mean(( log(y + 1) - log(fc.$i + 1) )^2)
 endloop
-
 return metric
 </code>
 </gretl-function>
@@ -2030,13 +1804,11 @@ return metric
   <param name="fc" type="list" const="true"/>
  </params>
 <code>/* Compute list of forecast errors */
-
 list fc_error = null
 loop foreach i fc
   series err_$i = get_fc_error(y, fc.$i)
   list fc_error += err_$i
 endloop
-
 return fc_error
 </code>
 </gretl-function>
@@ -2063,7 +1835,6 @@ return y - fc
   <param name="b" type="bundleref"/>
  </params>
 <code>/* For avoiding code duplicity. */
-
 if !inbundle(b, &quot;robust&quot;)
   scalar b.robust = 0
 endif
@@ -2074,7 +1845,6 @@ endif
   <param name="b" type="bundleref"/>
  </params>
 <code>/* For avoiding code duplicity. */
-
 if !inbundle(b, &quot;verb&quot;)
   b.verb = 0
 endif
@@ -2085,7 +1855,6 @@ endif
   <param name="b" type="bundleref"/>
  </params>
 <code>/* For avoiding code duplicity. */
-
 if !inbundle(b, &quot;fhor&quot;)
   b.fhor = 1
 endif
@@ -2099,24 +1868,19 @@ endif
 print &quot;*** Campbell &amp; Ghysels &quot;
 if !b.k &amp;&amp; !inbundle(b, &quot;CGX&quot;)
   printf &quot;You selected the test(s) of unbiasedness.\n&quot;
-
 elif !b.k &amp;&amp; inbundle(b, &quot;CGX&quot;)
   funcerr &quot;You set k=0 but provided CGX. Please set k&gt;0, and re-run.&quot;
 endif
-
 if b.k &gt; 0 &amp;&amp; !inbundle(b, &quot;CGX&quot;)
   printf &quot;You selected the test(s) of (no) serial &quot;
   printf &quot;correlation at lag %d.\n&quot;, b.k
-
 elif inbundle(b, &quot;CGX&quot;)
   printf &quot;You selected the test(s) of orthogonality at lag %d.\n&quot;, b.k
 endif
-
 printf &quot;Test stat (sign)        = %.1f &quot;, b.CGSIGNstat
 printf &quot;(p-val %.4f)\n&quot;, b.CGSIGNpval
 printf &quot;Test stat (signed rank) = %.1f &quot;, b.CGWILCstat
 printf &quot;(p-val %.4f)\n&quot;, b.CGWILCpval
-
 printf &quot;********************************************************\n&quot;
 </code>
 </gretl-function>
@@ -2126,13 +1890,11 @@ printf &quot;********************************************************\n&quot;
  </params>
 <code>strings codes = defarray(&quot;MZ&quot;,&quot;KG&quot;,&quot;DL&quot;,&quot;EKT&quot;,&quot;KS&quot;,&quot;PT&quot;, &quot;CGRANK&quot;,&quot;CGWILC&quot;,&quot;DM&quot;,&quot;GW&quot;, &quot;HP&quot;, &quot;PS&quot;, &quot;CG&quot;, &quot;CW&quot;)
 strings fulls = defarray(&quot;Mincer-Zarnowitz (MZ)&quot;, &quot;Holden-Peel-Kirchgaessner (KG)&quot;, &quot;Diebold-Lopez (DL)&quot;, &quot;Elliott-Komunjer-Timmermann (EKT)&quot;, &quot;Kuiper score (KS)&quot;, &quot;Pesaran-Timmermann (PT)&quot;, &quot;Campbell-Ghysels rank sign (CGRANK)&quot;, &quot;Campbell-Ghysels Wilcoxon sign (CGWILC)&quot;, &quot;Diebold-Mariano (DM)&quot;, &quot;Giacomini-White (GW)&quot;, &quot;Holden-Peel (HP)&quot;, &quot;Probability Score (PS)&quot;, &quot;Campbell-Ghysels (CG)&quot;, &quot;Clark-West (CW)&quot;)
-
 loop i=1..nelem(codes)
   if scode == codes[i]
     return fulls[i]
   endif
 endloop
-
 # When we get here it's a problem
 printf &quot;Whoops, scode is %s\n&quot;, scode
 funcerr &quot;Code scode didn't match anything&quot;
