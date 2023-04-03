@@ -20,7 +20,7 @@ tarball : clean
 	tar -cvzf ../$(PKG).zip *
 
 clean:
-	rm -rf $(PKG).zip # $(GFN)
+	rm -rf $(PKG).zip $(PKG).gfn
 	rm -rf session.inp
 	rm -rf ./$(PKG).pdf
 	rm -rf ./FEPdata.gdt
