@@ -523,9 +523,11 @@ function void doCGtest (bundle *b)
         scalar b.CGWILCstat = testout[2][1,1]
     endif
 
+    # TODO: Remove this part if redundant, and also the loadextra() functions
     ## p-value calc with functions from 'extra' addon
     # err = loadextra() # (we now require extra anyway)
     
+    # FIXME: Currently fails, as "err" does not exist.
     if !err
         if b.CGWILCstat < (T * (T + 1) / 2 / 2) # left tail
             # (force X > x by passing x' = x+1 since this func does >= x)

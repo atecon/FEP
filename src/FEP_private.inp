@@ -44,7 +44,6 @@ end function
 
 function series getLossDiff (const bundle b, const series e1, const series e2)
     # Calculates the loss differential between two forecasts.
-    
     # The newer interface is to accept the string b.lossfunc,
     # along with a conditionally required matrix b.lossparam.
     # (This interface takes precedence.)
@@ -101,6 +100,7 @@ end function
 
 # The following function should be redundant after Jan 30, 2023,
 # given that "extra" is now a dependency. 
+# TODO: If this function is redundant, let's remove it.
 
 function scalar loadextra(void)
     # Pull in the extra pkg for the Wilcoxon p-values

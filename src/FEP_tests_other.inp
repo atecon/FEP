@@ -3,25 +3,39 @@
 # doGWtest (Giacomini-White)
 # doCWtest (Clark-West)
 
-##############
 function void doDMtest (bundle *b)
-      
+    # TODO: Allow for further loss functions in future
+    /* Idea for an interface (Sven, December 2022):
+
+    -- The string b.lossfunc = "<funcname>" would refer to an
+      active/loaded user func
+     (errorif( b.loss == 0 && (!inbundle(b,"lossfunc") || b.lossfunc=="")))
+    -- Such a user func would have to have the following signature:
+      args: series y (realization), series f (forecasts)
+      return value: series loss
+    -- b.lossfunc == "U" (or quad) could be used instead of b.loss == 1,
+      and b.lossfunc == "V" instead of b.loss == 2
+    -- Then for the non-U and non-V cases we would simply do:
+      series L = feval(b.lossfunc, e1, e2)
+    */
+
     # apply defaults
     set_verbatim_flag(&b)
+    if !inbundle(b, "loss")
+        b.loss = 1	# U-shape
+    endif
     set_fhor_default(&b)
 
     series e1 = b.y - b.f1
     series e2 = b.y - b.f2
     smpl e1 e2 --no-missing
 
-    # Construct loss differential
-    series LD = getLossDiff(b, e1, e2)
+    series lossdiff = getLossDiff(b, e1, e2)
+    b.L = lossdiff    # TODO: maybe use b.LD as alias? If so, do it everyhwere.
 
     # Run regression based HAC robust DM test
-    ols LD 0 --robust --quiet
-    # Return test statistics and p-value
-    b.L = LD									# series of loss differentials
-                                                # (maybe use b.LD as alias?)
+    ols lossdiff 0 --robust --quiet
+
     scalar tstat = $coeff / $stderr
     b.DMstat = tstat
     b.pvaln = 2 * pvalue(z, abs(tstat))			# stand. normal
@@ -52,7 +66,6 @@ function void doDMtest (bundle *b)
         printf "p-val (small-sample): \t%.4f\n", b.DMpvalssc
         printf "***********************************************\n"
     endif
-
 end function
 
 
@@ -72,16 +85,15 @@ function void doGWtest (bundle *b)
 	procedure and the possible cond of estimation window."
     */
 
-    # apply defaults
     set_verbatim_flag(&b)
+    set_fhor_default(&b)
+
     if !inbundle(b, "loss")
         b.loss = 1	# U-shape
     endif
-    set_fhor_default(&b)
     if b.fhor == 0
         printf "\n*** Warning: You have set the forecast horizon to h=0.\n"
     endif
-
     if !inbundle(b, "cond")
         b.cond = 0	# 0: unconditional test
     endif
@@ -90,15 +102,9 @@ function void doGWtest (bundle *b)
     series e2 = b.y - b.f2
     smpl e1 e2 --no-missing
 
-    # Construct loss differential
     # TODO: Allow for further loss functions in future
-    if b.loss == 1			# U-shape quadratic loss
-        series L = e1^2 - e2^2
-    elif b.loss == 2		# V-shape
-        series L = abs(e1) - abs(e2)
-    endif
-
-    scalar T = nobs(L) - b.fhor
+    series lossdiff = getLossDiff(b, e1, e2)
+    scalar T = nobs(lossdiff) - b.fhor
 
     list h_inst = const	# was z before, but Z is sth. else in GW (Sven)
     # (and wouldn't it also have conflicted with the generated "z" 
@@ -108,7 +114,7 @@ function void doGWtest (bundle *b)
     if b.cond
         # add lagged loss values -- 
 		# info set available in period t for the t+tau forecast
-        h_inst += L(-b.fhor to -b.fhor)
+        h_inst += lossdiff(-b.fhor)
 
         # add additional regressors
         if inbundle(b, "z")
@@ -130,10 +136,11 @@ function void doGWtest (bundle *b)
         endif
     endif
 
-    # create the reg matrix given by L*ht', where ht is matrix of instr
+    # create the reg matrix given by lossdiff*ht', where ht is matrix of
+    # instruments
     list reg = null
     loop foreach i h_inst 
-        series r$i = h_inst.$i * L
+        series r$i = h_inst.$i * lossdiff
         reg += r$i
     endloop 
 
@@ -141,32 +148,26 @@ function void doGWtest (bundle *b)
     if b.fhor == 1
         # calc the test stat as n*R^2 from the regression of one on L*ht
         ols 0 reg --quiet
-        scalar Thmn_stat = $T * $rsq			# this only works for fhor=1!
+        scalar teststat = $T * $rsq	   # this only works for fhor=1!
     else
+        set hac_lag (b.fhor - 1)
         matrix zbar = meanc({reg})'
-        
-        # old:
-        # matrix omega = NeweyWest({reg},(b.fhor-1))
-        # new: 
-        set hac_lag b.fhor-1 
         matrix omega = lrcovar({reg})
-        
-        scalar Thmn_stat = T * qform(zbar', invpd(omega)) # *zbar
+        scalar teststat = T * qform(zbar', invpd(omega))
     endif
 
-    # Return test statistics and p-value
-    b.L = L								# series of loss differentials
-    b.GWstat = Thmn_stat
-    b.GWpval = pvalue(c, nelem(reg), abs(Thmn_stat))  # Chi^2 distributed
-    b.sign = mean(L)
+    b.L = lossdiff
+    b.GWstat = teststat
+    b.GWpval = pvalue(c, nelem(reg), abs(teststat))
+    b.sign = mean(b.L)
 
     if b.verb
         printf "\n***********************************************\n"
         printf "*** Giacomini & White (2006) \n"
         printf "*** test of conditional predictive ability\n"
-        if b.loss==1
+        if b.loss == 1
             printf "\nLoss: U-shape quadratic.\n"
-        elif b.loss==2
+        elif b.loss == 2
             printf "\nLoss: V-shape linear.\n"
         endif
         if b.cond==0

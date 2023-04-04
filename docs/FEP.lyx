@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.8, January 2023
+ version 2.9, April 2023
 \end_layout
 
 \begin_layout Abstract
@@ -4511,7 +4511,7 @@ Notes: About input format for
 \emph on
 param:
 \emph default
- In recent versions, gretl accepts a scalar as a 1x1 matrix.
+  In recent versions, gretl accepts a scalar as a 1x1 matrix.
  
 \end_layout
 
@@ -14148,12 +14148,12 @@ Changelog
 \end_layout
 
 \begin_layout Itemize
-version 2.8 (January 2023)
+version 2.10 (April 2023)
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-formally require the 
+formally require the
 \begin_inset Quotes eld
 \end_inset
 
@@ -14161,21 +14161,52 @@ extra
 \begin_inset Quotes erd
 \end_inset
 
- addon instead of home-cooked internal checks
+addon instead of home-cooked internal checks
+Internal improvement: remove odd syntax for specifying lagged variable for
+ GW test
 \end_layout
 
 \begin_layout Itemize
 extend the getLoss() function to accept user-defined loss function names
 \end_layout
+\end_deeper
 
 \begin_layout Itemize
 based on the extended getLoss(), generalize the DM test to work with many
  more loss function possibilities
 \end_layout
 
+\begin_deeper
 \begin_layout Itemize
 Todo: apply the same generalizations as for the DM test to other tests such
  as GW...
+\end_layout
+\end_deeper
+
+
+\begin_layout Itemize
+version 2.9 (April 2023)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Internal improvement: remove odd syntax for specifying lagged variable for
+ GW test
+\end_layout
+
+\begin_layout Itemize
+Minor internal refactorings
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+version 2.8 (March 2023)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Improve error message in case an empty list of forecasts is passed via the
+ GUI
 \end_layout
 
 \end_deeper

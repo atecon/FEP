@@ -84,7 +84,8 @@ function bundle GUI_FEP(
         endif
 
     elif instring("DL HP MZ KS PT DM GW CW", b.code)	# and here: fc is null
-        funcerr "Need forecast (fc) input!"
+         msg = sprintf("Need forecast (fc) input for the %s test!", b.code)
+        funcerr msg
     endif
 
     # process flexarg
