@@ -20,3 +20,4 @@ gui-main = GUI_FEP
 bundle-print = GUI_FEP_print
 menu-attachment = MAINWIN/View
 label = Forecast evaluations
+depends = extra
