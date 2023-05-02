@@ -161,7 +161,7 @@ function void doHPtest (bundle *b)
     endif
     set_verbatim_flag(&b)
 
-    # acommodate old variant
+    # accommodate old variant
     if inbundle(b, "strrob")
         string strrob = b.strrob
     else
@@ -313,7 +313,7 @@ function void doMZtest (bundle *b)
     set_robust_flag(&b)
     set_verbatim_flag(&b)
 
-    # acommodate old variant
+    # accommodate old variant
     if inbundle(b, "strrob")
         string strrob = b.strrob
     else
@@ -427,8 +427,6 @@ end function
 ##############
 
 function void doCGtest (bundle *b)
-    # consolidating all CG test variants
-
     /* Computes both Campbell & Ghysels sign and signed rank
        (Wilcoxon-type) nonparam. statistics,
        going back to Campbell & Dufour who also showed that in
@@ -517,7 +515,7 @@ function void doCGtest (bundle *b)
         scalar b.CGWILCstat = testout[3][1,1]
 
     else	# orthogonality test
-        #... must use Campbell&Dufour's special signed-rank variant
+        #... must use Campbell & Dufour's special signed-rank variant
         # (we argue that strict exogeneity is very unrealistic)
         scalar b.CGWILCstat = testout[2][1,1]
     endif
@@ -529,12 +527,10 @@ function void doCGtest (bundle *b)
             # (force X > x by passing x' = x+1 since this func does >= x)
             temp = WSRpvalue(T, b.CGWILCstat + 1)
             b.CGWILCpval = 2 * (1 - temp) # because of symmetry
-
         else # right tail
             # (this func does X >= x)
             b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
         endif
-
     else
         scalar b.CGWILCpval = NA
     endif
@@ -542,4 +538,4 @@ function void doCGtest (bundle *b)
     if b.verb
         CGprint(&b)	    # (lives in FEP_private.inp)
     endif
-end function # doCGtest
+end function
