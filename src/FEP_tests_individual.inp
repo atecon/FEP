@@ -512,7 +512,7 @@ function void doCGtest (bundle *b)
         # (again, because of symmetry)
     endif
 
-    ## signed rank test
+    # signed rank test
     if !inbundle(b, "CGX") # serial correlation, or unbiasedness
         # here we can use the standard variant
         scalar b.CGWILCstat = testout[3][1,1]
@@ -523,9 +523,9 @@ function void doCGtest (bundle *b)
         scalar b.CGWILCstat = testout[2][1,1]
     endif
 
-    ## p-value calc with functions from extra
-    err = loadextra()
-    if !err
+    # p-value calculation with functions from the "extra" package
+    scalar err = loadextra()
+    if err == FALSE
         if b.CGWILCstat < (T * (T + 1) / 2 / 2) # left tail
             # (force X > x by passing x' = x+1 since this func does >= x)
             temp = WSRpvalue(T, b.CGWILCstat + 1)
@@ -536,12 +536,11 @@ function void doCGtest (bundle *b)
             b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
         endif
 
-    else	# extra.gfn package not available/loadable
+    else
         scalar b.CGWILCpval = NA
     endif
 
     if b.verb
-        CGprint(&b)	# (lives in FEP_private.inp)
+        CGprint(&b)	    # (lives in FEP_private.inp)
     endif
-
 end function # doCGtest

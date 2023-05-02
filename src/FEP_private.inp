@@ -41,45 +41,34 @@ function void check_series_in_b (const bundle b, const string which)
 end function
 
 
-function scalar loadextra(void)
-    # Pull in the extra pkg for the Wilcoxon p-values
-    # needed in the doCGtest
+function scalar loadextra (void)
+    /* Load the `extra` package for computing Wilcoxon p-values needed in the `doCGtest`.
 
-    # (Until extra.gfn allows introspection for its version,
-    # we use this warning workaround).
-    string warn = "(FEP needs extra.gfn version 0.41 or higher."
-    warn = sprintf("%s\nOtherwise expect errors,", warn)
-    warn = sprintf("%s then install a newer version of 'extra'.)\n", warn)
+    Returns:
+        - FALSE (scalar): Returns false if the package is successfully loaded.
+        - TRUE (scalar): Returns TRUE if the package version is less than v0.41 or the package cannot be installed/ updated automatically.
+    */
 
-    catch include extra.gfn
-    if $error
-        catch pkg install extra
-        if $error
-            print "Fatal problem getting the 'extra' package."
-            print "Please install it manually and try again."
-            print "(Tests except CG should still work,"
-            print "  otherwise expect more errors ahead...)"
-            return 2
+    pkg query extra --quiet
 
-        else
-            catch include extra.gfn
-            if $error
-                print "Fatal error loading the 'extra' package."
-                print "(Tests except CG should still work,"
-                print "  otherwise expect more errors ahead...)"
-                return 1
+    if ($result.version < 0.41) || (nelem($result) == 0)
+        # $result-bundle is empty if pkg. is not installed locally
 
-            else
-                print warn
-                return 0
-            endif
-
+        if $result.version < 0.41
+            printf "WARNING: You need at least version 0.41 of the 'extra' package.\nTrying to install it automatically now.\n"
         endif
 
-    else
-        print warn
-        return 0
+        catch pkg install extra
+        if $error
+            print "ERROR: Fatal problem getting the 'extra' package."
+            print "Please install it manually and try again."
+            print "(Tests except 'CG' should still work,"
+            print "  otherwise expect more errors ahead...)"
+            return TRUE
+        endif
     endif
+
+    return FALSE
 end function
 
 ################
