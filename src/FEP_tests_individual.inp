@@ -465,9 +465,8 @@ function void doCGtest (bundle *b)
     elif b.k < 0 || (b.k != int(b.k))
         funcerr "lag number k must be non-negative integer"
     endif
-    scalar k = b.k	 # (scalar treated by gretl as 1x1 matrix, should be OK)
 
-    if !k && inbundle(b, "CGX")
+    if !b.k && inbundle(b, "CGX")
         print "You provide X [CGX] but set k=0 (lag order)."
         print "Please set k>0 for running the orthogonality test."
         print "(And make sure the CGX themselves are given without lags.)"
@@ -488,10 +487,10 @@ function void doCGtest (bundle *b)
     # or (c) orthogonality
     if !inbundle(b, "CGX")
         # no exogenous/orthogonality terms
-        matrices testout = CamDufStats(mE, k)
+        matrices testout = CamDufStats(mE, b.k)
     else
         # orthogonality test, with recursive median recentering
-        matrices testout = CamDufStats(mE ~ mCGX, k, 1)
+        matrices testout = CamDufStats(mE ~ mCGX, b.k, 1)
     endif
 
     ### process results
