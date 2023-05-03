@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.9, April 2023
+ version 2.10, April 2023
 \end_layout
 
 \begin_layout Abstract
@@ -14149,6 +14149,29 @@ status open
 Changelog
 \end_layout
 
+\begin_layout Itemize
+version 2.10 (May 2023)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Improve automatic handling of the required 
+\begin_inset Quotes eld
+\end_inset
+
+extra
+\begin_inset Quotes erd
+\end_inset
+
+ package (min.
+ version is 0.41)
+\end_layout
+
+\begin_layout Itemize
+Minor internal refactorings
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 version 2.9 (April 2023)
 \end_layout

@@ -161,7 +161,7 @@ function void doHPtest (bundle *b)
     endif
     set_verbatim_flag(&b)
 
-    # acommodate old variant
+    # accommodate old variant
     if inbundle(b, "strrob")
         string strrob = b.strrob
     else
@@ -313,7 +313,7 @@ function void doMZtest (bundle *b)
     set_robust_flag(&b)
     set_verbatim_flag(&b)
 
-    # acommodate old variant
+    # accommodate old variant
     if inbundle(b, "strrob")
         string strrob = b.strrob
     else
@@ -427,8 +427,6 @@ end function
 ##############
 
 function void doCGtest (bundle *b)
-    # consolidating all CG test variants
-
     /* Computes both Campbell & Ghysels sign and signed rank
        (Wilcoxon-type) nonparam. statistics,
        going back to Campbell & Dufour who also showed that in
@@ -444,6 +442,8 @@ function void doCGtest (bundle *b)
 
        # Additional assumption that E is symmetric about 0 under the null
     */
+
+    checkextra()
 
     # handle various ways to provide the needed input
     if inbundle(b, "y") && inbundle(b, "fc")
@@ -465,9 +465,8 @@ function void doCGtest (bundle *b)
     elif b.k < 0 || (b.k != int(b.k))
         funcerr "lag number k must be non-negative integer"
     endif
-    scalar k = b.k	 # (scalar treated by gretl as 1x1 matrix, should be OK)
 
-    if !k && inbundle(b, "CGX")
+    if !b.k && inbundle(b, "CGX")
         print "You provide X [CGX] but set k=0 (lag order)."
         print "Please set k>0 for running the orthogonality test."
         print "(And make sure the CGX themselves are given without lags.)"
@@ -488,10 +487,10 @@ function void doCGtest (bundle *b)
     # or (c) orthogonality
     if !inbundle(b, "CGX")
         # no exogenous/orthogonality terms
-        matrices testout = CamDufStats(mE, k)
+        matrices testout = CamDufStats(mE, b.k)
     else
         # orthogonality test, with recursive median recentering
-        matrices testout = CamDufStats(mE ~ mCGX, k, 1)
+        matrices testout = CamDufStats(mE ~ mCGX, b.k, 1)
     endif
 
     ### process results
@@ -512,36 +511,28 @@ function void doCGtest (bundle *b)
         # (again, because of symmetry)
     endif
 
-    ## signed rank test
+    # signed rank test
     if !inbundle(b, "CGX") # serial correlation, or unbiasedness
         # here we can use the standard variant
         scalar b.CGWILCstat = testout[3][1,1]
 
     else	# orthogonality test
-        #... must use Campbell&Dufour's special signed-rank variant
+        #... must use Campbell & Dufour's special signed-rank variant
         # (we argue that strict exogeneity is very unrealistic)
         scalar b.CGWILCstat = testout[2][1,1]
     endif
 
-    ## p-value calc with functions from extra
-    err = loadextra()
-    if !err
-        if b.CGWILCstat < (T * (T + 1) / 2 / 2) # left tail
-            # (force X > x by passing x' = x+1 since this func does >= x)
-            temp = WSRpvalue(T, b.CGWILCstat + 1)
-            b.CGWILCpval = 2 * (1 - temp) # because of symmetry
-
-        else # right tail
-            # (this func does X >= x)
-            b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
-        endif
-
-    else	# extra.gfn package not available/loadable
-        scalar b.CGWILCpval = NA
+    # p-value calculation with functions from the "extra" package
+    if b.CGWILCstat < (T * (T + 1) / 2 / 2) # left tail
+        # (force X > x by passing x' = x+1 since this func does >= x)
+        temp = WSRpvalue(T, b.CGWILCstat + 1)
+        b.CGWILCpval = 2 * (1 - temp) # because of symmetry
+    else # right tail
+        # (this func does X >= x)
+        b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
     endif
 
     if b.verb
-        CGprint(&b)	# (lives in FEP_private.inp)
+        CGprint(&b)	    # (lives in FEP_private.inp)
     endif
-
-end function # doCGtest
+end function

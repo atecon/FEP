@@ -1,10 +1,10 @@
 author = Artur Tarassow and Sven Schreiber
 email = atecon@posteo.de
-version = 2.9
-date = 2023-04-03
+version = 2.91
+date = 2023-05-03
 description = Forecast Evaluation Package
 tags = C12 C52 C53
-min-version = 2020c
+min-version = 2021a
 data-requirement = no-data-ok
 public = doKS doEKTtest doHPtest applyFCtests doDLtest \
   getLoss doMZtest doPTtest \
@@ -20,3 +20,4 @@ gui-main = GUI_FEP
 bundle-print = GUI_FEP_print
 menu-attachment = MAINWIN/View
 label = Forecast evaluations
+depends = extra

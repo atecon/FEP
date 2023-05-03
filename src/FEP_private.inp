@@ -41,48 +41,19 @@ function void check_series_in_b (const bundle b, const string which)
 end function
 
 
-function scalar loadextra(void)
-    # Pull in the extra pkg for the Wilcoxon p-values
-    # needed in the doCGtest
+function void checkextra (void)
+    /* Check whether the minimum version of the `extra` package for computing Wilcoxon p-values is actually installed. Otherwise error.
 
-    # (Until extra.gfn allows introspection for its version,
-    # we use this warning workaround).
-    string warn = "(FEP needs extra.gfn version 0.41 or higher."
-    warn = sprintf("%s\nOtherwise expect errors,", warn)
-    warn = sprintf("%s then install a newer version of 'extra'.)\n", warn)
+    Returns: Nothing
+    */
 
-    catch include extra.gfn
-    if $error
-        catch pkg install extra
-        if $error
-            print "Fatal problem getting the 'extra' package."
-            print "Please install it manually and try again."
-            print "(Tests except CG should still work,"
-            print "  otherwise expect more errors ahead...)"
-            return 2
+    scalar MIN_VERSION = 0.41
+    pkg query extra --quiet
 
-        else
-            catch include extra.gfn
-            if $error
-                print "Fatal error loading the 'extra' package."
-                print "(Tests except CG should still work,"
-                print "  otherwise expect more errors ahead...)"
-                return 1
-
-            else
-                print warn
-                return 0
-            endif
-
-        endif
-
-    else
-        print warn
-        return 0
-    endif
+    errorif($result.version < MIN_VERSION,
+            sprintf("Please update the 'extra' package. Minimum version is %.g", MIN_VERSION))
 end function
 
-################
 
 function scalar check_y_fc_length (const series y, const list fc)
     /* Check number of valid observations. Needed for ForecastMetrics(). */

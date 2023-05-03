@@ -28,7 +28,7 @@ b.robust = 1
 b.verb = 1
 applyFCtests(&b, "HP")
 print b
-   
+
 #------------------
 # CG tests
 #------------------
@@ -41,8 +41,11 @@ else
     series E = y - fc	# define on your own the forecast errors
     b.E = E
 endif
-b.k = 0						# k=0-->Test on unbiasedness (default); k>0 for efficiency test (serial correlation)
-# b.CGX = time				# add conditional regressor -- will call the orthogonality test iff k>0
+# k=0-->Test on unbiasedness (default); k>0 for efficiency test
+# (serial correlation)
+b.k = 0
+# add conditional regressor -- will call the orthogonality test iff k>0
+# b.CGX = time
 b.verb = 1					# 1=print details
 applyFCtests(&b, "CG")
 print b
