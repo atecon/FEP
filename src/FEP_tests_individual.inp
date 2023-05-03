@@ -443,6 +443,8 @@ function void doCGtest (bundle *b)
        # Additional assumption that E is symmetric about 0 under the null
     */
 
+    checkextra()
+
     # handle various ways to provide the needed input
     if inbundle(b, "y") && inbundle(b, "fc")
         series E = b.y - b.fc
@@ -521,18 +523,13 @@ function void doCGtest (bundle *b)
     endif
 
     # p-value calculation with functions from the "extra" package
-    scalar err = loadextra()
-    if err == FALSE
-        if b.CGWILCstat < (T * (T + 1) / 2 / 2) # left tail
-            # (force X > x by passing x' = x+1 since this func does >= x)
-            temp = WSRpvalue(T, b.CGWILCstat + 1)
-            b.CGWILCpval = 2 * (1 - temp) # because of symmetry
-        else # right tail
-            # (this func does X >= x)
-            b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
-        endif
-    else
-        scalar b.CGWILCpval = NA
+    if b.CGWILCstat < (T * (T + 1) / 2 / 2) # left tail
+        # (force X > x by passing x' = x+1 since this func does >= x)
+        temp = WSRpvalue(T, b.CGWILCstat + 1)
+        b.CGWILCpval = 2 * (1 - temp) # because of symmetry
+    else # right tail
+        # (this func does X >= x)
+        b.CGWILCpval = 2 * WSRpvalue(T, b.CGWILCstat) # again, symmetry
     endif
 
     if b.verb

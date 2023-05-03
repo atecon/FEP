@@ -41,37 +41,19 @@ function void check_series_in_b (const bundle b, const string which)
 end function
 
 
-function scalar loadextra (void)
-    /* Load the `extra` package for computing Wilcoxon p-values needed in the `doCGtest`.
+function void checkextra (void)
+    /* Check whether the minimum version of the `extra` package for computing Wilcoxon p-values is actually installed. Otherwise error.
 
-    Returns:
-        - FALSE (scalar): Returns false if the package is successfully loaded.
-        - TRUE (scalar): Returns TRUE if the package version is less than v0.41 or the package cannot be installed/ updated automatically.
+    Returns: Nothing
     */
 
+    scalar MIN_VERSION = 0.41
     pkg query extra --quiet
 
-    if ($result.version < 0.41) || (nelem($result) == 0)
-        # $result-bundle is empty if pkg. is not installed locally
-
-        if $result.version < 0.41
-            printf "WARNING: You need at least version 0.41 of the 'extra' package.\nTrying to install it automatically now.\n"
-        endif
-
-        catch pkg install extra
-        if $error
-            print "ERROR: Fatal problem getting the 'extra' package."
-            print "Please install it manually and try again."
-            print "(Tests except 'CG' should still work,"
-            print "  otherwise expect more errors ahead...)"
-            return TRUE
-        endif
-    endif
-
-    return FALSE
+    errorif($result.version < MIN_VERSION,
+            sprintf("Please update the 'extra' package. Minimum version is %.g", MIN_VERSION))
 end function
 
-################
 
 function scalar check_y_fc_length (const series y, const list fc)
     /* Check number of valid observations. Needed for ForecastMetrics(). */
