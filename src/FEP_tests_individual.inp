@@ -499,7 +499,7 @@ function void doCGtest (bundle *b)
     ## sign test
     scalar b.CGSIGNstat = testout[1][1,1]
 
-    b.CGSIGNstat = pvalue_two_sided_signtest(T, b.CGSIGNstat)
+    b.CGSIGNpval = pvalue_two_sided_signtest(T, b.CGSIGNstat)
 
     # signed rank test
     if !inbundle(b, "CGX") # serial correlation, or unbiasedness
