@@ -394,9 +394,9 @@ end function
 
 # ---------------------------------------------
 
-function matrices CamDufStats( matrix mdat,
-                              matrix whichlags[null], int recenter[0:2:0])
-    # (switched the arg ordering ...)
+function matrices CamDufStats (matrix mdat,
+                               matrix whichlags[null],
+                               int recenter[0:2:0])
     /*
        Function to calculate the test statistics from
        Campbell & Dufour 1995 (C&D), which are sign statistics
