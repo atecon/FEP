@@ -4,16 +4,18 @@ set -e
 DIR=$(dirname $(realpath "$0")) 	# locate folder where this sh-script is located in
 
 PROJECT="FEP"
-SCRIPT_1="./tests/test_forecast_metrics.inp"
+
+FILELIST="./tests/test_forecast_metrics.inp \
+          ./tests/test_private.inp"
 
 
 cd $DIR
 echo "Switched to ${DIR}"
 
 
-# Execute scripts
-gretlcli -b -e -q ${SCRIPT_1}
-
+for f in ${FILELIST};
+  do gretlcli -b -e -q ${f}
+done;
 
 if [ $? -eq 0 ]
 then
