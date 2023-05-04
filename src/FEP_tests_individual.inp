@@ -499,24 +499,7 @@ function void doCGtest (bundle *b)
     ## sign test
     scalar b.CGSIGNstat = testout[1][1,1]
 
-    # Binomial dist
-    if b.CGSIGNstat < T/2       # left tail of the distribution (for odd and even T)
-        # (gretl does X <= x with cdf)
-        b.CGSIGNpval = 2 * cdf(B, 0.5, T, b.CGSIGNstat) # because of symmetry under p=0.5
-
-    elif b.CGSIGNstat == T/2    # center 
-        b.CGSIGNpval = 1
-
-    else	# right tail
-        # (force X >= x by passing x' = x-1, since gretl does X > x with pvalue)
-        b.CGSIGNpval = 2 * pvalue(B, 0.5, T, b.CGSIGNstat - 1)
-        # (again, because of symmetry)
-
-        if b.CGSIGNstat > T 
-            # (the pvalue will be NA in this case)
-            printf "Warning: stat %d out of range for %d trials!\n", b.CGSIGNstat, T 
-        endif 
-    endif
+    b.CGSIGNstat = pvalue_two_sided_signtest(T, b.CGSIGNstat)
 
     # signed rank test
     if !inbundle(b, "CGX") # serial correlation, or unbiasedness
