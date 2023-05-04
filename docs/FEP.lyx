@@ -131,7 +131,7 @@ based on FEP
 
 \end_inset
 
- version 2.10, April 2023
+ version 2.91, May 2023
 \end_layout
 
 \begin_layout Abstract
@@ -14150,7 +14150,7 @@ Changelog
 \end_layout
 
 \begin_layout Itemize
-version 2.10 (May 2023)
+version 2 .91 (May 2023)
 \end_layout
 
 \begin_deeper
@@ -14165,6 +14165,14 @@ extra
 
  package (min.
  version is 0.41)
+\end_layout
+
+\begin_layout Itemize
+Bugfix: Computing two-sided Sign test for 
+\family typewriter
+doCGtest()
+\family default
+ was wrong in some case
 \end_layout
 
 \begin_layout Itemize
