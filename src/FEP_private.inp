@@ -479,6 +479,55 @@ function matrix rattest (matrix Y,
 end function
 
 
+function scalar pvalue_two_sided_signtest (const int T[1::],
+                                           const scalar teststat)
+    /* Computes the p-value for a sign test using a two-sided alternative.
+
+    Args:
+        T (int]): the number of trials.
+        teststat (scalar): the sign test statistic.
+
+    The forecast error is E = Y - F.
+    Under the null H0: p=0.5 (equal probability which implies that the median of E is zero.
+
+    W is the number of pairs that E > 0. If H0 is true, then W follows a
+    binomial distribution W ~ b(T, 0.5).
+
+    The left-tail value is computed by Pr(W ≤ w), which is the p-value for the
+    alternative H1: p < 0.50. This alternative means that the F measurements
+    tend to be higher.
+
+    The right-tail value is computed by Pr(W ≥ w), which is the p-value for
+    the alternative H1: p > 0.50. This alternative means that the Y
+    measurements tend to be higher.
+
+    For a two-sided alternative H1 the p-value is twice the smaller tail-value.
+
+    The C&G test is two-sided: H0: Median of E = 0, H1: Median of E != 0
+
+    Source: https://en.wikipedia.org/wiki/Sign_test
+    */
+
+    if teststat > T
+        printf "Warning: stat %d out of range for %d trials!\n", teststat, T
+        return NA
+    elif teststat < T/2
+        # left tail of the distribution (for odd and even T)
+        # (gretl does X <= x with cdf())
+        # because of symmetry under p=0.5
+        scalar pval = 2 * cdf(B, 0.5, T, teststat)
+    elif teststat == T/2    # center
+        scalar pval = 1
+    else                    # right tail
+        # (force X >= x by passing x' = x-1, since gretl does
+        # X > x with pvalue) because of symmetry under p=0.5
+        scalar pval = 2 * pvalue(B, 0.5, T, teststat - 1)
+    endif
+
+    return pval
+end function
+
+
 /*
 # not needed anymore, replaced by native lrcovar
 

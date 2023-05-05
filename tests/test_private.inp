@@ -1,0 +1,40 @@
+set verbose off
+clear
+
+set assert stop
+include assertion.gfn
+
+include "./src/FEP.inp" --force
+
+
+bundles Params = null
+Params = Params + _(T=100, teststat = 50, expected = 1)
+Params = Params + _(T=100, teststat = 101, expected = NA)
+Params = Params + _(T=100, teststat = 25,
+                    expected = 2 * cdf(B, 0.5, 100, 25))
+Params = Params + _(T=100, teststat = 60,
+                    expected = 2 * pvalue(B, 0.5, 100, 60 - 1))
+
+Params = Params + _(T=10, teststat = 8, expected = 0.109375)
+
+function void test_pvalue_two_sided_signtest (const bundles P)
+    print "Start testing function pvalue_two_sided_signtest()."
+
+    loop foreach i P
+        # Given + When
+        scalar actual = pvalue_two_sided_signtest(P[i].T, P[i].teststat)
+
+        # Then
+        if ok(actual) && ok(P[i].expected)
+            assert_almost_equal_num(actual, P[i].expected, 10e-7)
+        elif !ok(actual) && !ok(P[i].expected)
+            print "assertion is OK"
+        else
+            assert(TRUE == FALSE)
+        endif
+    endloop
+end function
+test_pvalue_two_sided_signtest(Params)
+
+
+printf "\nInfo: All tests passed.\n"
