@@ -141,6 +141,9 @@ function void doGWtest (bundle *b)
         h_inst += lossdiff(-b.fhor)
 
         # add additional regressors
+        # TODO: maybe check and complain if a newly added regressor 
+        # is equal to an already existing one?
+        
         if inbundle(b, "z")
             # compatibility for matrix input of z
             if typestr(typeof(b.z)) == "matrix"
@@ -162,7 +165,7 @@ function void doGWtest (bundle *b)
 
     # create the reg matrix given by lossdiff*ht', where ht is matrix of
     # instruments
-    list reg = null
+    list reg
     loop foreach i h_inst 
         series r$i = h_inst.$i * lossdiff
         reg += r$i
@@ -175,6 +178,10 @@ function void doGWtest (bundle *b)
         scalar teststat = $T * $rsq	   # this only works for fhor=1!
     else
         set hac_lag (b.fhor - 1)
+        # FIXME: according to GW on p.1557, in the unconditional case 
+        # the hac_lag must grow with the sample size, so we should use the 
+        # fixed b.fhor-1 only for the *conditional* case, not always.
+         
         matrix zbar = meanc({reg})'
         matrix omega = lrcovar({reg})
         scalar teststat = T * qform(zbar', invpd(omega))

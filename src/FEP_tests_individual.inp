@@ -171,7 +171,7 @@ function void doHPtest (bundle *b)
     # compatibility for matrix input of z
     if typestr(typeof(b.z)) == "matrix"
         matrix mz = b.z
-        list Z = null
+        list Z
         loop i = 1..cols(mz)
             series S$i = mz[,i]
             Z += S$i

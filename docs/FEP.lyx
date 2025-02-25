@@ -1,16 +1,16 @@
-#LyX 2.3 created this file. For more info see http://www.lyx.org/
-\lyxformat 544
+#LyX 2.4 created this file. For more info see https://www.lyx.org/
+\lyxformat 620
 \begin_document
 \begin_header
 \save_transient_properties true
 \origin unavailable
 \textclass article
 \use_default_options true
-\maintain_unincluded_children false
+\maintain_unincluded_children no
 \language english
 \language_package babel
-\inputencoding auto
-\fontencoding global
+\inputencoding auto-legacy
+\fontencoding auto
 \font_roman "palatino" "default"
 \font_sans "default" "default"
 \font_typewriter "default" "default"
@@ -18,7 +18,9 @@
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
-\font_osf false
+\font_roman_osf false
+\font_sans_osf false
+\font_typewriter_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
 \use_microtype false
@@ -31,7 +33,7 @@
 \paperfontsize 11
 \spacing onehalf
 \use_hyperref false
-\papersize a4paper
+\papersize a4
 \use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
@@ -52,16 +54,18 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_formatted_ref 0
 \use_minted 0
+\use_lineno 0
 \branch nurWP
 \selected 0
 \filename_suffix 0
-\color #faf0e6
+\color background background
 \end_branch
 \branch nurDoku
 \selected 1
 \filename_suffix 0
-\color #faf0e6
+\color background background
 \end_branch
 \index Index
 \shortcut idx
@@ -82,12 +86,17 @@
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
+\tablestyle default
 \listings_params "basicstyle={\footnotesize\ttfamily}"
 \tracking_changes false
 \output_changes false
+\change_bars false
+\postpone_fragile_content false
 \html_math_output 0
 \html_css_as_file 0
 \html_be_strict false
+\docbook_table_output 0
+\docbook_mathml_prefix 1
 \end_header
 
 \begin_body
@@ -104,7 +113,8 @@ Artur Tarassow and Sven Schreiber
 status open
 
 \begin_layout Plain Layout
-Tarassow: atecon@posteo.de,
+Tarassow:
+ atecon@posteo.de,
 \begin_inset Newline newline
 \end_inset
 
@@ -112,7 +122,9 @@ Tarassow: atecon@posteo.de,
 \begin_inset Newline newline
 \end_inset
 
- Schreiber: IMK Düsseldorf and Free University Berlin, econ.svens.de.
+ Schreiber:
+ IMK Düsseldorf and Free University Berlin,
+ econ.svens.de.
 \end_layout
 
 \end_inset
@@ -131,7 +143,8 @@ based on FEP
 
 \end_inset
 
- version 2.91, May 2023
+ version 2.92,
+ Februar 2025
 \end_layout
 
 \begin_layout Abstract
@@ -143,14 +156,11 @@ FEP
 \emph on
 gretl
 \emph default
- program is a collection of functions for computing different types of forecast
- evaluation statistics as well as tests.
- For ease of use a common scripting interface framework is provided, which
- is flexible enough to accommodate future additions.
- Most of the functionality is also accessible through a graphical dialog
- window interface within gretl.
- This documentation explains the usage and capabilities as well as providing
- some econometric background where necessary.
+ program is a collection of functions for computing different types of forecast evaluation statistics as well as tests.
+ For ease of use a common scripting interface framework is provided,
+ which is flexible enough to accommodate future additions.
+ Most of the functionality is also accessible through a graphical dialog window interface within gretl.
+ This documentation explains the usage and capabilities as well as providing some econometric background where necessary.
  An illustration with expert forecasts of euro area growth is also provided.
 \end_layout
 
@@ -172,8 +182,7 @@ The
 \family typewriter
 FEP
 \family default
- function package is a collection of gretl functions for computing different
- types of forecast evaluation statistics as well as tests.
+ function package is a collection of gretl functions for computing different types of forecast evaluation statistics as well as tests.
  
 \begin_inset Branch nurWP
 inverted 0
@@ -184,10 +193,9 @@ status collapsed
 \emph on
 Gretl
 \emph default
- is an open-source econometrics and statistics program that offers both
- a command line and a graphical menu-driven interface.
- Its core functions are implemented in C, but it also comprises a versatile
- scripting and matrix language named 
+ is an open-source econometrics and statistics program that offers both a command line and a graphical menu-driven interface.
+ Its core functions are implemented in C,
+ but it also comprises a versatile scripting and matrix language named 
 \emph on
 hansl
 \emph default
@@ -213,6 +221,7 @@ http://gretl.sf.net
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Included-functions"
+nolink "false"
 
 \end_inset
 
@@ -221,13 +230,13 @@ reference "tab:Included-functions"
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Menu-driven-(GUI)-usage"
+nolink "false"
 
 \end_inset
 
- we explain the easy usage from gretl's menu-driven interface (GUI), but
- until then we focus on the scripting way of performing the analysis.
- A function package can be downloaded and installed simply by invoking the
- install option of the pkg command:
+ we explain the easy usage from gretl's menu-driven interface (GUI),
+ but until then we focus on the scripting way of performing the analysis.
+ A function package can be downloaded and installed simply by invoking the install option of the pkg command:
 \end_layout
 
 \begin_layout LyX-Code
@@ -235,8 +244,9 @@ pkg install FEP
 \end_layout
 
 \begin_layout Standard
-Then, in each work session, as with all function packages the FEP package
- needs to be loaded by:
+Then,
+ in each work session,
+ as with all function packages the FEP package needs to be loaded by:
 \end_layout
 
 \begin_layout LyX-Code
@@ -245,6 +255,8 @@ include FEP.gfn
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -574,8 +586,7 @@ CG
 \begin_inset Text
 
 \begin_layout Plain Layout
-Campbell-Ghysels sign or signed rank (Wilcoxon type) tests for unbiasedness
- or efficiency of forecasts
+Campbell-Ghysels sign or signed rank (Wilcoxon type) tests for unbiasedness or efficiency of forecasts
 \end_layout
 
 \end_inset
@@ -613,8 +624,8 @@ EKT
 \begin_inset Text
 
 \begin_layout Plain Layout
-Elliott, Komunjer & Timmermann test of forecast rationality under flexible
- loss
+Elliott,
+ Komunjer & Timmermann test of forecast rationality under flexible loss
 \end_layout
 
 \end_inset
@@ -890,8 +901,7 @@ PS
 \begin_inset Text
 
 \begin_layout Plain Layout
-calculate the log and quadratic probability scores for forecasts of binary
- outcomes
+calculate the log and quadratic probability scores for forecasts of binary outcomes
 \end_layout
 
 \end_inset
@@ -914,8 +924,7 @@ The applyFCtests() function
 \end_layout
 
 \begin_layout Standard
-This is a convenient top-level function which calls the other test functions
- in the background as needed.
+This is a convenient top-level function which calls the other test functions in the background as needed.
  The standard workflow is to define the needed gretl bundle
 \begin_inset Foot
 status collapsed
@@ -929,15 +938,14 @@ bundle
 \begin_inset Quotes erd
 \end_inset
 
- is a flexible gretl datatype which is basically a collection of other gretl
- objects.
+ is a flexible gretl datatype which is basically a collection of other gretl objects.
  See Section 10.7 of the gretl user guide (as of November 2017).
 \end_layout
 
 \end_inset
 
- with your input data and choices, and then call this function with the
- appropriate string code.
+ with your input data and choices,
+ and then call this function with the appropriate string code.
  Here's an example with the Mincer-Zarnowitz test:
 \end_layout
 
@@ -954,7 +962,8 @@ series b.fc = myforecast # ditto
 \end_layout
 
 \begin_layout LyX-Code
-applyFCtests(&b, 
+applyFCtests(&b,
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -971,8 +980,9 @@ The first three lines set up the bundle and put some relevant data in it.
 status collapsed
 
 \begin_layout Plain Layout
-If you're obsessed with saving lines of code, you might instead use something
- like the following: 
+If you're obsessed with saving lines of code,
+ you might instead use something like the following:
+ 
 \family typewriter
 
 \begin_inset Newline newline
@@ -986,7 +996,8 @@ y
 \begin_inset Quotes erd
 \end_inset
 
-,growth, 
+,growth,
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1022,21 +1033,20 @@ fc
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Bundle-members-needed"
+nolink "false"
 
 \end_inset
 
- for the possible and/or necessary bundle elements and their names, which
- depends on the test that you wish to perform.
- It is possible to store additional elements in the bundle that are not
- used by a certain test.
- Therefore you can set up the bundle once and then pass it around as an
- input to various tests.
+ for the possible and/or necessary bundle elements and their names,
+ which depends on the test that you wish to perform.
+ It is possible to store additional elements in the bundle that are not used by a certain test.
+ Therefore you can set up the bundle once and then pass it around as an input to various tests.
 \end_layout
 
 \begin_layout Standard
-In the last line some things are noteworthy: The applyFCtests() function
- does not have any return value, so the function call stands for itself
- without any assignment to a variable.
+In the last line some things are noteworthy:
+ The applyFCtests() function does not have any return value,
+ so the function call stands for itself without any assignment to a variable.
  The results of the tests are instead added to the bundle (
 \begin_inset Quotes eld
 \end_inset
@@ -1046,9 +1056,9 @@ b
 \end_inset
 
  here) that is passed to the function.
- To actually enable the function to change the input bundle we need to pass
- it in so-called pointer form, which just means to prepend the ampersand
- character: 
+ To actually enable the function to change the input bundle we need to pass it in so-called pointer form,
+ which just means to prepend the ampersand character:
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1069,42 +1079,46 @@ Function programming details
 \begin_inset Quotes erd
 \end_inset
 
-, Section 13.4 of the gretl user guide (as of November 2017).
+,
+ Section 13.4 of the gretl user guide (as of November 2017).
 \end_layout
 
 \end_inset
 
- Finally, a string code must be specified to indicate which test should
- be run, where the possible codes are given in Table 
+ Finally,
+ a string code must be specified to indicate which test should be run,
+ where the possible codes are given in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Included-functions"
+nolink "false"
 
 \end_inset
 
 .
- There appear also some supplementary functions in that table which do not
- have a string code; those functions have to be called directly and cannot
- be accessed through applyFCtests().
- On the other hand, several string codes may be included in a single call
- to applyFCtests(), separated by spaces.
+ There appear also some supplementary functions in that table which do not have a string code;
+ those functions have to be called directly and cannot be accessed through applyFCtests().
+ On the other hand,
+ several string codes may be included in a single call to applyFCtests(),
+ separated by spaces.
 \end_layout
 
 \begin_layout Standard
-If the function is called like this, then there will typically be some printed
- output showing the test results.
- The details depend on the respective background function, see the corresponding
- documentation below.
- The other possibility to access the results is to inspect the new members
- that are added to the bundle.
- Again, see the documentation below to learn which new members each function
- adds to the bundle.
+If the function is called like this,
+ then there will typically be some printed output showing the test results.
+ The details depend on the respective background function,
+ see the corresponding documentation below.
+ The other possibility to access the results is to inspect the new members that are added to the bundle.
+ Again,
+ see the documentation below to learn which new members each function adds to the bundle.
 \end_layout
 
 \begin_layout Standard
 
 \size small
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways true
 status open
@@ -1289,7 +1303,8 @@ series inputs ([
 \begin_inset space \thinspace{}
 \end_inset
 
-]: optional)
+]:
+ optional)
 \end_layout
 
 \end_inset
@@ -1556,7 +1571,8 @@ fc
 \begin_layout Plain Layout
 
 \size small
-f1, f2
+f1,
+ f2
 \end_layout
 
 \end_inset
@@ -1567,7 +1583,8 @@ f1, f2
 \begin_layout Plain Layout
 
 \size small
-f1, f2
+f1,
+ f2
 \end_layout
 
 \end_inset
@@ -1578,7 +1595,8 @@ f1, f2
 \begin_layout Plain Layout
 
 \size small
-f1, f2
+f1,
+ f2
 \end_layout
 
 \end_inset
@@ -1651,7 +1669,8 @@ fc
 \begin_layout Plain Layout
 
 \size small
-Forecast errors (replaces y, fc)
+Forecast errors (replaces y,
+ fc)
 \end_layout
 
 \end_inset
@@ -3881,7 +3900,9 @@ Loss drawing
 \align left
 
 \size small
-Notes: (*: EKT refers to the doEKTtest() variant.
+Notes:
+ (*:
+ EKT refers to the doEKTtest() variant.
  For the matrix-based variant doEKTtest_matrix() see the source code.)
 \end_layout
 
@@ -3913,7 +3934,8 @@ robust
 \begin_layout Plain Layout
 
 \size small
-can be 0 (default) or 1 (use HAC/robust SE); 
+can be 0 (default) or 1 (use HAC/robust SE);
+ 
 \end_layout
 
 \end_inset
@@ -3938,7 +3960,9 @@ loss
 \begin_layout Plain Layout
 
 \size small
-can be 1 (U-shape, default) or 2 (V-shape); 
+can be 1 (U-shape,
+ default) or 2 (V-shape);
+ 
 \end_layout
 
 \end_inset
@@ -3963,7 +3987,8 @@ cond
 \begin_layout Plain Layout
 
 \size small
-can be 0 (unconditional test, default) or 1 (conditional test)
+can be 0 (unconditional test,
+ default) or 1 (conditional test)
 \end_layout
 
 \end_inset
@@ -3988,7 +4013,9 @@ verb
 \begin_layout Plain Layout
 
 \size small
-can be 0 (no details, default) or 1 (print details); 
+can be 0 (no details,
+ default) or 1 (print details);
+ 
 \end_layout
 
 \end_inset
@@ -4021,7 +4048,8 @@ no
 \begin_inset Quotes erd
 \end_inset
 
- (default), 
+ (default),
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4029,7 +4057,9 @@ display
 \begin_inset Quotes erd
 \end_inset
 
-, or consist of path + filename; 
+,
+ or consist of path + filename;
+ 
 \end_layout
 
 \end_inset
@@ -4054,7 +4084,8 @@ fcup
 \begin_layout Plain Layout
 
 \size small
-is binary, not a probability;
+is binary,
+ not a probability;
 \end_layout
 
 \end_inset
@@ -4079,7 +4110,8 @@ k
 \begin_layout Plain Layout
 
 \size small
-can be 0 (default, no test on lags) or a positive (not too large) integer;
+can be 0 (default,
+ no test on lags) or a positive (not too large) integer;
  note that only a single lag is tested;
 \end_layout
 
@@ -4105,7 +4137,8 @@ a0
 \begin_layout Plain Layout
 
 \size small
-can be between 0 and 1 (non-integer, default 0.5).
+can be between 0 and 1 (non-integer,
+ default 0.5).
 \end_layout
 
 \end_inset
@@ -4138,13 +4171,16 @@ Calculate the (forecast error) loss
 \end_layout
 
 \begin_layout Standard
-The function getLoss() helps to calculate the forecast losses (disutilities)
- implied by the given forecast errors, according to various loss function
- assumptions such as lin-lin, square, linex, double linex.
+The function getLoss() helps to calculate the forecast losses (disutilities) implied by the given forecast errors,
+ according to various loss function assumptions such as lin-lin,
+ square,
+ linex,
+ double linex.
  See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:getLoss-–-forecast"
+nolink "false"
 
 \end_inset
 
@@ -4153,6 +4189,8 @@ reference "tab:getLoss-–-forecast"
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -4199,7 +4237,10 @@ Function
 \begin_layout Plain Layout
 
 \family typewriter
-getLoss(matrix fce, string LF[null], matrix param[null], matrix realiz[null])
+getLoss(matrix fce,
+ string LF[null],
+ matrix param[null],
+ matrix realiz[null])
 \end_layout
 
 \end_inset
@@ -4297,11 +4338,13 @@ fce
 \begin_inset Text
 
 \begin_layout Plain Layout
-T by k matrix of forecast errors; if 
+T by k matrix of forecast errors;
+ if 
 \emph on
 realiz
 \emph default
- is given, 
+ is given,
+ 
 \emph on
 fce
 \emph default
@@ -4338,7 +4381,8 @@ LF
 \begin_inset Text
 
 \begin_layout Plain Layout
-specify loss function: "ll" (or 
+specify loss function:
+ "ll" (or 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4346,7 +4390,12 @@ linlin
 \begin_inset Quotes erd
 \end_inset
 
-), "qq" (or "quadquad"), "sq" (or "square", default), "abs", "linex" (Varian),
+),
+ "qq" (or "quadquad"),
+ "sq" (or "square",
+ default),
+ "abs",
+ "linex" (Varian),
  "dlinex" (or "dle") for double linex (Granger)
 \end_layout
 
@@ -4382,7 +4431,9 @@ param
 
 \begin_layout Plain Layout
 \noindent
-loss function parameter(s), default 0.5; 
+loss function parameter(s),
+ default 0.5;
+ 
 \emph on
 param
 \emph default
@@ -4439,8 +4490,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-Returns a matrix with forecast error losses, of the same (T x k) dimension
- as the input matrix.
+Returns a matrix with forecast error losses,
+ of the same (T x k) dimension as the input matrix.
 \end_layout
 
 \end_inset
@@ -4476,7 +4527,8 @@ literal "true"
 
 \end_inset
 
-, 
+,
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Granger1999doublelinex"
@@ -4507,13 +4559,14 @@ literal "true"
 \end_layout
 
 \begin_layout Plain Layout
-Notes: About input format for 
+Notes:
+ About input format for 
 \emph on
 param:
+
 \emph default
- For gretl versions until 2017a scalar values must explicitly be provided
- as a pseudo matrix (e.g {0.4}) while for later versions, gretl accepts a
- scalar as a 1x1 matrix.
+ For gretl versions until 2017a scalar values must explicitly be provided as a pseudo matrix (e.g {0.4}) while for later versions,
+ gretl accepts a scalar as a 1x1 matrix.
  
 \end_layout
 
@@ -4527,12 +4580,12 @@ Draw some loss functions
 \end_layout
 
 \begin_layout Standard
-Draw a single (DrawLoss) or two (DrawLoss2) loss functions and their associated
- confidence intervals.
+Draw a single (DrawLoss) or two (DrawLoss2) loss functions and their associated confidence intervals.
  See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:drawloss"
+nolink "false"
 
 \end_inset
 
@@ -4541,6 +4594,8 @@ reference "tab:drawloss"
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -4586,7 +4641,10 @@ Function
 \begin_layout Plain Layout
 
 \family typewriter
-DrawLoss(int p, scalar aT, scalar V, string fpath[null])
+DrawLoss(int p,
+ scalar aT,
+ scalar V,
+ string fpath[null])
 \end_layout
 
 \end_inset
@@ -4648,9 +4706,12 @@ Function arguments
 \begin_layout Plain Layout
 int 
 \emph on
-p: 
+p:
+ 
 \emph default
-loss function type, 1 = lin-lin, 2 = quad-quad
+loss function type,
+ 1 = lin-lin,
+ 2 = quad-quad
 \end_layout
 
 \end_inset
@@ -4673,6 +4734,7 @@ loss function type, 1 = lin-lin, 2 = quad-quad
 scalar 
 \emph on
 aT:
+
 \emph default
  loss function shape parameter 
 \begin_inset Formula $\alpha\in[0,\,1]$
@@ -4702,7 +4764,8 @@ scalar
 \emph on
 V
 \emph default
-: estimated variance of 
+:
+ estimated variance of 
 \emph on
 aT
 \end_layout
@@ -4728,8 +4791,8 @@ string
 \emph on
 fpath
 \emph default
- (optional): null = display figure (default) or provide complete "path+file
- name" to store figure
+ (optional):
+ null = display figure (default) or provide complete "path+file name" to store figure
 \end_layout
 
 \end_inset
@@ -4785,8 +4848,12 @@ Function
 \begin_layout Plain Layout
 
 \family typewriter
-DrawLoss2(int p, scalar aT1, scalar V1, scalar aT2, scalar V2, string fpath[null
-])
+DrawLoss2(int p,
+ scalar aT1,
+ scalar V1,
+ scalar aT2,
+ scalar V2,
+ string fpath[null])
 \end_layout
 
 \end_inset
@@ -4848,9 +4915,12 @@ Function arguments
 \begin_layout Plain Layout
 int 
 \emph on
-p: 
+p:
+ 
 \emph default
-loss function type, 1 = lin-lin, 2 = quad-quad
+loss function type,
+ 1 = lin-lin,
+ 2 = quad-quad
 \end_layout
 
 \end_inset
@@ -4873,6 +4943,7 @@ loss function type, 1 = lin-lin, 2 = quad-quad
 scalar 
 \emph on
 aT1:
+
 \emph default
  loss function shape parameter 
 \begin_inset Formula $\alpha\in[0,\,1]$
@@ -4902,7 +4973,8 @@ scalar
 \emph on
 V
 \emph default
-1: estimated variance of 
+1:
+ estimated variance of 
 \emph on
 aT1
 \end_layout
@@ -4927,6 +4999,7 @@ aT1
 scalar 
 \emph on
 aT2:
+
 \emph default
  loss function shape parameter 
 \begin_inset Formula $\alpha\in[0,\,1]$
@@ -4956,7 +5029,8 @@ scalar
 \emph on
 V
 \emph default
-2: estimated variance of 
+2:
+ estimated variance of 
 \emph on
 aT2
 \end_layout
@@ -4982,8 +5056,8 @@ string
 \emph on
 fpath
 \emph default
- (optional): null = display figure (default) or provide complete "path+file
- name" to store figure
+ (optional):
+ null = display figure (default) or provide complete "path+file name" to store figure
 \end_layout
 
 \end_inset
@@ -5046,15 +5120,14 @@ The (Hanssen-) Kuipers Score (KS) is used to evaluate binary outcomes.
 \end_inset
 
 .
- The KS is defined as the difference between the probability of detection
- (POD) and the probability of false detection (POFD).
+ The KS is defined as the difference between the probability of detection (POD) and the probability of false detection (POFD).
 \begin_inset Foot
 status open
 
 \begin_layout Plain Layout
 It seems that this terminology is not universal.
- Sometimes the POD might be called hit rate, whereas usually the hit rate
- denotes something else.
+ Sometimes the POD might be called hit rate,
+ whereas usually the hit rate denotes something else.
  Similarly with the POFD and the false alarm rate.
 \end_layout
 
@@ -5070,7 +5143,8 @@ It seems that this terminology is not universal.
 \end_inset
 
  is wrongly predicted.
- Thus, KS is defined as 
+ Thus,
+ KS is defined as 
 \begin_inset Formula $KS=POD-POFD$
 \end_inset
 
@@ -5079,6 +5153,7 @@ It seems that this terminology is not universal.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doKS–-Kuipers"
+nolink "false"
 
 \end_inset
 
@@ -5087,6 +5162,8 @@ reference "tab:doKS–-Kuipers"
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -5261,8 +5338,8 @@ yup
 \begin_inset Text
 
 \begin_layout Plain Layout
-binary-valued series of actuals that takes the value of unity for ups, otherwise
- zero
+binary-valued series of actuals that takes the value of unity for ups,
+ otherwise zero
 \end_layout
 
 \end_inset
@@ -5293,8 +5370,8 @@ fcup
 \begin_inset Text
 
 \begin_layout Plain Layout
-binary-valued forecast that takes the value of unity for ups, otherwise
- zero
+binary-valued forecast that takes the value of unity for ups,
+ otherwise zero
 \end_layout
 
 \end_inset
@@ -5325,7 +5402,8 @@ verb
 \begin_inset Text
 
 \begin_layout Plain Layout
- 0 = no printout, 1 = print details
+ 0 = no printout,
+ 1 = print details
 \end_layout
 
 \end_inset
@@ -5345,7 +5423,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-The following new elements are stored into the model bundle: 
+The following new elements are stored into the model bundle:
+ 
 \end_layout
 
 \end_inset
@@ -5378,7 +5457,8 @@ scalar
 \emph on
 KSstat
 \emph default
-: 
+:
+ 
 \end_layout
 
 \end_inset
@@ -5411,7 +5491,8 @@ matrix
 \emph on
 KSmat
 \emph default
-: 
+:
+ 
 \end_layout
 
 \end_inset
@@ -5480,23 +5561,24 @@ Probability scores – doPS() and probscore()
 \end_layout
 
 \begin_layout Standard
-The probscore() function computes forecast accuracy statistics used for
- probability forecasts.
- The observed outcome is still binary, but in contrast to the Kuipers score
- the forecast here is a continuous probability.
+The probscore() function computes forecast accuracy statistics used for probability forecasts.
+ The observed outcome is still binary,
+ but in contrast to the Kuipers score the forecast here is a continuous probability.
  See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:probscore"
+nolink "false"
 
 \end_inset
 
 .
- The doPS() function is just a thin wrapper around probscore that is harmonized
- with the evaluation test functions in the package; see Table 
+ The doPS() function is just a thin wrapper around probscore that is harmonized with the evaluation test functions in the package;
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doPS"
+nolink "false"
 
 \end_inset
 
@@ -5505,6 +5587,8 @@ reference "tab:doPS"
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -5550,7 +5634,8 @@ Function
 \begin_layout Plain Layout
 
 \family typewriter
-probscore(matrix y, matrix Pr)
+probscore(matrix y,
+ matrix Pr)
 \end_layout
 
 \end_inset
@@ -5614,8 +5699,8 @@ matrix
 \emph on
 y
 \emph default
-: binary-valued vector of actuals that takes the value of unity for ups
- and otherwise zero
+:
+ binary-valued vector of actuals that takes the value of unity for ups and otherwise zero
 \end_layout
 
 \end_inset
@@ -5639,7 +5724,8 @@ matrix
 \emph on
 Pr
 \emph default
-: vector of forecast probabilities
+:
+ vector of forecast probabilities
 \end_layout
 
 \end_inset
@@ -5659,7 +5745,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-2-element (1 by 2) vector with QPS, LPS
+2-element (1 by 2) vector with QPS,
+ LPS
 \end_layout
 
 \end_inset
@@ -5679,6 +5766,8 @@ Output
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -5853,8 +5942,8 @@ yup
 \begin_inset Text
 
 \begin_layout Plain Layout
-binary-valued series of actuals that takes the value of unity for ups, otherwise
- zero
+binary-valued series of actuals that takes the value of unity for ups,
+ otherwise zero
 \end_layout
 
 \end_inset
@@ -5909,7 +5998,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-The following new elements are stored into the model bundle: 
+The following new elements are stored into the model bundle:
+ 
 \end_layout
 
 \end_inset
@@ -6003,18 +6093,17 @@ Tools for point forecasts – ForecastMetrics()
 \end_layout
 
 \begin_layout Standard
-The ForecastMetrics() function comprises the computation of various evaluation
- metrics for point forecasts.
- For computation of five standard measures, we apply gretl's built-in function
- fcstats().
- In total twelve measures are currently implemented – for details see Table
- 
+The ForecastMetrics() function comprises the computation of various evaluation metrics for point forecasts.
+ For computation of five standard measures,
+ we apply gretl's built-in function fcstats().
+ In total twelve measures are currently implemented – for details see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Computations-of-point"
 plural "false"
 caps "false"
 noprefix "false"
+nolink "false"
 
 \end_inset
 
@@ -6035,6 +6124,7 @@ reference "tab:Point-forecast-measures"
 plural "false"
 caps "false"
 noprefix "false"
+nolink "false"
 
 \end_inset
 
@@ -6043,6 +6133,8 @@ noprefix "false"
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -6666,6 +6758,8 @@ MSLE
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -6711,7 +6805,8 @@ Function
 \begin_layout Plain Layout
 
 \family typewriter
-ForecastMetrics(series y, list fc)
+ForecastMetrics(series y,
+ list fc)
 \end_layout
 
 \end_inset
@@ -6775,7 +6870,8 @@ series
 \emph on
 y
 \emph default
-: series of actual outcomes
+:
+ series of actual outcomes
 \end_layout
 
 \end_inset
@@ -6795,7 +6891,8 @@ y
 \begin_inset Text
 
 \begin_layout Plain Layout
-list fc: list of 
+list fc:
+ list of 
 \emph on
 k
 \emph default
@@ -6894,21 +6991,23 @@ Unbiasedness is viewed as a joint test of
 \end_inset
 
 .
- (H0: Forecast is unbiased and efficient.
- H1: Forecast is biased and/or inefficient.) Usually the corresponding test
- statistics is compared with asymptotic critical values from the F-distribution.
+ (H0:
+ Forecast is unbiased and efficient.
+ H1:
+ Forecast is biased and/or inefficient.) Usually the corresponding test statistics is compared with asymptotic critical values from the F-distribution.
  
 \end_layout
 
 \begin_layout Standard
-However, remaining serial correlation in 
+However,
+ remaining serial correlation in 
 \begin_inset Formula $u_{t+h}$
 \end_inset
 
  yields inefficient estimates.
  Also the small sample properties are unknown.
- To account for these two potential sources of inefficiency, the user can
- compute HAC robust standard errors as well as bootstrap p-values.
+ To account for these two potential sources of inefficiency,
+ the user can compute HAC robust standard errors as well as bootstrap p-values.
  An intercept will be automatically inserted.
 \end_layout
 
@@ -6917,6 +7016,7 @@ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doMZtest"
+nolink "false"
 
 \end_inset
 
@@ -6925,6 +7025,8 @@ reference "tab:doMZtest"
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -7161,7 +7263,8 @@ robust
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = no robust SEs (default), 1 = compute HAC SEs
+0 = no robust SEs (default),
+ 1 = compute HAC SEs
 \end_layout
 
 \end_inset
@@ -7192,7 +7295,8 @@ nboot
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = no bootstrap (default), or number of bootstrap iterations
+0 = no bootstrap (default),
+ or number of bootstrap iterations
 \end_layout
 
 \end_inset
@@ -7223,7 +7327,8 @@ verb
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = no printout (default), 1 = print details
+0 = no printout (default),
+ 1 = print details
 \end_layout
 
 \end_inset
@@ -7243,7 +7348,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-The following new elements are stored into the model bundle: 
+The following new elements are stored into the model bundle:
+ 
 \end_layout
 
 \end_inset
@@ -7390,12 +7496,13 @@ Holden-Peel test of forecast efficiency – doHPtest()
 \end_layout
 
 \begin_layout Standard
-The Mincer-Zarnowitz regression can be extended to include another regressor
- (or a whole vector of additional regressors), 
+The Mincer-Zarnowitz regression can be extended to include another regressor (or a whole vector of additional regressors),
+ 
 \begin_inset Formula $Z_{t}$
 \end_inset
 
-, such that (assuming for simplicity that 
+,
+ such that (assuming for simplicity that 
 \begin_inset Formula $Z_{t}$
 \end_inset
 
@@ -7432,7 +7539,8 @@ status open
 \begin_inset Formula $\beta_{0}=0$
 \end_inset
 
-, 
+,
+ 
 \begin_inset Formula $\beta_{1}=1$
 \end_inset
 
@@ -7450,6 +7558,7 @@ Again the user can compute HAC robust standard errors and/or bootstrap p-values;
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doHPtest"
+nolink "false"
 
 \end_inset
 
@@ -7458,6 +7567,8 @@ reference "tab:doHPtest"
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -7533,8 +7644,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-computes the Holden-Peel variant of the Mincer-Zarnowitz test regression
- of unbiasedness
+computes the Holden-Peel variant of the Mincer-Zarnowitz test regression of unbiasedness
 \end_layout
 
 \end_inset
@@ -7726,7 +7836,8 @@ robust
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = no robust SEs (default), 1 = compute HAC SEs
+0 = no robust SEs (default),
+ 1 = compute HAC SEs
 \end_layout
 
 \end_inset
@@ -7757,7 +7868,8 @@ nboot
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = no bootstrap (default), or number of bootstrap iterations
+0 = no bootstrap (default),
+ or number of bootstrap iterations
 \end_layout
 
 \end_inset
@@ -7788,7 +7900,8 @@ verb
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = no printout (default), 1 = print details
+0 = no printout (default),
+ 1 = print details
 \end_layout
 
 \end_inset
@@ -7808,7 +7921,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-The following new elements are stored into the model bundle: 
+The following new elements are stored into the model bundle:
+ 
 \end_layout
 
 \end_inset
@@ -7952,7 +8066,8 @@ efficiency
 \begin_inset Quotes erd
 \end_inset
 
- in a broad sense, comprising unbiasedness for example.
+ in a broad sense,
+ comprising unbiasedness for example.
 \end_layout
 
 \begin_layout Standard
@@ -7961,8 +8076,7 @@ Let us define the one-period forecast errors as
 \end_inset
 
 .
- An indicator function indicates whether the forecast error is positive
- or negative such that 
+ An indicator function indicates whether the forecast error is positive or negative such that 
 \begin_inset Formula $u(z)=1$
 \end_inset
 
@@ -7975,8 +8089,7 @@ Let us define the one-period forecast errors as
 \end_inset
 
  otherwise.
- The test statistics of the sign test of unbiasedness of forecast errors
- is
+ The test statistics of the sign test of unbiasedness of forecast errors is
 \begin_inset Formula 
 \[
 S=\sum_{t=1}^{T}u(e_{1t}),
@@ -8005,7 +8118,8 @@ with
 \begin_inset Formula $|e_{1t}|$
 \end_inset
 
-,..., 
+,...,
+ 
 \begin_inset Formula $|e_{1T}|$
 \end_inset
 
@@ -8020,8 +8134,8 @@ with
 \end_inset
 
 .
- Under the additional assumption of symmetrically distributed forecast errors
- around zero, the test statistics 
+ Under the additional assumption of symmetrically distributed forecast errors around zero,
+ the test statistics 
 \begin_inset Formula $W$
 \end_inset
 
@@ -8030,10 +8144,13 @@ with
 \begin_inset Formula $k=0$
 \end_inset
 
- (or leave it out, as this is the default; see Table 
+ (or leave it out,
+ as this is the default;
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCGtest"
+nolink "false"
 
 \end_inset
 
@@ -8041,8 +8158,7 @@ reference "tab:doCGtest"
 \end_layout
 
 \begin_layout Standard
-This test idea can also be employed to test for serial correlation in the
- forecast errors.
+This test idea can also be employed to test for serial correlation in the forecast errors.
  Construct the product series 
 \begin_inset Formula $Z_{\text{1t}}^{k}=e_{1t}e_{1(t-k)}$
 \end_inset
@@ -8051,7 +8167,9 @@ This test idea can also be employed to test for serial correlation in the
 \begin_inset Formula $k\geq1$
 \end_inset
 
-, and compute the statistics: 
+,
+ and compute the statistics:
+ 
 \begin_inset Formula 
 \[
 S_{k}=\sum_{t=k+1}^{T}u(Z_{1t}^{k})\quad\text{and \quad}W_{k}=\sum_{t=k+1}^{T}u(Z_{1t}^{k})R_{2t}^{+}
@@ -8067,7 +8185,8 @@ where
 \begin_inset Formula $Z_{1t}^{k}$
 \end_inset
 
-, 
+,
+ 
 \begin_inset Formula $t=1,\ldots,T$
 \end_inset
 
@@ -8081,8 +8200,7 @@ literal "true"
 \end_inset
 
 .
- Serial correlation in the forecast errors will move the centre of their
- product away from zero.
+ Serial correlation in the forecast errors will move the centre of their product away from zero.
  The sign statistic 
 \begin_inset Formula $S_{k}$
 \end_inset
@@ -8101,11 +8219,13 @@ literal "true"
 \end_inset
 
 .
- Note, both tests on serial correlation require to set the option 
+ Note,
+ both tests on serial correlation require to set the option 
 \begin_inset Formula $k>0$
 \end_inset
 
-, and the necessary product series 
+,
+ and the necessary product series 
 \begin_inset Formula $Z_{1t}^{k}$
 \end_inset
 
@@ -8114,6 +8234,8 @@ literal "true"
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -8189,8 +8311,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Campbell-Ghysels sign and signed rank (Wilcoxon-type) tests for unbiasedness
- or efficiency of forecasts
+Campbell-Ghysels sign and signed rank (Wilcoxon-type) tests for unbiasedness or efficiency of forecasts
 \end_layout
 
 \end_inset
@@ -8382,7 +8503,8 @@ verb
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = no printout (default), 1 = print details
+0 = no printout (default),
+ 1 = print details
 \end_layout
 
 \end_inset
@@ -8462,7 +8584,8 @@ set
 \emph on
 X
 \emph default
- is absent), else 
+ is absent),
+ else 
 \begin_inset Formula $k=0$
 \end_inset
 
@@ -8486,7 +8609,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-The following new elements are stored into the model bundle: 
+The following new elements are stored into the model bundle:
+ 
 \end_layout
 
 \end_inset
@@ -8592,7 +8716,8 @@ literal "true"
 
 \end_inset
 
-, 
+,
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Campbell.Ghysels1997"
@@ -8600,7 +8725,8 @@ literal "true"
 
 \end_inset
 
-, 
+,
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Dufour1981ranktest"
@@ -8631,8 +8757,10 @@ literal "true"
 \end_layout
 
 \begin_layout Plain Layout
-Notes: The calculation of CGWILCpval, the p-value of the Wilcoxon-type signed
- rank tests, depends on the WSRpvalue function in the special package 
+Notes:
+ The calculation of CGWILCpval,
+ the p-value of the Wilcoxon-type signed rank tests,
+ depends on the WSRpvalue function in the special package 
 \begin_inset Quotes eld
 \end_inset
 
@@ -8645,8 +8773,7 @@ extra
 \end_inset
 
 v0.41).
- Please install that package manually from the gretl package repository
- if the automatic loading fails.
+ Please install that package manually from the gretl package repository if the automatic loading fails.
 \end_layout
 
 \end_inset
@@ -8655,8 +8782,8 @@ v0.41).
 \end_layout
 
 \begin_layout Standard
-Lastly, one can use this framework to assess whether the forecast has made
- efficient use of the available information represented by the series 
+Lastly,
+ one can use this framework to assess whether the forecast has made efficient use of the available information represented by the series 
 \begin_inset Formula $X$
 \end_inset
 
@@ -8665,7 +8792,8 @@ Lastly, one can use this framework to assess whether the forecast has made
 \end_inset
 
 .
- For this, one needs to construct the product series 
+ For this,
+ one needs to construct the product series 
 \begin_inset Formula $Z_{t}^{k}=e_{ht}X_{t-k}^{c}$
 \end_inset
 
@@ -8697,15 +8825,17 @@ Recursive
 \begin_inset Formula $t$
 \end_inset
 
- are used, not all observations from the forecast evaluation sample.
- Otherwise the centering would contradict the real-time information flow
- and would not be feasible for actual forecasting.
+ are used,
+ not all observations from the forecast evaluation sample.
+ Otherwise the centering would contradict the real-time information flow and would not be feasible for actual forecasting.
  
 \end_layout
 
 \end_inset
 
- This way of re-centering requires, however, that the series 
+ This way of re-centering requires,
+ however,
+ that the series 
 \begin_inset Formula $X_{t}$
 \end_inset
 
@@ -8721,11 +8851,14 @@ S_{ok}=\sum_{t=k+1}^{T}u(Z_{t}^{k})\quad\text{and \quad}W_{ok}=\sum_{t=k+1}^{T}u
 
 \end_inset
 
-noting that the ranks used refer to the forecast errors, not to 
+noting that the ranks used refer to the forecast errors,
+ not to 
 \begin_inset Formula $Z_{t}^{k}$
 \end_inset
 
-, to obtain a statistic with a known and valid distribution; see 
+,
+ to obtain a statistic with a known and valid distribution;
+ see 
 \begin_inset CommandInset citation
 LatexCommand citet
 after "pp. 3"
@@ -8752,8 +8885,7 @@ When
 \begin_inset Formula $X_{t}$
 \end_inset
 
- is strictly exogenous without any feedback occurring from the forecast
- errors to future realizations of 
+ is strictly exogenous without any feedback occurring from the forecast errors to future realizations of 
 \begin_inset Formula $X$
 \end_inset
 
@@ -8761,25 +8893,26 @@ When
 \begin_inset Formula $Z_{t}^{k}$
 \end_inset
 
- could also be used, and this would then indeed equal a Wilcoxon signed
- rank test on 
+ could also be used,
+ and this would then indeed equal a Wilcoxon signed rank test on 
 \begin_inset Formula $Z_{t}^{k}$
 \end_inset
 
 .
- This variant is not implemented, however, because the assumption appears
- very strong and hardly relevant in practice.
+ This variant is not implemented,
+ however,
+ because the assumption appears very strong and hardly relevant in practice.
  
 \end_layout
 
 \end_inset
 
- This orthogonality test can be achieved by passing the series as CGX in
- the bundle.
+ This orthogonality test can be achieved by passing the series as CGX in the bundle.
  See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCGtest"
+nolink "false"
 
 \end_inset
 
@@ -8793,18 +8926,17 @@ name "subsec:Elliott,-Komunjer"
 
 \end_inset
 
-Elliott, Komunjer, and Timmermann test with asymmetric loss – doEKTtest()
+Elliott,
+ Komunjer,
+ and Timmermann test with asymmetric loss – doEKTtest()
 \begin_inset Foot
 status open
 
 \begin_layout Plain Layout
-For historical reasons and backward compatibility the doEKTtest function
- up to FEP version 2.1 has operated on matrices.
- The preferred interface now is based on a bundle and series as described
- in this document.
+For historical reasons and backward compatibility the doEKTtest function up to FEP version 2.1 has operated on matrices.
+ The preferred interface now is based on a bundle and series as described in this document.
  The doEKTtest_series function has fulfilled that role since version 2.0.
- Starting with version 2.3 the doEKTtest function will follow the preferred
- interface (be an alias for 
+ Starting with version 2.3 the doEKTtest function will follow the preferred interface (be an alias for 
 \begin_inset ERT
 status open
 
@@ -8829,8 +8961,8 @@ status collapsed
 
 \end_inset
 
-), and a new wrapper function doEKTtest_matrix will provide the old access
- for those who need it.
+),
+ and a new wrapper function doEKTtest_matrix will provide the old access for those who need it.
 \end_layout
 
 \end_inset
@@ -8850,8 +8982,7 @@ Elliott/Komunjer/Timmermann test (asymmetric loss) – doEKTtest()
 
 \begin_layout Standard
 This is a test for forecast rationality that allows for asymmetric loss.
- As a side product the parameters of a general class of loss functions can
- be estimated.
+ As a side product the parameters of a general class of loss functions can be estimated.
 \end_layout
 
 \begin_layout Standard
@@ -8862,7 +8993,8 @@ literal "true"
 
 \end_inset
 
- propose a flexible class of loss functions, the so-called EKT loss function:
+ propose a flexible class of loss functions,
+ the so-called EKT loss function:
 \begin_inset Formula 
 \[
 L(e)=\left[\alpha+(1-2\alpha)\mathbf{I}(e<0)\right]|e|^{p},\quad\alpha\in[0,1]
@@ -8878,13 +9010,14 @@ where
 \begin_inset Formula $e=y-f<0$
 \end_inset
 
-, and otherwise zero.
+,
+ and otherwise zero.
  Asymmetric loss is given for 
 \begin_inset Formula $\alpha\neq0.5$
 \end_inset
 
-, and where values exceeding 0.5 indicate greater aversion to positive forecast
- errors.
+,
+ and where values exceeding 0.5 indicate greater aversion to positive forecast errors.
  Parameter 
 \begin_inset Formula $p$
 \end_inset
@@ -8894,8 +9027,7 @@ where
 \begin_inset Formula $p=1$
 \end_inset
 
- results in a lin-lin loss function with possibly different slopes under
- asymmetric loss.
+ results in a lin-lin loss function with possibly different slopes under asymmetric loss.
  The quadratic loss function is given for the special setting 
 \begin_inset Formula $p=2$
 \end_inset
@@ -8943,7 +9075,8 @@ literal "true"
 \begin_inset Formula $I_{d}$
 \end_inset
 
-, where 
+,
+ where 
 \begin_inset Formula $d$
 \end_inset
 
@@ -8965,22 +9098,26 @@ literal "true"
 \end_layout
 
 \begin_layout Standard
-The user can use the framework to (i) test for symmetric loss, and (ii)
- for rationality.
+The user can use the framework to (i) test for symmetric loss,
+ and (ii) for rationality.
  As 
 \begin_inset Formula $\hat{\alpha}$
 \end_inset
 
- is asymptotically normal and its variance is identical to the one obtained
- by the standard GMM estimator, one can test the null of symmetry, 
+ is asymptotically normal and its variance is identical to the one obtained by the standard GMM estimator,
+ one can test the null of symmetry,
+ 
 \begin_inset Formula $H_{0}:\alpha=0.5$
 \end_inset
 
-, against the alternative, 
+,
+ against the alternative,
+ 
 \begin_inset Formula $H_{0}:\alpha\neq0.5$
 \end_inset
 
-, by a t-test.
+,
+ by a t-test.
 \end_layout
 
 \begin_layout Standard
@@ -8998,8 +9135,7 @@ For a given
 \end_inset
 
 -type test provides a joint test for rationality of the forecasts.
- The EKT approach allows to test for rationality (i) either for an unknown
- 
+ The EKT approach allows to test for rationality (i) either for an unknown 
 \begin_inset Formula $\alpha$
 \end_inset
 
@@ -9015,18 +9151,23 @@ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doEKTtest"
+nolink "false"
 
 \end_inset
 
- for the synopsis, and note that the instruments 
+ for the synopsis,
+ and note that the instruments 
 \emph on
 z
 \emph default
- should not contain an intercept, it will be added automatically.
+ should not contain an intercept,
+ it will be added automatically.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -9041,7 +9182,8 @@ name "tab:doEKTtest"
 
 \end_inset
 
-Elliott, Komunjer and Timmermann test
+Elliott,
+ Komunjer and Timmermann test
 \end_layout
 
 \end_inset
@@ -9102,8 +9244,8 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Elliott, Komunjer and Timmermann test for forecast rationality that allows
- for asymmetric loss
+Elliott,
+ Komunjer and Timmermann test for forecast rationality that allows for asymmetric loss
 \end_layout
 
 \end_inset
@@ -9330,7 +9472,8 @@ initial value of shape parameter
 \emph on
 alpha
 \emph default
- (between 0 and 1, default 0.5)
+ (between 0 and 1,
+ default 0.5)
 \end_layout
 
 \end_inset
@@ -9361,7 +9504,9 @@ loss
 \begin_inset Text
 
 \begin_layout Plain Layout
-Loss function type: 1 = U-shape (default), 2 = V-shape
+Loss function type:
+ 1 = U-shape (default),
+ 2 = V-shape
 \end_layout
 
 \end_inset
@@ -9392,7 +9537,8 @@ verb
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = no printout (default), 1 = print details
+0 = no printout (default),
+ 1 = print details
 \end_layout
 
 \end_inset
@@ -9423,7 +9569,9 @@ lossdraw
 \begin_inset Text
 
 \begin_layout Plain Layout
-"no" = no draw (default), "display" = immediate plot, "Path+filename"
+"no" = no draw (default),
+ "display" = immediate plot,
+ "Path+filename"
 \end_layout
 
 \end_inset
@@ -9443,7 +9591,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-The following new elements are stored into the model bundle: 
+The following new elements are stored into the model bundle:
+ 
 \end_layout
 
 \end_inset
@@ -9677,8 +9826,7 @@ RatTest05
 \begin_inset Text
 
 \begin_layout Plain Layout
-test statistics of test for rationality conditional on symmetry (as if alpha
- = 0.5)
+test statistics of test for rationality conditional on symmetry (as if alpha = 0.5)
 \end_layout
 
 \end_inset
@@ -9709,8 +9857,7 @@ RatPv05
 \begin_inset Text
 
 \begin_layout Plain Layout
-p-value of test for rationality conditional conditional on symmetry (as
- if alpha = 0.5)
+p-value of test for rationality conditional conditional on symmetry (as if alpha = 0.5)
 \end_layout
 
 \end_inset
@@ -9780,11 +9927,14 @@ While the Kuipers score just computes the difference between the hit rate,
 \begin_inset Formula $H$
 \end_inset
 
-, and the false alarm rate, 
+,
+ and the false alarm rate,
+ 
 \begin_inset Formula $F$
 \end_inset
 
-, it is not a proper statistical test.
+,
+ it is not a proper statistical test.
  
 \begin_inset CommandInset citation
 LatexCommand citet
@@ -9795,8 +9945,7 @@ literal "true"
 \end_inset
 
  have proposed a simple test on market timing using binary outcomes.
- The basic idea is to test whether predicted ups are independent of actual
- ups or not.
+ The basic idea is to test whether predicted ups are independent of actual ups or not.
 \end_layout
 
 \begin_layout Standard
@@ -9851,26 +10000,26 @@ y_{t}=\beta_{0}+\beta_{1}x_{t}+u_{t}.
 
 \end_inset
 
-Under the null hypothesis that predictions and realizations are independently
- distributed, the restriction 
+Under the null hypothesis that predictions and realizations are independently distributed,
+ the restriction 
 \begin_inset Formula $\beta_{1}=0$
 \end_inset
 
  holds.
  The test statistic follows asymptotically a standard normal distribution.
  A rejection of the null hypothesis indicates predictive failure.
- Serial correlation in the errors, 
+ Serial correlation in the errors,
+ 
 \begin_inset Formula $u_{t}$
 \end_inset
 
-, are likely to occur but can be dealt with by using Bartlett weights to
- compute HAC standard errors.
+,
+ are likely to occur but can be dealt with by using Bartlett weights to compute HAC standard errors.
  
 \end_layout
 
 \begin_layout Standard
-A second –non-regression based– approach to compute the test instead is
- to rely on the correlation coefficient between forecasts and predictions,
+A second –non-regression based– approach to compute the test instead is to rely on the correlation coefficient between forecasts and predictions,
  
 \begin_inset Formula $\rho$
 \end_inset
@@ -9885,8 +10034,7 @@ A second –non-regression based– approach to compute the test instead is
 \end_inset
 
  refers to the number of forecasts available.
- The test statistic also follows a standard normal distribution asymptotically
- and cannot be robustified.
+ The test statistic also follows a standard normal distribution asymptotically and cannot be robustified.
 \end_layout
 
 \begin_layout Standard
@@ -9894,6 +10042,7 @@ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doPTtest"
+nolink "false"
 
 \end_inset
 
@@ -9902,6 +10051,8 @@ reference "tab:doPTtest"
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -10069,7 +10220,8 @@ series
 \emph on
 yup
 \emph default
-: 
+:
+ 
 \end_layout
 
 \end_inset
@@ -10078,8 +10230,8 @@ yup
 \begin_inset Text
 
 \begin_layout Plain Layout
-binary-valued series of actuals that takes the value of unity for ups, otherwise
- zero
+binary-valued series of actuals that takes the value of unity for ups,
+ otherwise zero
 \end_layout
 
 \end_inset
@@ -10103,7 +10255,8 @@ series
 \emph on
 fcup
 \emph default
-: 
+:
+ 
 \end_layout
 
 \end_inset
@@ -10145,7 +10298,8 @@ robust
 \begin_inset Text
 
 \begin_layout Plain Layout
- 0 = correlation-based PT test, 1 = regression-based with HAC robust SEs
+ 0 = correlation-based PT test,
+ 1 = regression-based with HAC robust SEs
 \end_layout
 
 \end_inset
@@ -10169,7 +10323,8 @@ scalar
 \emph on
 verb
 \emph default
-: 
+:
+ 
 \end_layout
 
 \end_inset
@@ -10178,7 +10333,8 @@ verb
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = no printout, 1 = print details
+0 = no printout,
+ 1 = print details
 \end_layout
 
 \end_inset
@@ -10198,7 +10354,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-The following new elements are stored into the model bundle: 
+The following new elements are stored into the model bundle:
+ 
 \end_layout
 
 \end_inset
@@ -10296,7 +10453,8 @@ literal "true"
 
 \end_inset
 
-, 
+,
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 after "p. 398"
@@ -10343,20 +10501,21 @@ Diebold-Lopez direction-of-change test – doDLtest()
 \end_layout
 
 \begin_layout Standard
-Performs the Diebold-Lopez direction of change test which is in principle
- just Pearson's 
+Performs the Diebold-Lopez direction of change test which is in principle just Pearson's 
 \begin_inset Formula $\chi$
 \end_inset
 
 - square test.
- H0: The direction-of-change forecast has no value meaning that the forecasts
- and realizations are independent.
- H1: The direction-of-change forecast has some value.
+ H0:
+ The direction-of-change forecast has no value meaning that the forecasts and realizations are independent.
+ H1:
+ The direction-of-change forecast has some value.
  (The side output of 
 \emph on
 DLinfo
 \emph default
- is closely related to the Kuipers score, namely by adding unity to it.)
+ is closely related to the Kuipers score,
+ namely by adding unity to it.)
 \end_layout
 
 \begin_layout Standard
@@ -10364,6 +10523,7 @@ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doDLtest"
+nolink "false"
 
 \end_inset
 
@@ -10372,6 +10532,8 @@ reference "tab:doDLtest"
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -10578,8 +10740,7 @@ fcup
 \begin_inset Text
 
 \begin_layout Plain Layout
- binary-valued forecast that takes the value of unity for ups otherwise
- zero
+ binary-valued forecast that takes the value of unity for ups otherwise zero
 \end_layout
 
 \end_inset
@@ -10610,7 +10771,8 @@ verb
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = no printout (default), 1 = print details
+0 = no printout (default),
+ 1 = print details
 \end_layout
 
 \end_inset
@@ -10630,7 +10792,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-The following new elements are stored into the model bundle: 
+The following new elements are stored into the model bundle:
+ 
 \end_layout
 
 \end_inset
@@ -10801,8 +10964,8 @@ Diebold-Mariano test – doDMtest()
 \end_layout
 
 \begin_layout Standard
-First, note that there also exists a dedicated contributed gretl function
- package called 
+First,
+ note that there also exists a dedicated contributed gretl function package called 
 \begin_inset Quotes eld
 \end_inset
 
@@ -10811,14 +10974,13 @@ DiebMar.gfn
 \end_inset
 
  by Giulio Palomba.
- It only partly overlaps with the features of the doDMtest() function, so
- it might be useful for you, too.
+ It only partly overlaps with the features of the doDMtest() function,
+ so it might be useful for you,
+ too.
 \end_layout
 
 \begin_layout Standard
-The Diebold-Mariano (DM) test of equivalent expected loss takes explicitly
- into account the underlying loss function as well as sampling variation
- in the average losses.
+The Diebold-Mariano (DM) test of equivalent expected loss takes explicitly into account the underlying loss function as well as sampling variation in the average losses.
 \end_layout
 
 \begin_layout Standard
@@ -10834,7 +10996,8 @@ We define the
 \begin_inset Formula $L(e_{t+h|t})$
 \end_inset
 
-, respectively.
+,
+ respectively.
  The loss differential of two non-nested forecasts for observation 
 \begin_inset Formula $t+h$
 \end_inset
@@ -10848,8 +11011,8 @@ We define the
 \end_inset
 
 .
- Specifically, one can test the null hypothesis of equal predictive accuracy
- 
+ Specifically,
+ one can test the null hypothesis of equal predictive accuracy 
 \begin_inset Formula 
 \[
 H_{0}:\quad E(d_{12,t+h|t})=0
@@ -10858,7 +11021,8 @@ H_{0}:\quad E(d_{12,t+h|t})=0
 \end_inset
 
 against either an one-sided alternative or against a two-sided alternative.
- Under the null, the test statistics is 
+ Under the null,
+ the test statistics is 
 \begin_inset Formula $DM=\bar{d}_{12,t+h|t}/\widehat{\sigma}_{\bar{d}_{12,t+h|t}}\rightarrow N(0,1)$
 \end_inset
 
@@ -10890,9 +11054,10 @@ against either an one-sided alternative or against a two-sided alternative.
 \end_layout
 
 \begin_layout Standard
-However, due to serial correlation in the forecast errors, we compute alternativ
-ely the following regression-based version using OLS combined with HAC robust
- standard errors: 
+However,
+ due to serial correlation in the forecast errors,
+ we compute alternatively the following regression-based version using OLS combined with HAC robust standard errors:
+ 
 \begin_inset Formula 
 \[
 d_{12,t+h|t}=\beta+u_{t}
@@ -10909,17 +11074,18 @@ where
 \end_inset
 
  zero-mean error term.
- The null of equal forecast accuracy between the two point forecasts is
- defined as 
+ The null of equal forecast accuracy between the two point forecasts is defined as 
 \begin_inset Formula $\beta=0$
 \end_inset
 
 .
- The test statistics, 
+ The test statistics,
+ 
 \begin_inset Formula $t_{DM}$
 \end_inset
 
-, follows asymptotically a standard normal distribution.
+,
+ follows asymptotically a standard normal distribution.
 \end_layout
 
 \begin_layout Standard
@@ -10930,8 +11096,7 @@ literal "true"
 
 \end_inset
 
- have suggested the following small-sample corrected degrees-of-freedom
- adjusted t-statistics 
+ have suggested the following small-sample corrected degrees-of-freedom adjusted t-statistics 
 \begin_inset Formula 
 \[
 t_{HLN}=[1+F^{-1}(1-2\times h)+F^{-2}h\times(h-1)]^{0.5}\times t_{DM}
@@ -10956,6 +11121,7 @@ where
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doDMtest"
+nolink "false"
 
 \end_inset
 
@@ -10963,14 +11129,14 @@ reference "tab:doDMtest"
 \end_layout
 
 \begin_layout Standard
-At the moment we only support two loss functions, namely symmetric linear
- (V-shape) and symmetric quadratic (U-shape) loss but in principle other
- loss functions could be applied and may be incorporated into the package
- in future versions.
+At the moment we only support two loss functions,
+ namely symmetric linear (V-shape) and symmetric quadratic (U-shape) loss but in principle other loss functions could be applied and may be incorporated into the package in future versions.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -11046,8 +11212,8 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Diebold-Mariano test for predictive accuracy, computation regression-based
- with HAC robust SEs
+Diebold-Mariano test for predictive accuracy,
+ computation regression-based with HAC robust SEs
 \end_layout
 
 \end_inset
@@ -11272,7 +11438,9 @@ loss
 \begin_inset Text
 
 \begin_layout Plain Layout
-Loss function type: 1 = U-shape (default), 2 = V-shape
+Loss function type:
+ 1 = U-shape (default),
+ 2 = V-shape
 \end_layout
 
 \end_inset
@@ -11303,7 +11471,8 @@ verb
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = print no details (default), 1 = print details
+0 = print no details (default),
+ 1 = print details
 \end_layout
 
 \end_inset
@@ -11323,7 +11492,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-The following new elements are stored into the model bundle: 
+The following new elements are stored into the model bundle:
+ 
 \end_layout
 
 \end_inset
@@ -11545,7 +11715,8 @@ literal "true"
 
 \end_inset
 
-, 
+,
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Harvey.etal1997"
@@ -11585,29 +11756,30 @@ Giacomini-White test – doGWtest()
 \end_layout
 
 \begin_layout Standard
-The Giacomini-White (GW) test is a test on equal conditional predictive
- ability.
+The Giacomini-White (GW) test is about equal conditional predictive ability.
  Given that the population parameters are not known and must be estimated,
- it is the actual future loss that is of interest to the forecaster, rather
- than that based on some population value.
- The function doGWtest() implements two test approaches: (i) The unconditional
- test restricts attention to the forecast model whereas (ii) the conditional
- approach allows the evaluation of the 
+ it is the actual future loss that is of interest to the forecaster,
+ which is subject to estimation biases and imperfections.
+ The function doGWtest() implements two test approaches;
+ an unconditional variant and a conditional approach,
+ which allows the evaluation of the 
 \emph on
 forecasting method
 \emph default
-, which includes the model, the estimation procedure and the possible choice
- of estimation window.
+,
+ including the model,
+ the estimation procedure and the possible choice of estimation window.
 \end_layout
 
 \begin_layout Standard
-The conditional test for forecasting performance tests whether the loss-differen
-tial between two forecasts is conditional on current information, 
+The conditional test for forecasting performance tests whether the loss differential between two forecasts is systematically linked to current information,
+ 
 \begin_inset Formula $z_{t}$
 \end_inset
 
 .
- The null hypothesis is then altered to 
+ Compared to unconditional tests like Diebold-Mariano,
+ the null hypothesis is then altered to 
 \begin_inset Formula 
 \[
 E\left[d_{12,t+h|t}(\hat{\beta}_{1,t},\hat{\beta}_{2,t},y_{t+h})|z_{t}\right]=0
@@ -11619,38 +11791,88 @@ where
 \begin_inset Formula $z_{t}$
 \end_inset
 
- is the information set (in Gretl terms a list of potential variables) available
- at time 
+ is the information set (in Gretl terms a list of potential variables) available at time 
 \begin_inset Formula $t$
 \end_inset
 
 .
- In case the user selects the conditional approach, per default the lagged
- loss differential, 
-\begin_inset Formula $d_{12,t-h}$
+ In case the user selects the conditional approach,
+ per default the lagged loss differential 
+\begin_inset Formula $d_{12,t}$
 \end_inset
 
-, which is available in period 
-\begin_inset Formula $t$
+ enters the information set – the lag 
+\begin_inset Formula $h$
 \end_inset
 
- for the 
+ is viewed from the forecast target period 
 \begin_inset Formula $t+h$
 \end_inset
 
- forecast, enters the information set.
- Additional conditioning variables may be included into the list 'z'.
+.
+ Additional conditioning variables may be included in the list 'z',
+ for example further lags.
+ It is the user's responsibility to specify only variables that are intrinsically observable in the forecast's base period 
+\begin_inset Formula $t$
+\end_inset
+
+.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Conditioning on 
+\begin_inset Formula $z_{t}$
+\end_inset
+
+ essentially means that the moment products 
+\begin_inset Formula $z_{t}d_{12,t+h|t}$
+\end_inset
+
+ are assessed.
+ Our notation for the conditioning variables 
+\begin_inset Formula $z_{t}$
+\end_inset
+
+ corresponds to the so-called 
+\begin_inset Quotes eld
+\end_inset
+
+test function
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset Formula $h_{t}$
+\end_inset
+
+ in GW,
+ but to avoid confusion with the forecast horizon 
+\begin_inset Formula $h$
+\end_inset
+
+,
+ we re-use our general instrument symbol 
+\begin_inset Formula $z_{t}$
+\end_inset
+
+ instead.
+\end_layout
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
-At the moment we only support two loss functions, namely symmetric linear
- (V-shape) and symmetric quadratic (U-shape) loss but in principle other
- loss functions could be applied and may be incorporated into the package
- in future versions.
+At the moment we only support two loss functions,
+ namely symmetric linear (V-shape) and symmetric quadratic (U-shape) loss but in principle other loss functions could be applied and may be incorporated into the package in future versions.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -11726,8 +11948,8 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Giacomini-White test on equal conditional predictive ability, computation
- regression-based
+Giacomini-White test on equal conditional predictive ability,
+ computation regression-based
 \end_layout
 
 \end_inset
@@ -11921,7 +12143,7 @@ fhor
 \begin_inset Text
 
 \begin_layout Plain Layout
- forecast horizon (default 1)
+forecast horizon (default 1)
 \end_layout
 
 \end_inset
@@ -11952,7 +12174,9 @@ loss
 \begin_inset Text
 
 \begin_layout Plain Layout
-Loss function type: 1 = U-shape (default), 2 = V-shape
+Loss function type:
+ 1 = U-shape (default),
+ 2 = V-shape
 \end_layout
 
 \end_inset
@@ -11983,7 +12207,8 @@ cond
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = unconditional test (default), 1 = conditional test
+0 = unconditional test (default),
+ 1 = conditional test
 \end_layout
 
 \end_inset
@@ -12015,7 +12240,7 @@ z
 
 \begin_layout Plain Layout
 series to condition on (only if 
-\begin_inset Formula $cond=1$
+\begin_inset Formula $cond==1$
 \end_inset
 
 )
@@ -12049,7 +12274,8 @@ verb
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = print no details (default), 1 = print details
+0 = print no details (default),
+ 1 = print details
 \end_layout
 
 \end_inset
@@ -12069,7 +12295,8 @@ Output
 \begin_inset Text
 
 \begin_layout Plain Layout
-The following new elements are stored into the model bundle: 
+The following new elements are stored into the model bundle:
+ 
 \end_layout
 
 \end_inset
@@ -12252,37 +12479,40 @@ literal "false"
 
 \end_inset
 
-, testing equal predictive accuracy in nested models (one-sided test); see
- Table 
+,
+ testing equal predictive accuracy in nested models (one-sided test);
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCWtest"
+nolink "false"
 
 \end_inset
 
 .
- If the test rejects, there is evidence that the smaller nested model is
- significantly worse at forecasting.
+ If the test rejects,
+ there is evidence that the smaller nested model is significantly worse at forecasting.
  It is the user's responsibility to ensure that the models are indeed nested,
  since this cannot be determined from the forecast realizations.
- Note that even though the test setup is one-sided, reverse outcomes may
- occur in reality (finite samples); in those cases the given p-value is
- still computed mechanically as the right-tail probability mass.
+ Note that even though the test setup is one-sided,
+ reverse outcomes may occur in reality (finite samples);
+ in those cases the given p-value is still computed mechanically as the right-tail probability mass.
  
 \end_layout
 
 \begin_layout Standard
-Two test statistics are provided, where the second one is a autocorrelation-robu
-st variant of the first.
- For example, if the forecast horizon exceeds 1 it is expected that the
- forecast time series display serial correlation and thus robust inference
- is usually advisable.
- For a one-step forecast standard inference may be sufficient, depending
- on the context and the application.
+Two test statistics are provided,
+ where the second one is a autocorrelation-robust variant of the first.
+ For example,
+ if the forecast horizon exceeds 1 it is expected that the forecast time series display serial correlation and thus robust inference is usually advisable.
+ For a one-step forecast standard inference may be sufficient,
+ depending on the context and the application.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float table
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -12552,7 +12782,8 @@ verb
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = print no details (default), 1 = print details
+0 = print no details (default),
+ 1 = print details
 \end_layout
 
 \end_inset
@@ -12770,17 +13001,15 @@ Menu-driven (GUI) usage
 \end_layout
 
 \begin_layout Standard
-To install the FEP package using the GUI one follows the usual steps for
- contributed function packages: Open the function package list window for
- example via the menu File / Function packages / On server, then find the
- FEP entry and click the install button (or mouse right-click and choose
- Installation in the context pop-up menu).
+To install the FEP package using the GUI one follows the usual steps for contributed function packages:
+ Open the function package list window for example via the menu File / Function packages / On server,
+ then find the FEP entry and click the install button (or mouse right-click and choose Installation in the context pop-up menu).
 \end_layout
 
 \begin_layout Standard
-For the precise meaning of the inputs to the respective functions please
- see the function documentation above, but ideally, using this package from
- gretl's menu interface should be mostly self-explanatory.
+For the precise meaning of the inputs to the respective functions please see the function documentation above,
+ but ideally,
+ using this package from gretl's menu interface should be mostly self-explanatory.
  From the menus you can only execute one test at a time.
 \end_layout
 
@@ -12789,16 +13018,19 @@ Figure
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Screenshot"
+nolink "false"
 
 \end_inset
 
- shows the layout of the central window where choices and specifications
- are entered.
- In order to keep the number of argument fields in this window within reasonable
- bounds, some fields have different overloaded meanings depending on which
- test is chosen.
- For example, the penultimate entry field expects a gretl list, and this
- input is relevant for the HP, DL, EKT, and CG variants.
+ shows the layout of the central window where choices and specifications are entered.
+ In order to keep the number of argument fields in this window within reasonable bounds,
+ some fields have different overloaded meanings depending on which test is chosen.
+ For example,
+ the penultimate entry field expects a gretl list,
+ and this input is relevant for the HP,
+ DL,
+ EKT,
+ and CG variants.
 \begin_inset Foot
 status collapsed
 
@@ -12811,7 +13043,8 @@ z
 \begin_inset Quotes erd
 \end_inset
 
-, 
+,
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -12819,7 +13052,8 @@ ref
 \begin_inset Quotes erd
 \end_inset
 
-, or 
+,
+ or 
 \begin_inset Quotes eld
 \end_inset
 
@@ -12827,7 +13061,8 @@ CGX
 \begin_inset Quotes erd
 \end_inset
 
-, respectively.
+,
+ respectively.
 \end_layout
 
 \end_inset
@@ -12837,6 +13072,8 @@ CGX
 
 \begin_layout Standard
 \begin_inset Float figure
+placement document
+alignment document
 wide false
 sideways false
 status open
@@ -12863,8 +13100,8 @@ name "fig:Screenshot"
 
 \end_inset
 
-Screenshot of the FEP graphical interface (a previous version, under Ubuntu
- Linux)
+Screenshot of the FEP graphical interface (a previous version,
+ under Ubuntu Linux)
 \end_layout
 
 \end_inset
@@ -12878,8 +13115,8 @@ Screenshot of the FEP graphical interface (a previous version, under Ubuntu
 \end_layout
 
 \begin_layout Standard
-The output from executing the function from the GUI is presented to the
- user in a new window, mostly simply with the printed test result.
+The output from executing the function from the GUI is presented to the user in a new window,
+ mostly simply with the printed test result.
  At the top of that output there is a toolbar including 
 \begin_inset Quotes eld
 \end_inset
@@ -12897,17 +13134,15 @@ bundle
 \end_inset
 
  icons.
- The save button allows you to save first the textual output, and secondly
- the whole produced bundle to the current gretl session.
- The bundle button in turn gives you direct access to the various produced
- bundle members which can also be saved.
+ The save button allows you to save first the textual output,
+ and secondly the whole produced bundle to the current gretl session.
+ The bundle button in turn gives you direct access to the various produced bundle members which can also be saved.
 \begin_inset Foot
 status open
 
 \begin_layout Plain Layout
-The concrete images of those icons will depend on your operating system
- and/or your desktop theme, but they are the first two buttons from the
- left.
+The concrete images of those icons will depend on your operating system and/or your desktop theme,
+ but they are the first two buttons from the left.
 \end_layout
 
 \end_inset
@@ -12916,11 +13151,12 @@ The concrete images of those icons will depend on your operating system
 \end_layout
 
 \begin_layout Standard
-Note that only the actual test functions are choosable from the GUI, not
- the helper functions from Section 
+Note that only the actual test functions are choosable from the GUI,
+ not the helper functions from Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Forecast-descriptive-statistics"
+nolink "false"
 
 \end_inset
 
@@ -12938,41 +13174,45 @@ Illustrative example
 \end_layout
 
 \begin_layout Standard
-In the following an applied example using survey-based forecasts for annual
- growth of euro area (EA) real GDP is presented.
+In the following an applied example using survey-based forecasts for annual growth of euro area (EA) real GDP is presented.
  Forecasts are averages based on surveys among professional forecasters,
  
 \begin_inset Formula $fc_{t}$
 \end_inset
 
-, conducted by the Economist magazine and obtained through the Macrobond
- database.
- The realizations, 
+,
+ conducted by the Economist magazine and obtained through the Macrobond database.
+ The realizations,
+ 
 \begin_inset Formula $y_{t}$
 \end_inset
 
-, are from the AMECO database provided by the European Commission.
+,
+ are from the AMECO database provided by the European Commission.
  Both series' values are reported in the data appendix 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Data"
+nolink "false"
 
 \end_inset
 
-, and Figure 
+,
+ and Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Forecast-error-for"
+nolink "false"
 
 \end_inset
 
- depicts the forecast errors, 
+ depicts the forecast errors,
+ 
 \begin_inset Formula $e_{t}=y_{t}-fc_{t}$
 \end_inset
 
 .
- For the following code to work we assume that a gretl annual time-series
- datafile is loaded with the series named 
+ For the following code to work we assume that a gretl annual time-series datafile is loaded with the series named 
 \family typewriter
 y
 \family default
@@ -12985,10 +13225,10 @@ fc
 \end_layout
 
 \begin_layout Standard
-In the following the main (but not all) functions of the FEP package are
- applied.
- Assuming the package is already installed on the local machine, at the
- beginning of the session the package must be loaded with: 
+In the following the main (but not all) functions of the FEP package are applied.
+ Assuming the package is already installed on the local machine,
+ at the beginning of the session the package must be loaded with:
+ 
 \end_layout
 
 \begin_layout LyX-Code
@@ -12998,6 +13238,7 @@ include FEP.gfn
 \begin_layout Standard
 \begin_inset Float figure
 placement h
+alignment document
 wide false
 sideways false
 status open
@@ -13042,24 +13283,27 @@ Tests of unbiasedness
 \end_layout
 
 \begin_layout Standard
-We run the parametric Mincer-Zarnowitz test on forecast unbiasedness using
- bootstrap p-values (999 iterations, 
+We run the parametric Mincer-Zarnowitz test on forecast unbiasedness using bootstrap p-values (999 iterations,
+ 
 \emph on
 iid
 \emph default
-) and HAC standard errors, see Section 
+) and HAC standard errors,
+ see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Mincer-Zarnowitz"
+nolink "false"
 
 \end_inset
 
 .
- First an empty bundle is defined, then the series and parameters are added:
+ First an empty bundle is defined,
+ then the series and parameters are added:
 \end_layout
 
 \begin_layout LyX-Code
-bundle b = null
+bundle b = _()
 \end_layout
 
 \begin_layout LyX-Code
@@ -13075,15 +13319,16 @@ b.nboot = 999
 \end_layout
 
 \begin_layout LyX-Code
-b.robust = 1 # 1= HAC robust VCV
+b.robust = TRUE # TRUE/1 = HAC robust VCV
 \end_layout
 
 \begin_layout LyX-Code
-b.verb = 1   # 1= print details
+b.verb = TRUE   # TRUE/1 = print details
 \end_layout
 
 \begin_layout LyX-Code
-applyFCtests(&b, "MZ") # call the top-level function
+applyFCtests(&b,
+ "MZ") # call the top-level function
 \end_layout
 
 \begin_layout Standard
@@ -13107,7 +13352,8 @@ Yields as output:
 \end_layout
 
 \begin_layout LyX-Code
-Method: Approach using HAC robust VCV.
+Method:
+ Approach using HAC robust VCV.
  
 \end_layout
 
@@ -13117,15 +13363,18 @@ Bootstrap p-value using 999 iterations.
 \end_layout
 
 \begin_layout LyX-Code
-H0: forecasts are unbiased 
+H0:
+ forecasts are unbiased 
 \end_layout
 
 \begin_layout LyX-Code
-Test stat.: 5.6758 
+Test stat.:
+ 5.6758 
 \end_layout
 
 \begin_layout LyX-Code
-p-value.:   0.3874 
+p-value.:
+   0.3874 
 \end_layout
 
 \begin_layout LyX-Code
@@ -13133,12 +13382,11 @@ p-value.:   0.3874
 \end_layout
 
 \begin_layout Standard
-As can be seen, the null hypothesis cannot be rejected at standard levels
- which indicates that the forecast errors are unbiased.
- (Please bear in mind that your exact numerical values may differ slightly
- due to different initializations of the bootstrap.
- To avoid this you would have to give gretl's random number generator a
- seed: 
+As can be seen,
+ the null hypothesis cannot be rejected at standard levels which indicates that the forecast errors are unbiased.
+ (Please bear in mind that your exact numerical values may differ slightly due to different initializations of the bootstrap.
+ To avoid this you would have to give gretl's random number generator a seed:
+ 
 \family typewriter
 set seed <whatever>
 \family default
@@ -13146,11 +13394,12 @@ set seed <whatever>
 \end_layout
 
 \begin_layout Standard
-A non-parametric alternative test approach for forecast unbiasedness was
- proposed by Campbell and Ghysels, as discussed in Section 
+A non-parametric alternative test approach for forecast unbiasedness was proposed by Campbell and Ghysels,
+ as discussed in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Campbell-&-Ghysels"
+nolink "false"
 
 \end_inset
 
@@ -13159,11 +13408,13 @@ reference "subsec:Campbell-&-Ghysels"
 \family typewriter
 b
 \family default
-, 
+,
+ 
 \family typewriter
 b.y
 \family default
-, 
+,
+ 
 \family typewriter
 b.fc
 \family default
@@ -13171,7 +13422,8 @@ b.fc
 \family typewriter
 b.verb
 \family default
- are already defined, the CG test can be performed as follows:
+ are already defined,
+ the CG test can be performed as follows:
 \begin_inset Foot
 status collapsed
 
@@ -13184,9 +13436,9 @@ Formatting the number printout as
 \family typewriter
 printf
 \family default
- command is already slightly advanced, rounding to three decimal digits.
- A straightforward alternative that usually also works fine for floating
- point numbers is 
+ command is already slightly advanced,
+ rounding to three decimal digits.
+ A straightforward alternative that usually also works fine for floating point numbers is 
 \family typewriter
 %g
 \family default
@@ -13199,19 +13451,22 @@ printf
 \end_layout
 
 \begin_layout LyX-Code
-applyFCtests(&b, "CG")
+applyFCtests(&b,
+ "CG")
 \end_layout
 
 \begin_layout LyX-Code
 printf "P-value Wilcoxon-type rank sign test = %.3f
 \backslash
-n", b.CGWILCpval
+n",
+ b.CGWILCpval
 \end_layout
 
 \begin_layout LyX-Code
 printf "P-value sign test = %.3f
 \backslash
-n", b.CGSIGNpval
+n",
+ b.CGSIGNpval
 \end_layout
 
 \begin_layout Standard
@@ -13242,17 +13497,18 @@ P-value sign test = 0.096
 \begin_layout Standard
 These nonparametric tests do not provide strong evidence against unbiasedness,
  either.
- However, if a researcher assumed an underlying asymmetric distribution
- the only adequate test would be the nonparametric sign test, which might
- be considered borderline significant here.
+ However,
+ if a researcher assumed an underlying asymmetric distribution the only adequate test would be the nonparametric sign test,
+ which might be considered borderline significant here.
 \begin_inset Foot
 status collapsed
 
 \begin_layout Plain Layout
 The empirical skewness in this sample is -0.6.
- A skewed distribution would obviously imply non-Gaussianity; the Shapiro-Wilk
- test of the null of a normal distribution yields a p-value of 0.096, the
- Doornik-Hansen test in turn produces 0.152, thus somewhat borderline again.
+ A skewed distribution would obviously imply non-Gaussianity;
+ the Shapiro-Wilk test of the null of a normal distribution yields a p-value of 0.096,
+ the Doornik-Hansen test in turn produces 0.152,
+ thus somewhat borderline again.
 \end_layout
 
 \end_inset
@@ -13265,19 +13521,23 @@ Tests of efficiency
 \end_layout
 
 \begin_layout Standard
-The Holden-Peel test is a parametric test of efficiency, see Section 
+The Holden-Peel test is a parametric test of efficiency,
+ see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Holden-Peel"
+nolink "false"
 
 \end_inset
 
 .
- We simply use lagged forecasts, 
+ We simply use lagged forecasts,
+ 
 \begin_inset Formula $fc_{t-1}$
 \end_inset
 
-, as the conditional variable.
+,
+ as the conditional variable.
  The HP test with bootstrap HAC standard errors is easily executed by:
 \end_layout
 
@@ -13286,7 +13546,8 @@ list b.z = fc(-1) # use lagged forecast as conditional variable
 \end_layout
 
 \begin_layout LyX-Code
-applyFCtests(&b, "HP")
+applyFCtests(&b,
+ "HP")
 \end_layout
 
 \begin_layout Standard
@@ -13306,7 +13567,8 @@ Yields as output:
 \end_layout
 
 \begin_layout LyX-Code
-Method: Approach using HAC robust VCV.
+Method:
+ Approach using HAC robust VCV.
  
 \end_layout
 
@@ -13316,15 +13578,18 @@ Bootstrap p-value using 999 iterations.
 \end_layout
 
 \begin_layout LyX-Code
-H0: forecasts are efficient 
+H0:
+ forecasts are efficient 
 \end_layout
 
 \begin_layout LyX-Code
-Test stat.: 8.1013 
+Test stat.:
+ 8.1013 
 \end_layout
 
 \begin_layout LyX-Code
-p-value.:   0.2763 
+p-value.:
+   0.2763 
 \end_layout
 
 \begin_layout LyX-Code
@@ -13332,8 +13597,8 @@ p-value.:   0.2763
 \end_layout
 
 \begin_layout Standard
-Hence, this parametric test result does not indicate any issue with forecast
- efficiency conditional on 
+Hence,
+ this parametric test result does not indicate any issue with forecast efficiency conditional on 
 \begin_inset Formula $fc_{t-1}$
 \end_inset
 
@@ -13341,8 +13606,7 @@ Hence, this parametric test result does not indicate any issue with forecast
 \end_layout
 
 \begin_layout Standard
-A non-parametric version is also provided by the CG test approach which
- can be used as follows.
+A non-parametric version is also provided by the CG test approach which can be used as follows.
  Note that here
 \family typewriter
  k
@@ -13351,20 +13615,27 @@ A non-parametric version is also provided by the CG test approach which
 \family typewriter
 CGX
 \family default
-, so the series for CGX should be given contemporaneously (here: 
+,
+ so the series for CGX should be given contemporaneously (here:
+ 
 \family typewriter
 fc
 \family default
-), not with a lag (not: 
+),
+ not with a lag (not:
+ 
 \family typewriter
 fc(-1)
 \family default
-); otherwise errors due to missing values may occur.
+);
+ otherwise errors due to missing values may occur.
 \begin_inset Note Note
 status collapsed
 
 \begin_layout Plain Layout
-FIXME: This error should be caught in the next version! (Sven)
+FIXME:
+ This error should be caught in the next version!
+ (Sven)
 \end_layout
 
 \end_inset
@@ -13381,19 +13652,22 @@ series b.CGX = fc
 \end_layout
 
 \begin_layout LyX-Code
-applyFCtests(&b, "CG")
+applyFCtests(&b,
+ "CG")
 \end_layout
 
 \begin_layout LyX-Code
 printf "P-value Wilcoxon-type rank sign test = %.3f
 \backslash
-n", b.CGWILCpval
+n",
+ b.CGWILCpval
 \end_layout
 
 \begin_layout LyX-Code
 printf "P-value sign test = %.3f
 \backslash
-n", b.CGSIGNpval
+n",
+ b.CGSIGNpval
 \end_layout
 
 \begin_layout Standard
@@ -13422,10 +13696,10 @@ P-value sign test = 0.210
 \end_layout
 
 \begin_layout Standard
-Thus, the non-parametric test results broadly agree with the parametric
- ones, although we might add that for lag 2 the result is quite different.
- (The reader is invited to verify this statement using the FEP package and
- the data in the appendix.)
+Thus,
+ the non-parametric test results broadly agree with the parametric ones,
+ although we might add that for lag 2 the result is quite different.
+ (The reader is invited to verify this statement using the FEP package and the data in the appendix.)
 \end_layout
 
 \begin_layout Subsection
@@ -13441,8 +13715,8 @@ literal "true"
 
 \end_inset
 
- extends parts of the previous analysis to the case of asymmetric loss functions
-, cf.
+ extends parts of the previous analysis to the case of asymmetric loss functions,
+ cf.
 \begin_inset space ~
 \end_inset
 
@@ -13450,20 +13724,25 @@ Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Elliott,-Komunjer"
+nolink "false"
 
 \end_inset
 
 .
- We will use lagged forecast errors as an additional instrument apart from
- an intercept for illustration, and assume a quad-quad loss function.
- (Strictly speaking, the explicit specification of 
+ We will use lagged forecast errors as an additional instrument apart from an intercept for illustration,
+ and assume a quad-quad loss function.
+ (Strictly speaking,
+ the explicit specification of 
 \family typewriter
 b.loss
 \family default
- is redundant, since the quadratic U-shape is the default, see Table 
+ is redundant,
+ since the quadratic U-shape is the default,
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Bundle-members-needed"
+nolink "false"
 
 \end_inset
 
@@ -13471,7 +13750,8 @@ reference "tab:Bundle-members-needed"
 \end_layout
 
 \begin_layout LyX-Code
-b.loss = 1                   # Loss function (1=quad-quad, 2=lin-lin) 
+b.loss = 1                   # Loss function (1=quad-quad,
+ 2=lin-lin) 
 \end_layout
 
 \begin_layout LyX-Code
@@ -13516,7 +13796,8 @@ string b.lossdraw = "display"
 \end_layout
 
 \begin_layout LyX-Code
-applyFCtests(&b, "EKT") 
+applyFCtests(&b,
+ "EKT") 
 \end_layout
 
 \begin_layout LyX-Code
@@ -13536,8 +13817,11 @@ Number of iterations before convergence = 8
 \end_layout
 
 \begin_layout LyX-Code
-Test for Symmetry: H0: aT=0.5 vs.
- H1: aT!=0.5
+Test for Symmetry:
+ H0:
+ aT=0.5 vs.
+ H1:
+ aT!=0.5
 \end_layout
 
 \begin_layout LyX-Code
@@ -13608,13 +13892,11 @@ P-value =        0.0262
 \end_layout
 
 \begin_layout Standard
-The null of symmetric loss can be rejected at the 5% level, and after imposing
- symmetry anyway one would indeed reject the null of forecast rationality
- at the 5% level.
- However, under the estimated asymmetric loss function one cannot reject
- the null of forecast rationality.
- Here the suggested conclusion is that the forecasts may be regarded as
- 
+The null of symmetric loss can be rejected at the 5% level,
+ and after imposing symmetry anyway one would indeed reject the null of forecast rationality at the 5% level.
+ However,
+ under the estimated asymmetric loss function one cannot reject the null of forecast rationality.
+ Here the suggested conclusion is that the forecasts may be regarded as 
 \begin_inset Quotes eld
 \end_inset
 
@@ -13622,8 +13904,8 @@ rational
 \begin_inset Quotes erd
 \end_inset
 
-, but only if one departs from the assumption of a symmetric forecast error
- loss function.
+,
+ but only if one departs from the assumption of a symmetric forecast error loss function.
  
 \end_layout
 
@@ -13633,19 +13915,18 @@ The estimated
 \end_inset
 
  is 0.236 which indicates greater aversion to negative forecast errors.
- This is perhaps not surprising considering the sequence of positive forecast
- errors in the first part of the sample.
- Apart from the reported test results, a plot of the estimated loss function
- is returned (see Figure 
+ This is perhaps not surprising considering the sequence of positive forecast errors in the first part of the sample.
+ Apart from the reported test results,
+ a plot of the estimated loss function is returned (see Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Estimated-loss-function"
+nolink "false"
 
 \end_inset
 
 ).
- The upper and lower lines represent a confidence band due to the estimation
- uncertainty of the asymmetry parameter 
+ The upper and lower lines represent a confidence band due to the estimation uncertainty of the asymmetry parameter 
 \begin_inset Formula $\hat{\alpha}$
 \end_inset
 
@@ -13655,6 +13936,7 @@ reference "fig:Estimated-loss-function"
 \begin_layout Standard
 \begin_inset Float figure
 placement h
+alignment document
 wide false
 sideways false
 status open
@@ -13699,17 +13981,16 @@ Forecast comparison
 \end_layout
 
 \begin_layout Standard
-The Diebold-Mariano approach tests for equal predictive accuracy of two
- competing forecasts (Section 
+The Diebold-Mariano approach tests for equal predictive accuracy of two competing forecasts (Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Diebold-Mariano"
+nolink "false"
 
 \end_inset
 
 ).
- We compare the current forecast for simplicity with the pre-year (naive)
- forecast assuming linear loss.
+ We compare the current forecast for simplicity with the pre-year (naive) forecast assuming linear loss.
  The test is called by:
 \end_layout
 
@@ -13718,15 +13999,18 @@ b.f1 = fc    # FC 1 series
 \end_layout
 
 \begin_layout LyX-Code
-b.f2 = y(-1) # FC 2 series: naive pre-year realization
+b.f2 = y(-1) # FC 2 series:
+ naive pre-year realization
 \end_layout
 
 \begin_layout LyX-Code
-b.loss = 2   # 1="U-shape", 2="V-shape"
+b.loss = 2   # 1="U-shape",
+ 2="V-shape"
 \end_layout
 
 \begin_layout LyX-Code
-applyFCtests(&b, "DM")
+applyFCtests(&b,
+ "DM")
 \end_layout
 
 \begin_layout Standard
@@ -13746,32 +14030,39 @@ Yields as output:
 \end_layout
 
 \begin_layout LyX-Code
-Loss: V-shape linear.
+Loss:
+ V-shape linear.
 \end_layout
 
 \begin_layout LyX-Code
-Forecast horizon: 1
+Forecast horizon:
+ 1
 \end_layout
 
 \begin_layout LyX-Code
-H0: forecasts are equally accurate
+H0:
+ forecasts are equally accurate
 \end_layout
 
 \begin_layout LyX-Code
-Test stat.: -2.5611
+Test stat.:
+ -2.5611
 \end_layout
 
 \begin_layout LyX-Code
 p-value (stand.
- normal): 0.0104
+ normal):
+ 0.0104
 \end_layout
 
 \begin_layout LyX-Code
-p-value (t-distributed): 0.0209
+p-value (t-distributed):
+ 0.0209
 \end_layout
 
 \begin_layout LyX-Code
-p-value (small-sample): 0.0178
+p-value (small-sample):
+ 0.0178
 \end_layout
 
 \begin_layout LyX-Code
@@ -13779,8 +14070,7 @@ p-value (small-sample): 0.0178
 \end_layout
 
 \begin_layout Standard
-The null hypothesis can be rejected at the 5% significance level for all
- three versions computed.
+The null hypothesis can be rejected at the 5% significance level for all three versions computed.
  The negative test statistic (-2.56) indicates that the 
 \begin_inset Quotes eld
 \end_inset
@@ -13797,7 +14087,8 @@ Directional forecast
 \end_layout
 
 \begin_layout Standard
-Apart from point forecasts, directional forecasts may be of interest.
+Apart from point forecasts,
+ directional forecasts may be of interest.
  The 
 \emph on
 Kuipers score
@@ -13807,6 +14098,7 @@ Kuipers score
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:The-Kuipers-Score"
+nolink "false"
 
 \end_inset
 
@@ -13819,8 +14111,8 @@ yup
 \family typewriter
 fcup
 \family default
- which take the value of one if the period-change in realized (or forecast)
- values is positive (otherwise zero), and then execute the KS computation.
+ which take the value of one if the period-change in realized (or forecast) values is positive (otherwise zero),
+ and then execute the KS computation.
  
 \end_layout
 
@@ -13833,7 +14125,8 @@ series b.fcup = (diff(fc) > 0)
 \end_layout
 
 \begin_layout LyX-Code
-applyFCtests(&b, "KS") # could also use doKS(&b)
+applyFCtests(&b,
+ "KS") # could also use doKS(&b)
 \end_layout
 
 \begin_layout Standard
@@ -13865,8 +14158,8 @@ Kuipers Score   = 0.900
 \end_layout
 
 \begin_layout Standard
-Accordingly, the forecasts have a perfect hit rate of 1 meaning that all
- 
+Accordingly,
+ the forecasts have a perfect hit rate of 1 meaning that all 
 \begin_inset Quotes eld
 \end_inset
 
@@ -13875,12 +14168,12 @@ ups
 \end_inset
 
  are correctly predicted.
- The false alarm rate is only 10% such that the KS statistic is 0.9 which
- indicates a good directional forecast performance.
+ The false alarm rate is only 10% such that the KS statistic is 0.9 which indicates a good directional forecast performance.
 \end_layout
 
 \begin_layout Standard
-Finally, the 
+Finally,
+ the 
 \emph on
 Diebold-Lopez
 \emph default
@@ -13888,13 +14181,12 @@ Diebold-Lopez
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Diebold-Lopez"
+nolink "false"
 
 \end_inset
 
-) tests whether a directional forecast is significantly different from a
- coin flip.
- For reasons of backwards compatibility with older FEP versions the bundle
- for the DL test currently must not contain other non-binary 
+) tests whether a directional forecast is significantly different from a coin flip.
+ For reasons of backwards compatibility with older FEP versions the bundle for the DL test currently must not contain other non-binary 
 \family typewriter
 y
 \family default
@@ -13902,13 +14194,13 @@ y
 \family typewriter
 fc
 \family default
- series, and therefore we cannot re-use the previously defined bundle.
+ series,
+ and therefore we cannot re-use the previously defined bundle.
  Instead we build a new bundle here.
 \end_layout
 
 \begin_layout Standard
-The positive test statistic of 1.88 indicates that the actual forecast outperform
-s a pure coin flip which is statistically confirmed by the p-value.
+The positive test statistic of 1.88 indicates that the actual forecast outperforms a pure coin flip which is statistically confirmed by the p-value.
  
 \end_layout
 
@@ -13917,7 +14209,7 @@ s a pure coin flip which is statistically confirmed by the p-value.
 \end_layout
 
 \begin_layout LyX-Code
-bundle bDL = null
+bundle bDL = _()
 \end_layout
 
 \begin_layout LyX-Code
@@ -13933,7 +14225,8 @@ series bDL.fcup = (diff(fc) > 0)
 \end_layout
 
 \begin_layout LyX-Code
-applyFCtests(&bDL, "DL")
+applyFCtests(&bDL,
+ "DL")
 \end_layout
 
 \begin_layout Standard
@@ -13953,19 +14246,23 @@ Yields as output:
 \end_layout
 
 \begin_layout LyX-Code
-H0: y(t) and fc(t) are independent
+H0:
+ y(t) and fc(t) are independent
 \end_layout
 
 \begin_layout LyX-Code
-Info-value: 1.8750
+Info-value:
+ 1.8750
 \end_layout
 
 \begin_layout LyX-Code
-Test stat.: 13.3875
+Test stat.:
+ 13.3875
 \end_layout
 
 \begin_layout LyX-Code
-p-value.: 0.0003
+p-value.:
+ 0.0003
 \end_layout
 
 \begin_layout LyX-Code
@@ -13977,6 +14274,7 @@ In this context the Pesaran-Timmermann test described in Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Pesaran-Timmermann"
+nolink "false"
 
 \end_inset
 
@@ -14000,16 +14298,13 @@ Summary and outlook
 \end_layout
 
 \begin_layout Standard
-FEP makes it easy to analyze and evaluate forecasts and the associated forecast
- errors (ex post).
+FEP makes it easy to analyze and evaluate forecasts and the associated forecast errors (ex post).
  It already offers many popular tests that have been proposed in the literature.
- The plan is to extend the package continually and to further broaden its
- scope.
- For example, tools to analyze density forecasts would be useful.
- Another interesting area for inclusion could be recent developments in
- the literature concerning the comparison of multiple forecasts.
- The bundle-based framework of FEP would allow these extensions while maintainin
-g a coherent user interface.
+ The plan is to extend the package continually and to further broaden its scope.
+ For example,
+ tools to analyze density forecasts would be useful.
+ Another interesting area for inclusion could be recent developments in the literature concerning the comparison of multiple forecasts.
+ The bundle-based framework of FEP would allow these extensions while maintaining a coherent user interface.
 \end_layout
 
 \end_inset
@@ -14044,16 +14339,17 @@ Data
 \end_layout
 
 \begin_layout Standard
-For replication purposes we reproduce the data used in the illustration
- in Section 
+For replication purposes we reproduce the data used in the illustration in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Illustrative-example"
+nolink "false"
 
 \end_inset
 
 .
- For the definitions see the text; source Macrobond and AMECO.
+ For the definitions see the text;
+ source Macrobond and AMECO.
 \end_layout
 
 \begin_layout LyX-Code
@@ -14150,6 +14446,39 @@ Changelog
 \end_layout
 
 \begin_layout Itemize
+version 2.92 (February 2025)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Clarify the Giacomini-White help text and correct relative timings description.
+\end_layout
+
+\begin_layout Itemize
+(TODO:) Adjust the HAC lag setting in the GW test to grow with the sample size in the case of ...
+\end_layout
+
+\begin_layout Itemize
+(TODO / maybe??) Change the default in the GW test from unconditional to conditional,
+ because that is really what it is made for (backwards incompatible!).
+\end_layout
+
+\begin_layout Itemize
+Internal:
+ replace some deprecated 
+\begin_inset Quotes eld
+\end_inset
+
+null
+\begin_inset Quotes erd
+\end_inset
+
+ initializers.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
 version 2 .91 (May 2023)
 \end_layout
 
@@ -14168,7 +14497,8 @@ extra
 \end_layout
 
 \begin_layout Itemize
-Bugfix: Computing two-sided Sign test for 
+Bugfix:
+ Computing two-sided Sign test for 
 \family typewriter
 doCGtest()
 \family default
@@ -14186,8 +14516,8 @@ version 2.9 (April 2023)
 
 \begin_deeper
 \begin_layout Itemize
-Internal improvement: remove odd syntax for specifying lagged variable for
- GW test
+Internal improvement:
+ remove odd syntax for specifying lagged variable for GW test
 \end_layout
 
 \begin_layout Itemize
@@ -14201,8 +14531,7 @@ version 2.8 (March 2023)
 
 \begin_deeper
 \begin_layout Itemize
-Improve error message in case an empty list of forecasts is passed via the
- GUI
+Improve error message in case an empty list of forecasts is passed via the GUI
 \end_layout
 
 \end_deeper
@@ -14212,12 +14541,12 @@ version 2.7 (January 2023)
 
 \begin_deeper
 \begin_layout Itemize
-modernize syntax again, require gretl 2020c
+modernize syntax again,
+ require gretl 2020c
 \end_layout
 
 \begin_layout Itemize
-fix a bug with the GW test when the instrument data was passed as series
- type
+fix a bug with the GW test when the instrument data was passed as series type
 \end_layout
 
 \begin_layout Itemize
@@ -14231,7 +14560,8 @@ version 2.6 (July 2021)
 
 \begin_deeper
 \begin_layout Itemize
-internally replace deprecated syntax, require gretl 2018a because of that
+internally replace deprecated syntax,
+ require gretl 2018a because of that
 \end_layout
 
 \begin_layout Itemize
@@ -14245,19 +14575,23 @@ version 2.5 (October 2020)
 
 \begin_deeper
 \begin_layout Itemize
-Fix bug in MADmean(): passed forecast errors instead of point forecast values.
+Fix bug in MADmean():
+ passed forecast errors instead of point forecast values.
 \end_layout
 
 \begin_layout Itemize
 Fix bug in ForecastMetrics().
- When calling each of the following evaluation functions, the forecast error
- instead of the point forecast was passed as a variable: sMdAPE(), sMdAPE(),
- sMdAAPE(), sMdAAPE().
+ When calling each of the following evaluation functions,
+ the forecast error instead of the point forecast was passed as a variable:
+ sMdAPE(),
+ sMdAPE(),
+ sMdAAPE(),
+ sMdAAPE().
 \end_layout
 
 \begin_layout Itemize
-Add new evaluation metric for point forecasts: Mean Squared Logarithmic
- Error (MSLE).
+Add new evaluation metric for point forecasts:
+ Mean Squared Logarithmic Error (MSLE).
 \end_layout
 
 \begin_layout Itemize
@@ -14270,9 +14604,7 @@ functions computing point forecast evaluation statistics incl.
 \end_layout
 
 \begin_layout Itemize
-Add new public function getForecastMetricsNames() for returning array of
- names of forecasting statistics in the same order as returned by the ForecastMe
-trics() function.
+Add new public function getForecastMetricsNames() for returning array of names of forecasting statistics in the same order as returned by the ForecastMetrics() function.
 \end_layout
 
 \begin_layout Itemize
@@ -14286,8 +14618,7 @@ version 2.41 (January 2020)
 
 \begin_deeper
 \begin_layout Itemize
-add some documentation for the Clark-West test and also provide robust test
- statistics
+add some documentation for the Clark-West test and also provide robust test statistics
 \end_layout
 
 \begin_layout Itemize
@@ -14309,7 +14640,8 @@ RMdSPE
 \begin_inset Quotes erd
 \end_inset
 
-: instead of the median the mean was computed.
+:
+ instead of the median the mean was computed.
 \end_layout
 
 \begin_layout Itemize
@@ -14321,7 +14653,8 @@ MdE
 \begin_inset Quotes erd
 \end_inset
 
-, 
+,
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14329,7 +14662,8 @@ MdAE
 \begin_inset Quotes erd
 \end_inset
 
-, 
+,
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14351,25 +14685,30 @@ version 2.3 (November 2019)
 
 \begin_deeper
 \begin_layout Itemize
-Implement experimental version of Clark-West test on equal predictive accuracy
- of nested models.
+Implement experimental version of Clark-West test on equal predictive accuracy of nested models.
 \end_layout
 
 \begin_layout Itemize
-New function ForecastMetrics() for computing various time-series related
- measures for the evaluation of point forecasts.
+New function ForecastMetrics() for computing various time-series related measures for the evaluation of point forecasts.
 \end_layout
 
 \begin_layout Itemize
-As previously announced, rename doEKTtest_series to doEKTtest and doEKTtest
- to doEKTtest_matrix to harmonize the interfaces.
- This is backwards-incompatible, but the minimal needed change is to follow
- the renaming to doEKTtest_matrix (or adapt your used interface).
+As previously announced,
+ rename doEKTtest_series to doEKTtest and doEKTtest to doEKTtest_matrix to harmonize the interfaces.
+ This is backwards-incompatible,
+ but the minimal needed change is to follow the renaming to doEKTtest_matrix (or adapt your used interface).
 \end_layout
 
 \begin_layout Itemize
-remove several deprecated aliases: doCGWILCtest (use: doCGtest), doCGRANKtest
- (use: doCGtest), doKStest (use: doKS), doKGtest (use: doHPtest)
+remove several deprecated aliases:
+ doCGWILCtest (use:
+ doCGtest),
+ doCGRANKtest (use:
+ doCGtest),
+ doKStest (use:
+ doKS),
+ doKGtest (use:
+ doHPtest)
 \end_layout
 
 \begin_layout Itemize
@@ -14418,8 +14757,7 @@ add Giacomini-White test on conditional predictive ability
 \end_layout
 
 \begin_layout Itemize
-switch to new sample data set comprising annual EA GDP growth realizations
- and forecasts by the Economist Poll of Forecasters
+switch to new sample data set comprising annual EA GDP growth realizations and forecasts by the Economist Poll of Forecasters
 \end_layout
 
 \begin_layout Itemize
@@ -14427,7 +14765,9 @@ In case the forecast horizon is chosen to be
 \begin_inset Formula $fhor=0$
 \end_inset
 
- for both the DM- and GW-Test, respectively, return a warning.
+ for both the DM- and GW-Test,
+ respectively,
+ return a warning.
 \end_layout
 
 \end_deeper
@@ -14437,8 +14777,7 @@ version 2.11 (March 2018)
 
 \begin_deeper
 \begin_layout Itemize
-internal change (related to the 'strstr' function) to make FEP compatible
- with the next gretl version 2018a
+internal change (related to the 'strstr' function) to make FEP compatible with the next gretl version 2018a
 \end_layout
 
 \begin_layout Itemize
@@ -14457,14 +14796,13 @@ doCGtest():
 
 \begin_deeper
 \begin_layout Itemize
-re-centering of the CGX series for the orthogonality test is done properly
- (recursively) now
+re-centering of the CGX series for the orthogonality test is done properly (recursively) now
 \end_layout
 
 \begin_layout Itemize
-rewrite the entire CG test apparatus based on new function CamDufStats (referrin
-g to Campbell & Dufour 1995, not yet in references), properly taking into
- account the necessary different variants of constructing the ranks
+rewrite the entire CG test apparatus based on new function CamDufStats (referring to Campbell & Dufour 1995,
+ not yet in references),
+ properly taking into account the necessary different variants of constructing the ranks
 \end_layout
 
 \begin_layout Itemize
@@ -14473,7 +14811,8 @@ remove the method switch CGmeth and always calculate both variants
 
 \end_deeper
 \begin_layout Itemize
-add print-out option for doDLtest, doHPtest and doMZtest
+add print-out option for doDLtest,
+ doHPtest and doMZtest
 \end_layout
 
 \begin_layout Itemize
@@ -14491,12 +14830,14 @@ switch the documentation to this PDF file
 \end_layout
 
 \begin_layout Itemize
-harmonize the functions' interfaces, in a hopefully backwards-compatible
- way (old behavior not documented anymore)
+harmonize the functions' interfaces,
+ in a hopefully backwards-compatible way (old behavior not documented anymore)
 \end_layout
 
 \begin_layout Itemize
-introduce more default values (b.nboot = 0, b.fhor = 1, b.verb = 0...)
+introduce more default values (b.nboot = 0,
+ b.fhor = 1,
+ b.verb = 0...)
 \end_layout
 
 \begin_layout Itemize
@@ -14504,9 +14845,8 @@ allow more than one test spec in applyFCtests()
 \end_layout
 
 \begin_layout Itemize
-For functions that deal with FC errors E, infer the respective series from
- the bundle input of realizations y and forecasts fc if E isn't directly
- given.
+For functions that deal with FC errors E,
+ infer the respective series from the bundle input of realizations y and forecasts fc if E isn't directly given.
 \end_layout
 
 \begin_layout Itemize
@@ -14530,9 +14870,8 @@ fix bug with the CG tests for
 \end_layout
 
 \begin_layout Itemize
-deprecate doCGRANKtest() and doCGWILCtest() in favor of single doCGtest()
- with method switch (also CGRANK didn't really have ranks in it); and switch
- to gretl built-in nonparametric test (difftest)
+deprecate doCGRANKtest() and doCGWILCtest() in favor of single doCGtest() with method switch (also CGRANK didn't really have ranks in it);
+ and switch to gretl built-in nonparametric test (difftest)
 \end_layout
 
 \end_deeper
@@ -14550,14 +14889,15 @@ fix another bug with p-value calculation in the PT case
 \end_layout
 
 \begin_layout Itemize
-DL test: additional info value now in <bundle>.DLinfo, test stat in <bundle>.DLsta
-t (backward incompatible change) 
+DL test:
+ additional info value now in <bundle>.DLinfo,
+ test stat in <bundle>.DLstat (backward incompatible change) 
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-version 1.25 (12.06.2017): Correct a bug in the computation of the p-value
- of the Pesaran-Timmermann test when using HAC S.E.
+version 1.25 (12.06.2017):
+ Correct a bug in the computation of the p-value of the Pesaran-Timmermann test when using HAC S.E.
 \end_layout
 
 \begin_layout Itemize
@@ -14566,8 +14906,7 @@ version 1.24 (22.05.2017)
 
 \begin_deeper
 \begin_layout Itemize
-Add the getLoss() function for computing forecast error losses (written
- by Sven Schreiber) 
+Add the getLoss() function for computing forecast error losses (written by Sven Schreiber) 
 \end_layout
 
 \begin_layout Itemize
@@ -14576,8 +14915,8 @@ no specific data type for usage of the FEP package required now
 
 \end_deeper
 \begin_layout Itemize
-version 1.23 (09.05.2017): Some small improvements in both DrawLoss() and DrawLoss2
-() (thanks to Sven Schreiber for suggestions) 
+version 1.23 (09.05.2017):
+ Some small improvements in both DrawLoss() and DrawLoss2() (thanks to Sven Schreiber for suggestions) 
 \end_layout
 
 \begin_layout Itemize
@@ -14586,25 +14925,23 @@ version 1.22 (08.03.2017)
 
 \begin_deeper
 \begin_layout Itemize
-corrected: Pesaran-Timmermann test should be a 1-sided not 2-sided alternative
- 
+corrected:
+ Pesaran-Timmermann test should be a 1-sided not 2-sided alternative 
 \end_layout
 
 \begin_layout Itemize
 DrawLoss() (related to doEKTtest) now also plots the 2 S.E.
- of the estimated loss function based on the estimated (a-)symmetry parameter
- alpha 
+ of the estimated loss function based on the estimated (a-)symmetry parameter alpha 
 \end_layout
 
 \begin_layout Itemize
-add the function DrawLoss2() which can be called manually (see sample script)
- to plot jointly 2 loss functions as well as its associated 2 S.E.
+add the function DrawLoss2() which can be called manually (see sample script) to plot jointly 2 loss functions as well as its associated 2 S.E.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-version 1.21 (26.01.2017): return classification matrix Ksmat computed for
- the Kuipers Score
+version 1.21 (26.01.2017):
+ return classification matrix Ksmat computed for the Kuipers Score
 \end_layout
 
 \begin_layout Itemize
@@ -14614,13 +14951,13 @@ version 1.20 (15.01.2017)
 \begin_deeper
 \begin_layout Itemize
 Replace the DiebMar.gfn package (vers.
- 1.0) for computation of Diebold-Mariano test by own regression-based procedure
- using HAC robust S.E.
+ 1.0) for computation of Diebold-Mariano test by own regression-based procedure using HAC robust S.E.
  
 \end_layout
 
 \begin_layout Itemize
-*** NOTE: The function's usage has changed from vers.
+*** NOTE:
+ The function's usage has changed from vers.
  1.1 -> 1.2!
 \end_layout
 
@@ -14644,8 +14981,8 @@ add Pesaran-Timmermann Test (1992)
 
 \end_deeper
 \begin_layout Itemize
-version 1.01 (24.11.2016): In doKGtest() the linear restriction was not correctly
- set.
+version 1.01 (24.11.2016):
+ In doKGtest() the linear restriction was not correctly set.
 \end_layout
 
 \end_inset

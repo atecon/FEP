@@ -6,19 +6,19 @@ open FEPdata.gdt --frompkg=FEP
 #--------
 # MZ test
 #--------
-bundle b = null
+bundle b = _()
 b.y = y						# realizations
 b.fc = fc					# forecasts
-b.nboot = 999				# 0=NO bootstrap, nboot>0 --> use nboot replications
-b.robust = 1				# 1=robust HAC robust VCV
-b.verb = 1					# 1=print details
+b.nboot = 999				# 0 = NO bootstrap, nboot>0 --> use nboot replications
+b.robust = 1				# 1 = robust HAC robust VCV
+b.verb = 1					# 1 = print details
 applyFCtests(&b, "MZ")		# call the top-level function
 print b						# print bundle input
    
 #--------------------
 # HP (former KG) test
 #--------------------
-bundle b = null
+bundle b = _()
 b.y = y
 b.fc = fc
 list z = time
@@ -32,7 +32,7 @@ print b
 #------------------
 # CG tests
 #------------------
-bundle b = null
+bundle b = _()
 scalar variant = 1			# for illustration only
 if variant == 1				# let FEP compute the forecast errors
     b.y = y
@@ -46,34 +46,34 @@ endif
 b.k = 0
 # add conditional regressor -- will call the orthogonality test iff k>0
 # b.CGX = time
-b.verb = 1					# 1=print details
+b.verb = 1					# 1 = print details
 applyFCtests(&b, "CG")
 print b
 
 #-----------------
 # Diebold & Lopez
 #-----------------
-bundle b = null
+bundle b = _()
 b.yup = (diff(y) > 0)
 b.fcup = (diff(fc) > 0)
-b.verb = 1					# 1=print details
+b.verb = 1					# 1 = print details
 applyFCtests(&b, "DL")
 print b
 
 #---------------
 # Kuipers Score
 #---------------
-bundle b = null
+bundle b = _()
 b.yup = (diff(y) > 0)
 b.fcup = (diff(fc) > 0)
-b.verb = 1					# 1=print details
+b.verb = 1					# 1 = print details
 applyFCtests(&b, "KS")
 print b
 
 #----------------------------
 # Pesaran & Timmermann (1992)
 #----------------------------
-bundle b = null
+bundle b = _()
 b.yup = (diff(y) > 0)
 b.fcup = (diff(fc) > 0)
 # b.PTmeth = 2				# 1=correlation based, 2=regression based with HAC VCV
@@ -85,7 +85,7 @@ print b
 #------------------
 # Diebold & Mariano
 #------------------
-bundle b = null
+bundle b = _()
 b.y = y
 b.f1 = fc		# FC 1 series
 b.f2 = fc(-1)	# FC 2 series
@@ -98,7 +98,7 @@ print b
 #------------------
 # Giacomini & White
 #------------------
-bundle b = null
+bundle b = _()
 b.y = y
 b.f1 = fc			# FC 1 series
 b.f2 = fc(-1)		# FC 2 series
@@ -113,7 +113,7 @@ print b
 #-------------
 # Clark & West
 #-------------
-bundle b = null
+bundle b = _()
 b.y = y
 b.f1 = fc			# Forecast from parsimonious model
 b.f2 = fc + 0.1*fc(-1)    # Forecast from the larger model that nests model 1
@@ -128,7 +128,7 @@ print b
 # Elliott, Komunjer, Timmermann
 # Example 1 using doEKTtest_series()
 #------------------------------------
-bundle b = null
+bundle b = _()
 b.p0 = 2					# Loss function (lin-lin = 1, quad-quad = 2)
 scalar variant = 1			# for illustration only
 series fcerr = y-fc
@@ -153,7 +153,7 @@ smpl full
 #------------
 # Example 2
 #------------
-bundle b = null
+bundle b = _()
 b.p0 = 2
 smpl fcerr fcerr1 --no-missing
 b.E = fcerr
@@ -178,7 +178,7 @@ series pr = $yhat			# estimated probabilities that Pr(UP|I)=1
 # use directly probscore()
 probscore({UP},{pr})
 # alternatively use the wrapper doPS() using the bundle expression
-bundle b = null
+bundle b = _()
 b.yup = UP
 b.pfc = pr
 doPS(&b)

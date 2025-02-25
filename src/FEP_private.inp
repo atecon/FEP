@@ -274,7 +274,7 @@ end function
 function list get_fc_error_list (const series y, const list fc)
     /* Compute list of forecast errors */
 
-    list fc_error = null
+    list fc_error
     loop foreach i fc 
         series err_$i = get_fc_error(y, fc.$i)
         list fc_error += err_$i
