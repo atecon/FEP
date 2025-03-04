@@ -144,7 +144,7 @@ based on FEP
 \end_inset
 
  version 2.92,
- Februar 2025
+ March 2025
 \end_layout
 
 \begin_layout Abstract
@@ -11818,7 +11818,7 @@ where
 
 .
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Conditioning on 
@@ -12207,8 +12207,8 @@ cond
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 = unconditional test (default),
- 1 = conditional test
+0 = unconditional test,
+ 1 = conditional test (default)
 \end_layout
 
 \end_inset
@@ -14446,23 +14446,34 @@ Changelog
 \end_layout
 
 \begin_layout Itemize
-version 2.92 (February 2025)
+version 2.92 (March 2025)
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Clarify the Giacomini-White help text and correct relative timings description.
+Giacomini-White (GW) test improvements:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Clarify the GW help text and correct relative timings description.
 \end_layout
 
 \begin_layout Itemize
-(TODO:) Adjust the HAC lag setting in the GW test to grow with the sample size in the case of ...
+Adjust the HAC estimation truncation lag setting in the GW test to grow with the sample size in the unconditional case (cf.
+ GW p.
+ 1557)
 \end_layout
 
 \begin_layout Itemize
-(TODO / maybe??) Change the default in the GW test from unconditional to conditional,
- because that is really what it is made for (backwards incompatible!).
+Backwards incompatible,
+ adjust your scripts:
+ change the default in the GW test from unconditional to conditional,
+ because that is really what it is made for.
+ 
 \end_layout
 
+\end_deeper
 \begin_layout Itemize
 Internal:
  replace some deprecated 
