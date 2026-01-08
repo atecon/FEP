@@ -216,7 +216,7 @@ http://gretl.sf.net
 
 \end_inset
 
- The FEP package currently comprises the functions listed in Table
+ The FEP package currently comprises the functions listed in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Included-functions"
@@ -225,7 +225,7 @@ nolink "false"
 \end_inset
 
 .
- In Section
+ In Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Menu-driven-(GUI)-usage"
@@ -924,26 +924,7 @@ The applyFCtests() function
 
 \begin_layout Standard
 This is a convenient top-level function which calls the other test functions in the background as needed.
- The standard workflow is to define the needed gretl bundle
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
-A
-\begin_inset Quotes eld
-\end_inset
-
-bundle
-\begin_inset Quotes erd
-\end_inset
-
- is a flexible gretl datatype which is basically a collection of other gretl objects.
- See Section 10.7 of the gretl user guide (as of November 2017).
-\end_layout
-
-\end_inset
-
- with your input data and choices,
+ The standard workflow is to define the needed gretl bundle with your input data and choices,
  and then call this function with the appropriate string code.
  Here's an example with the Mincer-Zarnowitz test:
 \end_layout
@@ -975,7 +956,7 @@ MZ
 \begin_layout Standard
 The first three lines set up the bundle and put some relevant data in it.
 \begin_inset Foot
-status collapsed
+status open
 
 \begin_layout Plain Layout
 If you're obsessed with saving lines of code,
@@ -985,23 +966,8 @@ If you're obsessed with saving lines of code,
 \begin_inset Newline newline
 \end_inset
 
-bundle b = defbundle(
-\begin_inset Quotes eld
-\end_inset
-
-y
-\begin_inset Quotes erd
-\end_inset
-
-,growth,
-\begin_inset Quotes eld
-\end_inset
-
-fc
-\begin_inset Quotes erd
-\end_inset
-
-,myforecast)
+bundle b = _(y=growth,
+ fc=myforecast)
 \family default
 .
 \end_layout
@@ -1025,7 +991,7 @@ fc
 \end_inset
 
  need to match exactly and are case sensitive.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Bundle-members-needed"
@@ -1063,7 +1029,7 @@ b
 
 .
 \begin_inset Foot
-status collapsed
+status open
 
 \begin_layout Plain Layout
 See
@@ -1075,14 +1041,14 @@ Function programming details
 \end_inset
 
 ,
- Section 13.4 of the gretl user guide (as of November 2017).
+ Section 14.4 of the gretl user guide (as of January 2026).
 \end_layout
 
 \end_inset
 
  Finally,
  a string code must be specified to indicate which test should be run,
- where the possible codes are given in Table
+ where the possible codes are given in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Included-functions"
@@ -4166,7 +4132,7 @@ The function getLoss() helps to calculate the forecast losses (disutilities) imp
  square,
  linex,
  double linex.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:getLoss-–-forecast"
@@ -4547,13 +4513,17 @@ literal "true"
 
 \begin_layout Plain Layout
 Notes:
- About input format for
-\emph on
-param:
+ gretl also accepts a scalar for a 1-element vector.
+\begin_inset Note Note
+status collapsed
 
-\emph default
- For gretl versions until 2017a scalar values must explicitly be provided as a pseudo matrix (e.g {0.4}) while for later versions,
- gretl accepts a scalar as a 1x1 matrix.
+\begin_layout Plain Layout
+at least since 2017a
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -4567,7 +4537,7 @@ Draw some loss functions
 
 \begin_layout Standard
 Draw a single (DrawLoss) or two (DrawLoss2) loss functions and their associated confidence intervals.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:drawloss"
@@ -5133,7 +5103,7 @@ It seems that this terminology is not universal.
 \end_inset
 
 .
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doKS–-Kuipers"
@@ -5545,7 +5515,7 @@ Probability scores – doPS() and probscore()
 The probscore() function computes forecast accuracy statistics used for probability forecasts.
  The observed outcome is still binary,
  but in contrast to the Kuipers score the forecast here is a continuous probability.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:probscore"
@@ -5555,7 +5525,7 @@ nolink "false"
 
 .
  The doPS() function is just a thin wrapper around probscore that is harmonized with the evaluation test functions in the package;
- see Table
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doPS"
@@ -6076,7 +6046,7 @@ Tools for point forecasts – ForecastMetrics()
 The ForecastMetrics() function comprises the computation of various evaluation metrics for point forecasts.
  For computation of five standard measures,
  we apply gretl's built-in function fcstats().
- In total twelve measures are currently implemented – for details see Table
+ In total twelve measures are currently implemented – for details see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Computations-of-point"
@@ -6097,7 +6067,7 @@ literal "false"
 \end_inset
 
 .
- Details on the ForecastMetrics() function can be found in Table
+ Details on the ForecastMetrics() function can be found in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Point-forecast-measures"
@@ -6991,7 +6961,7 @@ However,
 \end_layout
 
 \begin_layout Standard
-See Table
+See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doMZtest"
@@ -7530,7 +7500,7 @@ status open
 
 \begin_layout Standard
 Again the user can compute HAC robust standard errors and/or bootstrap p-values;
- see Table
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doHPtest"
@@ -8120,7 +8090,7 @@ with
 
  (or leave it out,
  as this is the default;
- see Table
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCGtest"
@@ -8826,7 +8796,7 @@ noting that the ranks used refer to the forecast errors,
 
 ,
  to obtain a statistic with a known and valid distribution;
- see
+ see 
 \begin_inset CommandInset citation
 LatexCommand citet
 after "pp. 3"
@@ -8835,7 +8805,7 @@ literal "true"
 
 \end_inset
 
- or
+ or 
 \begin_inset CommandInset citation
 LatexCommand citet
 after "p. 560"
@@ -8875,7 +8845,7 @@ When
 \end_inset
 
  This orthogonality test can be achieved by passing the series as CGX in the bundle.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCGtest"
@@ -9112,7 +9082,7 @@ For a given
 \end_layout
 
 \begin_layout Standard
-See Table
+See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doEKTtest"
@@ -9993,7 +9963,7 @@ A second –non-regression based– approach to compute the test instead is to r
 \end_layout
 
 \begin_layout Standard
-See Table
+See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doPTtest"
@@ -10469,7 +10439,7 @@ DLinfo
 \end_layout
 
 \begin_layout Standard
-See Table
+See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doDLtest"
@@ -11064,7 +11034,7 @@ where
 \end_inset
 
 -step forecast horizon.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doDMtest"
@@ -12414,7 +12384,7 @@ We gratefully acknowledge useful comments from Michał Rubaszek.
 \end_layout
 
 \begin_layout Standard
-Implementation of
+Implementation of 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "ClarkWest2007"
@@ -12424,7 +12394,7 @@ literal "false"
 
 ,
  testing equal predictive accuracy in nested models (one-sided test);
- see Table
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCWtest"
@@ -13093,7 +13063,7 @@ The concrete images of those icons will depend on your operating system and/or y
 
 \begin_layout Standard
 Note that only the actual test functions are choosable from the GUI,
- not the helper functions from Section
+ not the helper functions from Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Forecast-descriptive-statistics"
@@ -13128,7 +13098,7 @@ In the following an applied example using survey-based forecasts for annual grow
 
 ,
  are from the AMECO database provided by the European Commission.
- Both series' values are reported in the data appendix
+ Both series' values are reported in the data appendix 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Data"
@@ -13137,7 +13107,7 @@ nolink "false"
 \end_inset
 
 ,
- and Figure
+ and Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Forecast-error-for"
@@ -13224,7 +13194,7 @@ We run the parametric Mincer-Zarnowitz test on forecast unbiasedness using boots
 iid
 \emph default
 ) and HAC standard errors,
- see Section
+ see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Mincer-Zarnowitz"
@@ -13319,15 +13289,16 @@ As can be seen,
  the null hypothesis cannot be rejected at standard levels which indicates that the forecast errors are unbiased.
  (Please bear in mind that your exact numerical values may differ slightly due to different initializations of the bootstrap.
  To avoid this you would have to give gretl's random number generator a seed:
+
 \family typewriter
-set seed <whatever>
+ set seed <whatever>
 \family default
 )
 \end_layout
 
 \begin_layout Standard
 A non-parametric alternative test approach for forecast unbiasedness was proposed by Campbell and Ghysels,
- as discussed in Section
+ as discussed in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Campbell-&-Ghysels"
@@ -13338,19 +13309,21 @@ nolink "false"
 .
  Assuming that the previous code has been executed and thus
 \family typewriter
-b
+ b
 \family default
 ,
+
 \family typewriter
-b.y
+ b.y
 \family default
 ,
+
 \family typewriter
-b.fc
+ b.fc
 \family default
  and
 \family typewriter
-b.verb
+ b.verb
 \family default
  are already defined,
  the CG test can be performed as follows:
@@ -13451,7 +13424,7 @@ Tests of efficiency
 
 \begin_layout Standard
 The Holden-Peel test is a parametric test of efficiency,
- see Section
+ see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Holden-Peel"
@@ -13630,7 +13603,7 @@ Tests of (a)symmetric loss and forecast rationality
 \end_layout
 
 \begin_layout Standard
-The framework proposed by
+The framework proposed by 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Elliot.etal2005"
@@ -13643,7 +13616,7 @@ literal "true"
 \begin_inset space ~
 \end_inset
 
-Section
+Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Elliott,-Komunjer"
@@ -13657,11 +13630,11 @@ nolink "false"
  (Strictly speaking,
  the explicit specification of
 \family typewriter
-b.loss
+ b.loss
 \family default
  is redundant,
  since the quadratic U-shape is the default,
- see Table
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Bundle-members-needed"
@@ -13903,7 +13876,7 @@ Forecast comparison
 \end_layout
 
 \begin_layout Standard
-The Diebold-Mariano approach tests for equal predictive accuracy of two competing forecasts (Section
+The Diebold-Mariano approach tests for equal predictive accuracy of two competing forecasts (Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Diebold-Mariano"
@@ -14013,10 +13986,10 @@ Apart from point forecasts,
  directional forecasts may be of interest.
  The
 \emph on
-Kuipers score
+ Kuipers score
 \emph default
  (KS) is a widely applied simple statistic to summarize directional forecasts,
- see Section
+ see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:The-Kuipers-Score"
@@ -14027,11 +14000,11 @@ nolink "false"
 .
  The following lines first compute the dummy variables
 \family typewriter
-yup
+ yup
 \family default
  and
 \family typewriter
-fcup
+ fcup
 \family default
  which take the value of one if the period-change in realized (or forecast) values is positive (otherwise zero),
  and then execute the KS computation.
@@ -14098,7 +14071,7 @@ Finally,
 \emph on
 Diebold-Lopez
 \emph default
- test (Section
+ test (Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Diebold-Lopez"
@@ -14190,7 +14163,7 @@ p-value.:
 \end_layout
 
 \begin_layout Standard
-In this context the Pesaran-Timmermann test described in Section
+In this context the Pesaran-Timmermann test described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Pesaran-Timmermann"
@@ -14259,7 +14232,7 @@ Data
 \end_layout
 
 \begin_layout Standard
-For replication purposes we reproduce the data used in the illustration in Section
+For replication purposes we reproduce the data used in the illustration in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Illustrative-example"
@@ -14436,6 +14409,10 @@ doCGtest()
 
 \begin_layout Itemize
 Minor internal refactorings
+\end_layout
+
+\begin_layout Itemize
+require gretl 2021c
 \end_layout
 
 \end_deeper
