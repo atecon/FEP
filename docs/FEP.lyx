@@ -104,7 +104,7 @@
 \begin_layout Title
 FEP – the forecast evaluation package for
 \emph on
-gretl
+ gretl
 \end_layout
 
 \begin_layout Author
@@ -114,15 +114,12 @@ status open
 
 \begin_layout Plain Layout
 Tarassow:
- atecon@posteo.de,
+ Brandenburg University of Technology,
+ atecon@posteo.de .
 \begin_inset Newline newline
 \end_inset
 
-Brandenburg University of Technology.
-\begin_inset Newline newline
-\end_inset
-
- Schreiber:
+Schreiber:
  IMK Düsseldorf and Free University Berlin,
  econ.svens.de.
 \end_layout
@@ -216,7 +213,7 @@ http://gretl.sf.net
 
 \end_inset
 
- The FEP package currently comprises the functions listed in Table 
+ The FEP package currently comprises the functions listed in Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Included-functions"
@@ -225,7 +222,7 @@ nolink "false"
 \end_inset
 
 .
- In Section 
+ In Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Menu-driven-(GUI)-usage"
@@ -991,7 +988,7 @@ fc
 \end_inset
 
  need to match exactly and are case sensitive.
- See Table 
+ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Bundle-members-needed"
@@ -1020,6 +1017,7 @@ b
  here) that is passed to the function.
  To actually enable the function to change the input bundle we need to pass it in so-called pointer form,
  which just means to prepend the ampersand character:
+
 \begin_inset Quotes eld
 \end_inset
 
@@ -1048,7 +1046,7 @@ Function programming details
 
  Finally,
  a string code must be specified to indicate which test should be run,
- where the possible codes are given in Table 
+ where the possible codes are given in Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Included-functions"
@@ -4007,6 +4005,7 @@ no
 \end_inset
 
  (default),
+
 \begin_inset Quotes eld
 \end_inset
 
@@ -4132,7 +4131,7 @@ The function getLoss() helps to calculate the forecast losses (disutilities) imp
  square,
  linex,
  double linex.
- See Table 
+ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:getLoss-–-forecast"
@@ -4285,7 +4284,7 @@ Function arguments
 \begin_layout Plain Layout
 matrix
 \emph on
-fce
+ fce
 \end_layout
 
 \end_inset
@@ -4297,11 +4296,12 @@ fce
 T by k matrix of forecast errors;
  if
 \emph on
-realiz
+ realiz
 \emph default
  is given,
+
 \emph on
-fce
+ fce
 \emph default
  is understood as the forecasts themselves
 \end_layout
@@ -4325,7 +4325,7 @@ fce
 \begin_layout Plain Layout
 string
 \emph on
-LF
+ LF
 \emph default
  (optional)
 \end_layout
@@ -4374,7 +4374,7 @@ linlin
 \noindent
 matrix
 \emph on
-param
+ param
 \emph default
  (optional)
 \end_layout
@@ -4388,8 +4388,9 @@ param
 \noindent
 loss function parameter(s),
  default 0.5;
+
 \emph on
-param
+ param
 \emph default
  must be a 1-element or 2-element vector
 \end_layout
@@ -4413,9 +4414,9 @@ param
 \begin_layout Plain Layout
 matrix
 \emph on
-realiz
+ realiz
 \emph default
-(optional)
+ (optional)
 \end_layout
 
 \end_inset
@@ -4482,6 +4483,7 @@ literal "true"
 \end_inset
 
 ,
+
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Granger1999doublelinex"
@@ -4537,7 +4539,7 @@ Draw some loss functions
 
 \begin_layout Standard
 Draw a single (DrawLoss) or two (DrawLoss2) loss functions and their associated confidence intervals.
- See Table 
+ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:drawloss"
@@ -4662,9 +4664,10 @@ Function arguments
 \begin_layout Plain Layout
 int
 \emph on
-p:
+ p:
+
 \emph default
-loss function type,
+ loss function type,
  1 = lin-lin,
  2 = quad-quad
 \end_layout
@@ -4688,7 +4691,7 @@ loss function type,
 \begin_layout Plain Layout
 scalar
 \emph on
-aT:
+ aT:
 
 \emph default
  loss function shape parameter
@@ -4717,12 +4720,12 @@ aT:
 \begin_layout Plain Layout
 scalar
 \emph on
-V
+ V
 \emph default
 :
  estimated variance of
 \emph on
-aT
+ aT
 \end_layout
 
 \end_inset
@@ -4744,7 +4747,7 @@ aT
 \begin_layout Plain Layout
 string
 \emph on
-fpath
+ fpath
 \emph default
  (optional):
  null = display figure (default) or provide complete "path+file name" to store figure
@@ -4870,9 +4873,10 @@ Function arguments
 \begin_layout Plain Layout
 int
 \emph on
-p:
+ p:
+
 \emph default
-loss function type,
+ loss function type,
  1 = lin-lin,
  2 = quad-quad
 \end_layout
@@ -4896,7 +4900,7 @@ loss function type,
 \begin_layout Plain Layout
 scalar
 \emph on
-aT1:
+ aT1:
 
 \emph default
  loss function shape parameter
@@ -4925,12 +4929,12 @@ aT1:
 \begin_layout Plain Layout
 scalar
 \emph on
-V
+ V
 \emph default
 1:
  estimated variance of
 \emph on
-aT1
+ aT1
 \end_layout
 
 \end_inset
@@ -4952,7 +4956,7 @@ aT1
 \begin_layout Plain Layout
 scalar
 \emph on
-aT2:
+ aT2:
 
 \emph default
  loss function shape parameter
@@ -4981,12 +4985,12 @@ aT2:
 \begin_layout Plain Layout
 scalar
 \emph on
-V
+ V
 \emph default
 2:
  estimated variance of
 \emph on
-aT2
+ aT2
 \end_layout
 
 \end_inset
@@ -5008,7 +5012,7 @@ aT2
 \begin_layout Plain Layout
 string
 \emph on
-fpath
+ fpath
 \emph default
  (optional):
  null = display figure (default) or provide complete "path+file name" to store figure
@@ -5064,7 +5068,7 @@ The Kuipers Score (KS)
 \end_layout
 
 \begin_layout Standard
-The (Hanssen-) Kuipers Score (KS) is used to evaluate binary outcomes.
+The (Hanssen-)Kuipers Score (KS) is used to evaluate binary outcomes.
  Let
 \begin_inset Formula $f=\{0,1\}$
 \end_inset
@@ -5103,7 +5107,7 @@ It seems that this terminology is not universal.
 \end_inset
 
 .
- See Table 
+ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doKS–-Kuipers"
@@ -5283,7 +5287,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-yup
+ yup
 \end_layout
 
 \end_inset
@@ -5315,7 +5319,7 @@ binary-valued series of actuals that takes the value of unity for ups,
 \begin_layout Plain Layout
 series
 \emph on
-fcup
+ fcup
 \end_layout
 
 \end_inset
@@ -5347,7 +5351,7 @@ binary-valued forecast that takes the value of unity for ups,
 \begin_layout Plain Layout
 scalar
 \emph on
-verb
+ verb
 \end_layout
 
 \end_inset
@@ -5408,7 +5412,7 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 scalar
 \emph on
-KSstat
+ KSstat
 \emph default
 :
 \end_layout
@@ -5441,7 +5445,7 @@ Kuipers score
 \begin_layout Plain Layout
 matrix
 \emph on
-KSmat
+ KSmat
 \emph default
 :
 \end_layout
@@ -5515,7 +5519,7 @@ Probability scores – doPS() and probscore()
 The probscore() function computes forecast accuracy statistics used for probability forecasts.
  The observed outcome is still binary,
  but in contrast to the Kuipers score the forecast here is a continuous probability.
- See Table 
+ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:probscore"
@@ -5525,7 +5529,7 @@ nolink "false"
 
 .
  The doPS() function is just a thin wrapper around probscore that is harmonized with the evaluation test functions in the package;
- see Table 
+ see Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doPS"
@@ -5648,7 +5652,7 @@ Function arguments
 \begin_layout Plain Layout
 matrix
 \emph on
-y
+ y
 \emph default
 :
  binary-valued vector of actuals that takes the value of unity for ups and otherwise zero
@@ -5673,7 +5677,7 @@ y
 \begin_layout Plain Layout
 matrix
 \emph on
-Pr
+ Pr
 \emph default
 :
  vector of forecast probabilities
@@ -5884,7 +5888,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-yup
+ yup
 \end_layout
 
 \end_inset
@@ -5916,7 +5920,7 @@ binary-valued series of actuals that takes the value of unity for ups,
 \begin_layout Plain Layout
 series
 \emph on
-pfc
+ pfc
 \end_layout
 
 \end_inset
@@ -5927,7 +5931,7 @@ pfc
 \begin_layout Plain Layout
 probability forecast (between 0 and 1) that
 \emph on
-yup
+ yup
 \emph default
  takes the value of unity
 \end_layout
@@ -5980,7 +5984,7 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 scalar
 \emph on
-qps
+ qps
 \end_layout
 
 \end_inset
@@ -6011,7 +6015,7 @@ quadratic probability score
 \begin_layout Plain Layout
 scalar
 \emph on
-lps
+ lps
 \end_layout
 
 \end_inset
@@ -6046,7 +6050,7 @@ Tools for point forecasts – ForecastMetrics()
 The ForecastMetrics() function comprises the computation of various evaluation metrics for point forecasts.
  For computation of five standard measures,
  we apply gretl's built-in function fcstats().
- In total twelve measures are currently implemented – for details see Table 
+ In total twelve measures are currently implemented – for details see Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Computations-of-point"
@@ -6067,7 +6071,7 @@ literal "false"
 \end_inset
 
 .
- Details on the ForecastMetrics() function can be found in Table 
+ Details on the ForecastMetrics() function can be found in Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Point-forecast-measures"
@@ -6818,7 +6822,7 @@ Function arguments
 \begin_layout Plain Layout
 series
 \emph on
-y
+ y
 \emph default
 :
  series of actual outcomes
@@ -6844,7 +6848,7 @@ y
 list fc:
  list of
 \emph on
-k
+ k
 \emph default
  alternative forecasts
 \end_layout
@@ -6868,11 +6872,11 @@ Output
 \begin_layout Plain Layout
 16 by
 \emph on
-k
+ k
 \emph default
  matrix with 16 measures for
 \emph on
-k
+ k
 \emph default
  different forecasts
 \end_layout
@@ -6924,8 +6928,8 @@ Define the
 \end_inset
 
 .
- Mincer&Zarnowitz suggest to run the following regression:
-\begin_inset Formula 
+ Mincer & Zarnowitz suggest to run the following regression:
+\begin_inset Formula
 \[
 y_{t+h}=\beta_{\text{0}}+\beta_{1}f_{t+h|t}+u_{t+h}
 \]
@@ -6961,7 +6965,7 @@ However,
 \end_layout
 
 \begin_layout Standard
-See Table 
+See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doMZtest"
@@ -7141,7 +7145,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-y
+ y
 \end_layout
 
 \end_inset
@@ -7172,7 +7176,7 @@ actual observations
 \begin_layout Plain Layout
 series
 \emph on
-fc
+ fc
 \end_layout
 
 \end_inset
@@ -7203,7 +7207,7 @@ fc
 \begin_layout Plain Layout
 scalar
 \emph on
-robust
+ robust
 \end_layout
 
 \end_inset
@@ -7235,7 +7239,7 @@ robust
 \begin_layout Plain Layout
 scalar
 \emph on
-nboot
+ nboot
 \end_layout
 
 \end_inset
@@ -7267,7 +7271,7 @@ nboot
 \begin_layout Plain Layout
 scalar
 \emph on
-verb
+ verb
 \end_layout
 
 \end_inset
@@ -7328,7 +7332,7 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 scalar
 \emph on
-MZstat
+ MZstat
 \end_layout
 
 \end_inset
@@ -7359,7 +7363,7 @@ test statistics
 \begin_layout Plain Layout
 scalar
 \emph on
-MZpval
+ MZpval
 \end_layout
 
 \end_inset
@@ -7445,6 +7449,7 @@ Holden-Peel test of forecast efficiency – doHPtest()
 
 \begin_layout Standard
 The Mincer-Zarnowitz regression can be extended to include another regressor (or a whole vector of additional regressors),
+
 \begin_inset Formula $Z_{t}$
 \end_inset
 
@@ -7457,7 +7462,7 @@ The Mincer-Zarnowitz regression can be extended to include another regressor (or
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula 
+\begin_inset Formula
 \[
 y_{t+h}=\beta_{\text{0}}+\beta_{1}f_{t+h|t}+\beta_{2}Z_{t}+u_{t+h}\qquad.
 \]
@@ -7487,6 +7492,7 @@ status open
 \end_inset
 
 ,
+
 \begin_inset Formula $\beta_{1}=1$
 \end_inset
 
@@ -7500,7 +7506,7 @@ status open
 
 \begin_layout Standard
 Again the user can compute HAC robust standard errors and/or bootstrap p-values;
- see Table 
+ see Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doHPtest"
@@ -7680,7 +7686,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-y
+ y
 \end_layout
 
 \end_inset
@@ -7711,7 +7717,7 @@ actual observations
 \begin_layout Plain Layout
 series
 \emph on
-fc
+ fc
 \end_layout
 
 \end_inset
@@ -7742,7 +7748,7 @@ h-step ahead forecast
 \begin_layout Plain Layout
 list
 \emph on
-z
+ z
 \end_layout
 
 \end_inset
@@ -7773,7 +7779,7 @@ gretl list of additional control variables
 \begin_layout Plain Layout
 scalar
 \emph on
-robust
+ robust
 \end_layout
 
 \end_inset
@@ -7805,7 +7811,7 @@ robust
 \begin_layout Plain Layout
 scalar
 \emph on
-nboot
+ nboot
 \end_layout
 
 \end_inset
@@ -7837,7 +7843,7 @@ nboot
 \begin_layout Plain Layout
 scalar
 \emph on
-verb
+ verb
 \end_layout
 
 \end_inset
@@ -7898,7 +7904,7 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 scalar
 \emph on
-HPstat
+ HPstat
 \end_layout
 
 \end_inset
@@ -7929,7 +7935,7 @@ test statistics
 \begin_layout Plain Layout
 scalar
 \emph on
-HPpval
+ HPpval
 \end_layout
 
 \end_inset
@@ -8035,7 +8041,7 @@ Let us define the one-period forecast errors as
 
  otherwise.
  The test statistics of the sign test of unbiasedness of forecast errors is
-\begin_inset Formula 
+\begin_inset Formula
 \[
 S=\sum_{t=1}^{T}u(e_{1t}),
 \]
@@ -8048,7 +8054,7 @@ where
 
  is the number of available forecast errors.
  While the signed rank test (see below) is defined as
-\begin_inset Formula 
+\begin_inset Formula
 \[
 W=\sum_{t=1}^{T}u(e_{1t})R_{1t}^{+}
 \]
@@ -8090,7 +8096,7 @@ with
 
  (or leave it out,
  as this is the default;
- see Table 
+ see Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCGtest"
@@ -8113,7 +8119,7 @@ This test idea can also be employed to test for serial correlation in the foreca
 
 ,
  and compute the statistics:
-\begin_inset Formula 
+\begin_inset Formula
 \[
 S_{k}=\sum_{t=k+1}^{T}u(Z_{1t}^{k})\quad\text{and \quad}W_{k}=\sum_{t=k+1}^{T}u(Z_{1t}^{k})R_{2t}^{+}
 \]
@@ -8142,7 +8148,7 @@ literal "true"
 \end_inset
 
 .
- Serial correlation in the forecast errors will move the centre of their product away from zero.
+ Serial correlation in the forecast errors will move the center of their product away from zero.
  The sign statistic
 \begin_inset Formula $S_{k}$
 \end_inset
@@ -8343,7 +8349,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-y
+ y
 \end_layout
 
 \end_inset
@@ -8374,7 +8380,7 @@ actual observations
 \begin_layout Plain Layout
 series
 \emph on
-fc
+ fc
 \end_layout
 
 \end_inset
@@ -8405,7 +8411,7 @@ forecast
 \begin_layout Plain Layout
 (or series
 \emph on
-E
+ E
 \end_layout
 
 \end_inset
@@ -8436,7 +8442,7 @@ forecast error)
 \begin_layout Plain Layout
 scalar
 \emph on
-verb
+ verb
 \end_layout
 
 \end_inset
@@ -8468,7 +8474,7 @@ verb
 \begin_layout Plain Layout
 series
 \emph on
-CGX
+ CGX
 \emph default
  (optional)
 \end_layout
@@ -8481,7 +8487,7 @@ CGX
 \begin_layout Plain Layout
 variable for orthogonality (see also
 \emph on
-k
+ k
 \emph default
 )
 \end_layout
@@ -8505,7 +8511,7 @@ k
 \begin_layout Plain Layout
 scalar
 \emph on
-k
+ k
 \end_layout
 
 \end_inset
@@ -8524,7 +8530,7 @@ set
 
  (own lag of forecast error if
 \emph on
-X
+ X
 \emph default
  is absent),
  else
@@ -8582,11 +8588,11 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 scalar
 \emph on
-CGSIGNstat
+ CGSIGNstat
 \emph default
  and
 \emph on
-CGWILCstat
+ CGWILCstat
 \end_layout
 
 \end_inset
@@ -8617,7 +8623,7 @@ test statistic
 \begin_layout Plain Layout
 scalar
 \emph on
-CGSIGNpval
+ CGSIGNpval
 \emph default
  and
 \emph on
@@ -8782,7 +8788,7 @@ Recursive
 
 \begin_layout Standard
 The sign and signed rank statistics are given by
-\begin_inset Formula 
+\begin_inset Formula
 \[
 S_{ok}=\sum_{t=k+1}^{T}u(Z_{t}^{k})\quad\text{and \quad}W_{ok}=\sum_{t=k+1}^{T}u(Z_{t}^{k})R_{1t}^{+},
 \]
@@ -8796,7 +8802,7 @@ noting that the ranks used refer to the forecast errors,
 
 ,
  to obtain a statistic with a known and valid distribution;
- see 
+ see
 \begin_inset CommandInset citation
 LatexCommand citet
 after "pp. 3"
@@ -8805,7 +8811,7 @@ literal "true"
 
 \end_inset
 
- or 
+ or
 \begin_inset CommandInset citation
 LatexCommand citet
 after "p. 560"
@@ -8845,7 +8851,7 @@ When
 \end_inset
 
  This orthogonality test can be achieved by passing the series as CGX in the bundle.
- See Table 
+ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCGtest"
@@ -8932,7 +8938,7 @@ literal "true"
 
  propose a flexible class of loss functions,
  the so-called EKT loss function:
-\begin_inset Formula 
+\begin_inset Formula
 \[
 L(e)=\left[\alpha+(1-2\alpha)\mathbf{I}(e<0)\right]|e|^{p},\quad\alpha\in[0,1]
 \]
@@ -9048,6 +9054,7 @@ The user can use the framework to (i) test for symmetric loss,
 
 ,
  against the alternative,
+
 \begin_inset Formula $H_{0}:\alpha\neq0.5$
 \end_inset
 
@@ -9082,7 +9089,7 @@ For a given
 \end_layout
 
 \begin_layout Standard
-See Table 
+See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doEKTtest"
@@ -9093,7 +9100,7 @@ nolink "false"
  for the synopsis,
  and note that the instruments
 \emph on
-z
+ z
 \emph default
  should not contain an intercept,
  it will be added automatically.
@@ -9270,7 +9277,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-y
+ y
 \end_layout
 
 \end_inset
@@ -9301,7 +9308,7 @@ actual observations
 \begin_layout Plain Layout
 series
 \emph on
-fc
+ fc
 \end_layout
 
 \end_inset
@@ -9332,7 +9339,7 @@ h-step ahead forecast
 \begin_layout Plain Layout
 (or series
 \emph on
-E
+ E
 \end_layout
 
 \end_inset
@@ -9363,7 +9370,7 @@ forecast error)
 \begin_layout Plain Layout
 list
 \emph on
-z
+ z
 \end_layout
 
 \end_inset
@@ -9394,7 +9401,7 @@ instruments
 \begin_layout Plain Layout
 scalar
 \emph on
-a0
+ a0
 \end_layout
 
 \end_inset
@@ -9405,7 +9412,7 @@ a0
 \begin_layout Plain Layout
 initial value of shape parameter
 \emph on
-alpha
+ alpha
 \emph default
  (between 0 and 1,
  default 0.5)
@@ -9430,7 +9437,7 @@ alpha
 \begin_layout Plain Layout
 scalar
 \emph on
-loss
+ loss
 \end_layout
 
 \end_inset
@@ -9463,7 +9470,7 @@ Loss function type:
 \begin_layout Plain Layout
 scalar
 \emph on
-verb
+ verb
 \end_layout
 
 \end_inset
@@ -9495,7 +9502,7 @@ verb
 \begin_layout Plain Layout
 string
 \emph on
-lossdraw
+ lossdraw
 \end_layout
 
 \end_inset
@@ -9557,7 +9564,7 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 scalar
 \emph on
-alpha
+ alpha
 \end_layout
 
 \end_inset
@@ -9588,7 +9595,7 @@ estimated shape parameter
 \begin_layout Plain Layout
 scalar
 \emph on
-V
+ V
 \end_layout
 
 \end_inset
@@ -9599,7 +9606,7 @@ V
 \begin_layout Plain Layout
 estimated variance of
 \emph on
-alpha
+ alpha
 \end_layout
 
 \end_inset
@@ -9621,7 +9628,7 @@ alpha
 \begin_layout Plain Layout
 scalar
 \emph on
-SymTest
+ SymTest
 \end_layout
 
 \end_inset
@@ -9652,7 +9659,7 @@ test statistics of test for symmetric loss function
 \begin_layout Plain Layout
 scalar
 \emph on
-SymPval
+ SymPval
 \end_layout
 
 \end_inset
@@ -9661,40 +9668,7 @@ SymPval
 \begin_inset Text
 
 \begin_layout Plain Layout
- p-value of test for symmetric loss function
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-scalar
-\emph on
-RatTest
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
- test statistics of test for rationality conditional on estimated
-\emph on
-alpha
+p-value of test for symmetric loss function
 \end_layout
 
 \end_inset
@@ -9716,7 +9690,40 @@ alpha
 \begin_layout Plain Layout
 scalar
 \emph on
-RatPv
+ RatTest
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+test statistics of test for rationality conditional on estimated
+\emph on
+ alpha
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scalar
+\emph on
+ RatPv
 \end_layout
 
 \end_inset
@@ -9727,7 +9734,7 @@ RatPv
 \begin_layout Plain Layout
 p-value of test for rationality conditional on estimated
 \emph on
-alpha
+ alpha
 \end_layout
 
 \end_inset
@@ -9749,7 +9756,7 @@ alpha
 \begin_layout Plain Layout
 scalar
 \emph on
-RatTest05
+ RatTest05
 \end_layout
 
 \end_inset
@@ -9780,7 +9787,7 @@ test statistics of test for rationality conditional on symmetry (as if alpha = 0
 \begin_layout Plain Layout
 scalar
 \emph on
-RatPv05
+ RatPv05
 \end_layout
 
 \end_inset
@@ -9855,16 +9862,19 @@ Pesaran-Timmermann test of market timing – doPTtest()
 
 \begin_layout Standard
 While the Kuipers score just computes the difference between the hit rate,
+
 \begin_inset Formula $H$
 \end_inset
 
 ,
  and the false alarm rate,
+
 \begin_inset Formula $F$
 \end_inset
 
 ,
  it is not a proper statistical test.
+
 \begin_inset CommandInset citation
 LatexCommand citet
 after "PT"
@@ -9921,7 +9931,7 @@ The PT test statistic can be approximated by the t-ratio of the
 \end_inset
 
  coefficient of the following OLS regression
-\begin_inset Formula 
+\begin_inset Formula
 \[
 y_{t}=\beta_{0}+\beta_{1}x_{t}+u_{t}.
 \]
@@ -9937,6 +9947,7 @@ Under the null hypothesis that predictions and realizations are independently di
  The test statistic follows asymptotically a standard normal distribution.
  A rejection of the null hypothesis indicates predictive failure.
  Serial correlation in the errors,
+
 \begin_inset Formula $u_{t}$
 \end_inset
 
@@ -9945,7 +9956,8 @@ Under the null hypothesis that predictions and realizations are independently di
 \end_layout
 
 \begin_layout Standard
-A second –non-regression based– approach to compute the test instead is to rely on the correlation coefficient between forecasts and predictions,
+A second – non-regression based – approach to compute the test instead is to rely on the correlation coefficient between forecasts and predictions,
+
 \begin_inset Formula $\rho$
 \end_inset
 
@@ -9963,7 +9975,7 @@ A second –non-regression based– approach to compute the test instead is to r
 \end_layout
 
 \begin_layout Standard
-See Table 
+See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doPTtest"
@@ -10143,7 +10155,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-yup
+ yup
 \emph default
 :
 \end_layout
@@ -10177,7 +10189,7 @@ binary-valued series of actuals that takes the value of unity for ups,
 \begin_layout Plain Layout
 series
 \emph on
-fcup
+ fcup
 \emph default
 :
 \end_layout
@@ -10210,7 +10222,7 @@ binary-valued forecast that takes the value of unity for ups otherwise zero
 \begin_layout Plain Layout
 scalar
 \emph on
-robust
+ robust
 \emph default
 :
 \end_layout
@@ -10221,7 +10233,7 @@ robust
 \begin_inset Text
 
 \begin_layout Plain Layout
- 0 = correlation-based PT test,
+0 = correlation-based PT test,
  1 = regression-based with HAC robust SEs
 \end_layout
 
@@ -10244,7 +10256,7 @@ robust
 \begin_layout Plain Layout
 scalar
 \emph on
-verb
+ verb
 \emph default
 :
 \end_layout
@@ -10307,7 +10319,7 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 scalar
 \emph on
-PTstat
+ PTstat
 \end_layout
 
 \end_inset
@@ -10338,7 +10350,7 @@ test statistic
 \begin_layout Plain Layout
 scalar
 \emph on
-PTpval
+ PTpval
 \end_layout
 
 \end_inset
@@ -10375,6 +10387,7 @@ literal "true"
 \end_inset
 
 ,
+
 \begin_inset CommandInset citation
 LatexCommand citet
 after "p. 398"
@@ -10432,14 +10445,14 @@ Performs the Diebold-Lopez direction of change test which is in principle just P
  The direction-of-change forecast has some value.
  (The side output of
 \emph on
-DLinfo
+ DLinfo
 \emph default
  is closely related to the Kuipers score,
  namely by adding unity to it.)
 \end_layout
 
 \begin_layout Standard
-See Table 
+See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doDLtest"
@@ -10619,7 +10632,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-yup
+ yup
 \end_layout
 
 \end_inset
@@ -10651,7 +10664,7 @@ yup
 \begin_layout Plain Layout
 series
 \emph on
-fcup
+ fcup
 \end_layout
 
 \end_inset
@@ -10682,7 +10695,7 @@ fcup
 \begin_layout Plain Layout
 scalar
 \emph on
-verb
+ verb
 \end_layout
 
 \end_inset
@@ -10743,7 +10756,7 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 scalar
 \emph on
-DLstat
+ DLstat
 \end_layout
 
 \end_inset
@@ -10774,7 +10787,7 @@ test statistic
 \begin_layout Plain Layout
 scalar
 \emph on
-DLpval
+ DLpval
 \end_layout
 
 \end_inset
@@ -10805,7 +10818,7 @@ p-value
 \begin_layout Plain Layout
 scalar
 \emph on
-DLinfo
+ DLinfo
 \end_layout
 
 \end_inset
@@ -10932,7 +10945,7 @@ We define the
 .
  Specifically,
  one can test the null hypothesis of equal predictive accuracy
-\begin_inset Formula 
+\begin_inset Formula
 \[
 H_{0}:\quad E(d_{12,t+h|t})=0
 \]
@@ -10976,7 +10989,7 @@ against either an one-sided alternative or against a two-sided alternative.
 However,
  due to serial correlation in the forecast errors,
  we compute alternatively the following regression-based version using OLS combined with HAC robust standard errors:
-\begin_inset Formula 
+\begin_inset Formula
 \[
 d_{12,t+h|t}=\beta+u_{t}
 \]
@@ -10998,6 +11011,7 @@ where
 
 .
  The test statistics,
+
 \begin_inset Formula $t_{DM}$
 \end_inset
 
@@ -11014,7 +11028,7 @@ literal "true"
 \end_inset
 
  have suggested the following small-sample corrected degrees-of-freedom adjusted t-statistics
-\begin_inset Formula 
+\begin_inset Formula
 \[
 t_{HLN}=[1+F^{-1}(1-2\times h)+F^{-2}h\times(h-1)]^{0.5}\times t_{DM}
 \]
@@ -11034,7 +11048,7 @@ where
 \end_inset
 
 -step forecast horizon.
- See Table 
+ See Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doDMtest"
@@ -11220,7 +11234,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-y
+ y
 \end_layout
 
 \end_inset
@@ -11251,7 +11265,7 @@ realized values
 \begin_layout Plain Layout
 series
 \emph on
-f1
+ f1
 \end_layout
 
 \end_inset
@@ -11282,7 +11296,7 @@ forecast values of model 1
 \begin_layout Plain Layout
 series
 \emph on
-f
+ f
 \emph default
 2
 \end_layout
@@ -11315,7 +11329,7 @@ forecast values of model 2
 \begin_layout Plain Layout
 scalar
 \emph on
-fhor
+ fhor
 \end_layout
 
 \end_inset
@@ -11346,7 +11360,7 @@ fhor
 \begin_layout Plain Layout
 scalar
 \emph on
-loss
+ loss
 \end_layout
 
 \end_inset
@@ -11379,7 +11393,7 @@ Loss function type:
 \begin_layout Plain Layout
 scalar
 \emph on
-verb
+ verb
 \end_layout
 
 \end_inset
@@ -11440,7 +11454,7 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 series
 \emph on
-L
+ L
 \end_layout
 
 \end_inset
@@ -11471,7 +11485,7 @@ L
 \begin_layout Plain Layout
 scalar
 \emph on
-DMstat
+ DMstat
 \end_layout
 
 \end_inset
@@ -11502,7 +11516,7 @@ test statistic (not small-sample adjusted)
 \begin_layout Plain Layout
 scalar
 \emph on
-DMpvaln
+ DMpvaln
 \end_layout
 
 \end_inset
@@ -11533,7 +11547,7 @@ p-value based on standard normal
 \begin_layout Plain Layout
 scalar
 \emph on
-DMpvalt
+ DMpvalt
 \end_layout
 
 \end_inset
@@ -11564,7 +11578,7 @@ p-value based on t-distribution
 \begin_layout Plain Layout
 scalar
 \emph on
-DMstatssc
+ DMstatssc
 \end_layout
 
 \end_inset
@@ -11595,7 +11609,7 @@ test statistic w/ small-sample correction
 \begin_layout Plain Layout
 scalar
 \emph on
-DMpvalssc
+ DMpvalssc
 \end_layout
 
 \end_inset
@@ -11679,7 +11693,7 @@ The Giacomini-White (GW) test is about equal conditional predictive ability.
  an unconditional variant and a conditional approach,
  which allows the evaluation of the
 \emph on
-forecasting method
+ forecasting method
 \emph default
 ,
  including the model,
@@ -11688,13 +11702,14 @@ forecasting method
 
 \begin_layout Standard
 The conditional test for forecasting performance tests whether the loss differential between two forecasts is systematically linked to current information,
+
 \begin_inset Formula $z_{t}$
 \end_inset
 
 .
  Compared to unconditional tests like Diebold-Mariano,
  the null hypothesis is then altered to
-\begin_inset Formula 
+\begin_inset Formula
 \[
 E\left[d_{12,t+h|t}(\hat{\beta}_{1,t},\hat{\beta}_{2,t},y_{t+h})|z_{t}\right]=0
 \]
@@ -11953,7 +11968,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-y
+ y
 \end_layout
 
 \end_inset
@@ -11984,7 +11999,7 @@ realized values
 \begin_layout Plain Layout
 series
 \emph on
-f1
+ f1
 \end_layout
 
 \end_inset
@@ -12015,7 +12030,7 @@ forecast values of model 1
 \begin_layout Plain Layout
 series
 \emph on
-f
+ f
 \emph default
 2
 \end_layout
@@ -12048,7 +12063,7 @@ forecast values of model 2
 \begin_layout Plain Layout
 scalar
 \emph on
-fhor
+ fhor
 \end_layout
 
 \end_inset
@@ -12079,7 +12094,7 @@ forecast horizon (default 1)
 \begin_layout Plain Layout
 scalar
 \emph on
-loss
+ loss
 \end_layout
 
 \end_inset
@@ -12112,7 +12127,7 @@ Loss function type:
 \begin_layout Plain Layout
 scalar
 \emph on
-cond
+ cond
 \end_layout
 
 \end_inset
@@ -12144,7 +12159,7 @@ cond
 \begin_layout Plain Layout
 list
 \emph on
-z
+ z
 \end_layout
 
 \end_inset
@@ -12179,7 +12194,7 @@ series to condition on (only if
 \begin_layout Plain Layout
 scalar
 \emph on
-verb
+ verb
 \end_layout
 
 \end_inset
@@ -12240,7 +12255,7 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 series
 \emph on
-L
+ L
 \end_layout
 
 \end_inset
@@ -12271,7 +12286,7 @@ L
 \begin_layout Plain Layout
 scalar
 \emph on
-GWstat
+ GWstat
 \end_layout
 
 \end_inset
@@ -12302,7 +12317,7 @@ test statistics (not small-sample adjusted)
 \begin_layout Plain Layout
 scalar
 \emph on
-GWpval
+ GWpval
 \end_layout
 
 \end_inset
@@ -12384,7 +12399,7 @@ We gratefully acknowledge useful comments from Michał Rubaszek.
 \end_layout
 
 \begin_layout Standard
-Implementation of 
+Implementation of
 \begin_inset CommandInset citation
 LatexCommand citet
 key "ClarkWest2007"
@@ -12394,7 +12409,7 @@ literal "false"
 
 ,
  testing equal predictive accuracy in nested models (one-sided test);
- see Table 
+ see Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCWtest"
@@ -12590,7 +12605,7 @@ Pointer to the model bundle.
 \begin_layout Plain Layout
 series
 \emph on
-y
+ y
 \end_layout
 
 \end_inset
@@ -12621,7 +12636,7 @@ realized values
 \begin_layout Plain Layout
 series
 \emph on
-f1
+ f1
 \end_layout
 
 \end_inset
@@ -12652,7 +12667,7 @@ forecast values of model 1
 \begin_layout Plain Layout
 series
 \emph on
-f
+ f
 \emph default
 2
 \end_layout
@@ -12685,7 +12700,7 @@ forecast values of model 2 (larger nesting model)
 \begin_layout Plain Layout
 scalar
 \emph on
-verb
+ verb
 \end_layout
 
 \end_inset
@@ -12746,7 +12761,7 @@ The following new elements are stored into the model bundle:
 \begin_layout Plain Layout
 scalar
 \emph on
-CWstat
+ CWstat
 \end_layout
 
 \end_inset
@@ -12777,7 +12792,7 @@ test statistic
 \begin_layout Plain Layout
 scalar
 \emph on
-CWpval
+ CWpval
 \end_layout
 
 \end_inset
@@ -12808,7 +12823,7 @@ p-value based on t-distribution (one-sided)
 \begin_layout Plain Layout
 scalar
 \emph on
-CWstat_rob
+ CWstat_rob
 \end_layout
 
 \end_inset
@@ -12839,7 +12854,7 @@ robustified test statistic
 \begin_layout Plain Layout
 scalar
 \emph on
-CWpval_rob
+ CWpval_rob
 \end_layout
 
 \end_inset
@@ -13063,7 +13078,7 @@ The concrete images of those icons will depend on your operating system and/or y
 
 \begin_layout Standard
 Note that only the actual test functions are choosable from the GUI,
- not the helper functions from Section 
+ not the helper functions from Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Forecast-descriptive-statistics"
@@ -13087,18 +13102,20 @@ Illustrative example
 \begin_layout Standard
 In the following an applied example using survey-based forecasts for annual growth of euro area (EA) real GDP is presented.
  Forecasts are averages based on surveys among professional forecasters,
+
 \begin_inset Formula $fc_{t}$
 \end_inset
 
 ,
  conducted by the Economist magazine and obtained through the Macrobond database.
  The realizations,
+
 \begin_inset Formula $y_{t}$
 \end_inset
 
 ,
  are from the AMECO database provided by the European Commission.
- Both series' values are reported in the data appendix 
+ Both series' values are reported in the data appendix
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Data"
@@ -13107,7 +13124,7 @@ nolink "false"
 \end_inset
 
 ,
- and Figure 
+ and Figure
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Forecast-error-for"
@@ -13116,17 +13133,18 @@ nolink "false"
 \end_inset
 
  depicts the forecast errors,
+
 \begin_inset Formula $e_{t}=y_{t}-fc_{t}$
 \end_inset
 
 .
  For the following code to work we assume that a gretl annual time-series datafile is loaded with the series named
 \family typewriter
-y
+ y
 \family default
  and
 \family typewriter
-fc
+ fc
 \family default
 .
 \end_layout
@@ -13190,11 +13208,12 @@ Tests of unbiasedness
 
 \begin_layout Standard
 We run the parametric Mincer-Zarnowitz test on forecast unbiasedness using bootstrap p-values (999 iterations,
+
 \emph on
-iid
+ iid
 \emph default
 ) and HAC standard errors,
- see Section 
+ see Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Mincer-Zarnowitz"
@@ -13298,7 +13317,7 @@ As can be seen,
 
 \begin_layout Standard
 A non-parametric alternative test approach for forecast unbiasedness was proposed by Campbell and Ghysels,
- as discussed in Section 
+ as discussed in Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Campbell-&-Ghysels"
@@ -13424,7 +13443,7 @@ Tests of efficiency
 
 \begin_layout Standard
 The Holden-Peel test is a parametric test of efficiency,
- see Section 
+ see Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Holden-Peel"
@@ -13434,6 +13453,7 @@ nolink "false"
 
 .
  We simply use lagged forecasts,
+
 \begin_inset Formula $fc_{t-1}$
 \end_inset
 
@@ -13512,17 +13532,19 @@ A non-parametric version is also provided by the CG test approach which can be u
 \family default
  already specifies the lag to be applied to
 \family typewriter
-CGX
+ CGX
 \family default
 ,
  so the series for CGX should be given contemporaneously (here:
+
 \family typewriter
-fc
+ fc
 \family default
 ),
  not with a lag (not:
+
 \family typewriter
-fc(-1)
+ fc(-1)
 \family default
 );
  otherwise errors due to missing values may occur.
@@ -13603,7 +13625,7 @@ Tests of (a)symmetric loss and forecast rationality
 \end_layout
 
 \begin_layout Standard
-The framework proposed by 
+The framework proposed by
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Elliot.etal2005"
@@ -13616,7 +13638,7 @@ literal "true"
 \begin_inset space ~
 \end_inset
 
-Section 
+Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Elliott,-Komunjer"
@@ -13634,7 +13656,7 @@ nolink "false"
 \family default
  is redundant,
  since the quadratic U-shape is the default,
- see Table 
+ see Table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Bundle-members-needed"
@@ -13876,7 +13898,7 @@ Forecast comparison
 \end_layout
 
 \begin_layout Standard
-The Diebold-Mariano approach tests for equal predictive accuracy of two competing forecasts (Section 
+The Diebold-Mariano approach tests for equal predictive accuracy of two competing forecasts (Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Diebold-Mariano"
@@ -13989,7 +14011,7 @@ Apart from point forecasts,
  Kuipers score
 \emph default
  (KS) is a widely applied simple statistic to summarize directional forecasts,
- see Section 
+ see Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:The-Kuipers-Score"
@@ -14069,9 +14091,9 @@ ups
 Finally,
  the
 \emph on
-Diebold-Lopez
+ Diebold-Lopez
 \emph default
- test (Section 
+ test (Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Diebold-Lopez"
@@ -14095,10 +14117,6 @@ fc
 
 \begin_layout Standard
 The positive test statistic of 1.88 indicates that the actual forecast outperforms a pure coin flip which is statistically confirmed by the p-value.
-\end_layout
-
-\begin_layout LyX-Code
-
 \end_layout
 
 \begin_layout LyX-Code
@@ -14163,7 +14181,7 @@ p-value.:
 \end_layout
 
 \begin_layout Standard
-In this context the Pesaran-Timmermann test described in Section 
+In this context the Pesaran-Timmermann test described in Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Pesaran-Timmermann"
@@ -14232,7 +14250,7 @@ Data
 \end_layout
 
 \begin_layout Standard
-For replication purposes we reproduce the data used in the illustration in Section 
+For replication purposes we reproduce the data used in the illustration in Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Illustrative-example"
@@ -14503,9 +14521,9 @@ Add new evaluation metric for point forecasts:
 \begin_layout Itemize
 Add unit-tests for
 \emph on
-all
+ all
 \emph default
-functions computing point forecast evaluation statistics incl.
+ functions computing point forecast evaluation statistics incl.
  ForecastMetrics().
 \end_layout
 
@@ -14560,6 +14578,7 @@ MdE
 \end_inset
 
 ,
+
 \begin_inset Quotes eld
 \end_inset
 
@@ -14568,6 +14587,7 @@ MdAE
 \end_inset
 
 ,
+
 \begin_inset Quotes eld
 \end_inset
 
@@ -14575,7 +14595,11 @@ MAM
 \begin_inset Quotes erd
 \end_inset
 
- and MdAMd
+ and
+\begin_inset Quotes eld
+\end_inset
+
+MdAMd
 \begin_inset Quotes erd
 \end_inset
 
@@ -14859,7 +14883,7 @@ Replace the DiebMar.gfn package (vers.
 \end_layout
 
 \begin_layout Itemize
-*** NOTE:
+NOTE:
  The function's usage has changed from vers.
  1.1 -> 1.2!
 \end_layout
