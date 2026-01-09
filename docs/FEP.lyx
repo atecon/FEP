@@ -193,11 +193,11 @@ Gretl
  Its core functions are implemented in C,
  but it also comprises a versatile scripting and matrix language named
 \emph on
-hansl
+ hansl
 \emph default
  which can be used to develop contributed function packages easily.
  FEP is such a package written in hansl.
- More information on gretl can be found online at
+ More information on gretl can be found online at 
 \begin_inset Flex URL
 status open
 
@@ -213,7 +213,7 @@ http://gretl.sf.net
 
 \end_inset
 
- The FEP package currently comprises the functions listed in Table
+ The FEP package currently comprises the functions listed in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Included-functions"
@@ -222,7 +222,7 @@ nolink "false"
 \end_inset
 
 .
- In Section
+ In Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Menu-driven-(GUI)-usage"
@@ -971,7 +971,7 @@ bundle b = _(y=growth,
 
 \end_inset
 
- Note that the names
+ Note that the names 
 \begin_inset Quotes eld
 \end_inset
 
@@ -979,7 +979,7 @@ y
 \begin_inset Quotes erd
 \end_inset
 
- and
+ and 
 \begin_inset Quotes eld
 \end_inset
 
@@ -988,7 +988,7 @@ fc
 \end_inset
 
  need to match exactly and are case sensitive.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Bundle-members-needed"
@@ -1017,7 +1017,7 @@ b
  here) that is passed to the function.
  To actually enable the function to change the input bundle we need to pass it in so-called pointer form,
  which just means to prepend the ampersand character:
-
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1030,7 +1030,7 @@ b
 status open
 
 \begin_layout Plain Layout
-See
+See 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1046,7 +1046,7 @@ Function programming details
 
  Finally,
  a string code must be specified to indicate which test should be run,
- where the possible codes are given in Table
+ where the possible codes are given in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Included-functions"
@@ -3996,7 +3996,7 @@ lossdraw
 \begin_layout Plain Layout
 
 \size small
-can be
+can be 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4005,7 +4005,7 @@ no
 \end_inset
 
  (default),
-
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4131,7 +4131,7 @@ The function getLoss() helps to calculate the forecast losses (disutilities) imp
  square,
  linex,
  double linex.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:getLoss-–-forecast"
@@ -4337,7 +4337,7 @@ string
 
 \begin_layout Plain Layout
 specify loss function:
- "ll" (or
+ "ll" (or 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4483,7 +4483,7 @@ literal "true"
 \end_inset
 
 ,
-
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Granger1999doublelinex"
@@ -4539,7 +4539,7 @@ Draw some loss functions
 
 \begin_layout Standard
 Draw a single (DrawLoss) or two (DrawLoss2) loss functions and their associated confidence intervals.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:drawloss"
@@ -4694,7 +4694,7 @@ scalar
  aT:
 
 \emph default
- loss function shape parameter
+ loss function shape parameter 
 \begin_inset Formula $\alpha\in[0,\,1]$
 \end_inset
 
@@ -4903,7 +4903,7 @@ scalar
  aT1:
 
 \emph default
- loss function shape parameter
+ loss function shape parameter 
 \begin_inset Formula $\alpha\in[0,\,1]$
 \end_inset
 
@@ -4959,7 +4959,7 @@ scalar
  aT2:
 
 \emph default
- loss function shape parameter
+ loss function shape parameter 
 \begin_inset Formula $\alpha\in[0,\,1]$
 \end_inset
 
@@ -5069,11 +5069,11 @@ The Kuipers Score (KS)
 
 \begin_layout Standard
 The (Hanssen-)Kuipers Score (KS) is used to evaluate binary outcomes.
- Let
+ Let 
 \begin_inset Formula $f=\{0,1\}$
 \end_inset
 
- be a forecast of the binary variable
+ be a forecast of the binary variable 
 \begin_inset Formula $y=\{0,1\}$
 \end_inset
 
@@ -5096,18 +5096,18 @@ It seems that this terminology is not universal.
 \end_inset
 
  is correctly predicted.
- The POFD is the proportion of times where
+ The POFD is the proportion of times where 
 \begin_inset Formula $y=1$
 \end_inset
 
  is wrongly predicted.
  Thus,
- KS is defined as
+ KS is defined as 
 \begin_inset Formula $KS=POD-POFD$
 \end_inset
 
 .
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doKS–-Kuipers"
@@ -5519,7 +5519,7 @@ Probability scores – doPS() and probscore()
 The probscore() function computes forecast accuracy statistics used for probability forecasts.
  The observed outcome is still binary,
  but in contrast to the Kuipers score the forecast here is a continuous probability.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:probscore"
@@ -5529,7 +5529,7 @@ nolink "false"
 
 .
  The doPS() function is just a thin wrapper around probscore that is harmonized with the evaluation test functions in the package;
- see Table
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doPS"
@@ -6050,7 +6050,7 @@ Tools for point forecasts – ForecastMetrics()
 The ForecastMetrics() function comprises the computation of various evaluation metrics for point forecasts.
  For computation of five standard measures,
  we apply gretl's built-in function fcstats().
- In total twelve measures are currently implemented – for details see Table
+ In total twelve measures are currently implemented – for details see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Computations-of-point"
@@ -6062,7 +6062,7 @@ nolink "false"
 \end_inset
 
 .
- For further readings we refer to
+ For further readings we refer to 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Hyndman.Koehler2006"
@@ -6071,7 +6071,7 @@ literal "false"
 \end_inset
 
 .
- Details on the ForecastMetrics() function can be found in Table
+ Details on the ForecastMetrics() function can be found in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Point-forecast-measures"
@@ -6915,32 +6915,32 @@ Define the
 \begin_inset Formula $h$
 \end_inset
 
--step ahead forecast made in
+-step ahead forecast made in 
 \begin_inset Formula $t$
 \end_inset
 
- as
+ as 
 \begin_inset Formula $f_{t+h\text{|t}}$
 \end_inset
 
- and the actual outcome as
+ and the actual outcome as 
 \begin_inset Formula $y_{t+h}$
 \end_inset
 
 .
  Mincer & Zarnowitz suggest to run the following regression:
-\begin_inset Formula
+\begin_inset Formula 
 \[
 y_{t+h}=\beta_{\text{0}}+\beta_{1}f_{t+h|t}+u_{t+h}
 \]
 
 \end_inset
 
-Unbiasedness is viewed as a joint test of
+Unbiasedness is viewed as a joint test of 
 \begin_inset Formula $\beta_{0}=0$
 \end_inset
 
- and
+ and 
 \begin_inset Formula $\beta_{1}=1$
 \end_inset
 
@@ -6953,7 +6953,7 @@ Unbiasedness is viewed as a joint test of
 
 \begin_layout Standard
 However,
- remaining serial correlation in
+ remaining serial correlation in 
 \begin_inset Formula $u_{t+h}$
 \end_inset
 
@@ -6965,7 +6965,7 @@ However,
 \end_layout
 
 \begin_layout Standard
-See Table
+See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doMZtest"
@@ -7449,12 +7449,12 @@ Holden-Peel test of forecast efficiency – doHPtest()
 
 \begin_layout Standard
 The Mincer-Zarnowitz regression can be extended to include another regressor (or a whole vector of additional regressors),
-
+ 
 \begin_inset Formula $Z_{t}$
 \end_inset
 
 ,
- such that (assuming for simplicity that
+ such that (assuming for simplicity that 
 \begin_inset Formula $Z_{t}$
 \end_inset
 
@@ -7462,7 +7462,7 @@ The Mincer-Zarnowitz regression can be extended to include another regressor (or
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula
+\begin_inset Formula 
 \[
 y_{t+h}=\beta_{\text{0}}+\beta_{1}f_{t+h|t}+\beta_{2}Z_{t}+u_{t+h}\qquad.
 \]
@@ -7487,16 +7487,15 @@ status open
 
 
 \color inherit
- of unbiasedness involves the null
+ of unbiasedness involves the null 
 \begin_inset Formula $\beta_{0}=0$
 \end_inset
 
 ,
-
 \begin_inset Formula $\beta_{1}=1$
 \end_inset
 
- and
+ and 
 \begin_inset Formula $\beta_{2}=0$
 \end_inset
 
@@ -7506,7 +7505,7 @@ status open
 
 \begin_layout Standard
 Again the user can compute HAC robust standard errors and/or bootstrap p-values;
- see Table
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doHPtest"
@@ -8009,7 +8008,7 @@ Campbell-Ghysels efficiency tests – doCGtest()
 \end_layout
 
 \begin_layout Standard
-Here we understand
+Here we understand 
 \begin_inset Quotes eld
 \end_inset
 
@@ -8022,26 +8021,26 @@ efficiency
 \end_layout
 
 \begin_layout Standard
-Let us define the one-period forecast errors as
+Let us define the one-period forecast errors as 
 \begin_inset Formula $e_{1t}=y_{t+1}-f_{t+1|t}$
 \end_inset
 
 .
- An indicator function indicates whether the forecast error is positive or negative such that
+ An indicator function indicates whether the forecast error is positive or negative such that 
 \begin_inset Formula $u(z)=1$
 \end_inset
 
- if
+ if 
 \begin_inset Formula $z\geq0$
 \end_inset
 
- and
+ and 
 \begin_inset Formula $u(z)=0$
 \end_inset
 
  otherwise.
  The test statistics of the sign test of unbiasedness of forecast errors is
-\begin_inset Formula
+\begin_inset Formula 
 \[
 S=\sum_{t=1}^{T}u(e_{1t}),
 \]
@@ -8054,18 +8053,18 @@ where
 
  is the number of available forecast errors.
  While the signed rank test (see below) is defined as
-\begin_inset Formula
+\begin_inset Formula 
 \[
 W=\sum_{t=1}^{T}u(e_{1t})R_{1t}^{+}
 \]
 
 \end_inset
 
-with
+with 
 \begin_inset Formula $R_{1t}^{+}$
 \end_inset
 
- referring to the rank of each forecast error when
+ referring to the rank of each forecast error when 
 \begin_inset Formula $|e_{1t}|$
 \end_inset
 
@@ -8079,24 +8078,24 @@ with
 \begin_inset Formula $S$
 \end_inset
 
- is binomially distributed with
+ is binomially distributed with 
 \begin_inset Formula $Bi(T,\,0.5)$
 \end_inset
 
 .
  Under the additional assumption of symmetrically distributed forecast errors around zero,
- the test statistics
+ the test statistics 
 \begin_inset Formula $W$
 \end_inset
 
  follows a Wilcoxon signed rank distribution.
- Note that this test is performed once you set
+ Note that this test is performed once you set 
 \begin_inset Formula $k=0$
 \end_inset
 
  (or leave it out,
  as this is the default;
- see Table
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCGtest"
@@ -8109,28 +8108,28 @@ nolink "false"
 
 \begin_layout Standard
 This test idea can also be employed to test for serial correlation in the forecast errors.
- Construct the product series
+ Construct the product series 
 \begin_inset Formula $Z_{\text{1t}}^{k}=e_{1t}e_{1(t-k)}$
 \end_inset
 
- with
+ with 
 \begin_inset Formula $k\geq1$
 \end_inset
 
 ,
  and compute the statistics:
-\begin_inset Formula
+\begin_inset Formula 
 \[
 S_{k}=\sum_{t=k+1}^{T}u(Z_{1t}^{k})\quad\text{and \quad}W_{k}=\sum_{t=k+1}^{T}u(Z_{1t}^{k})R_{2t}^{+}
 \]
 
 \end_inset
 
-where
+where 
 \begin_inset Formula $R_{2t}^{+}$
 \end_inset
 
- is the signed rank of the product
+ is the signed rank of the product 
 \begin_inset Formula $Z_{1t}^{k}$
 \end_inset
 
@@ -8139,7 +8138,7 @@ where
 \end_inset
 
 .
- These location tests were proposed by
+ These location tests were proposed by 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Dufour1981ranktest"
@@ -8149,11 +8148,11 @@ literal "true"
 
 .
  Serial correlation in the forecast errors will move the center of their product away from zero.
- The sign statistic
+ The sign statistic 
 \begin_inset Formula $S_{k}$
 \end_inset
 
- is binomially distributed with
+ is binomially distributed with 
 \begin_inset Formula $Bi(T-k,\,0.5)$
 \end_inset
 
@@ -8162,18 +8161,18 @@ literal "true"
 \begin_inset Formula $W_{k}$
 \end_inset
 
- follows a Wilcoxon signed rank distribution of size
+ follows a Wilcoxon signed rank distribution of size 
 \begin_inset Formula $T-k$
 \end_inset
 
 .
  Note,
- both tests on serial correlation require to set the option
+ both tests on serial correlation require to set the option 
 \begin_inset Formula $k>0$
 \end_inset
 
 ,
- and the necessary product series
+ and the necessary product series 
 \begin_inset Formula $Z_{1t}^{k}$
 \end_inset
 
@@ -8520,11 +8519,11 @@ scalar
 \begin_inset Text
 
 \begin_layout Plain Layout
-set
+set 
 \begin_inset Formula $k>0$
 \end_inset
 
- to test efficiency with respect to information at lag
+ to test efficiency with respect to information at lag 
 \begin_inset Formula $k$
 \end_inset
 
@@ -8533,7 +8532,7 @@ set
  X
 \emph default
  is absent),
- else
+ else 
 \begin_inset Formula $k=0$
 \end_inset
 
@@ -8664,6 +8663,7 @@ literal "true"
 \end_inset
 
 ,
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Campbell.Ghysels1997"
@@ -8672,6 +8672,7 @@ literal "true"
 \end_inset
 
 ,
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Dufour1981ranktest"
@@ -8705,7 +8706,7 @@ literal "true"
 Notes:
  The calculation of CGWILCpval,
  the p-value of the Wilcoxon-type signed rank tests,
- depends on the WSRpvalue function in the special package
+ depends on the WSRpvalue function in the special package 
 \begin_inset Quotes eld
 \end_inset
 
@@ -8728,25 +8729,25 @@ v0.41).
 
 \begin_layout Standard
 Lastly,
- one can use this framework to assess whether the forecast has made efficient use of the available information represented by the series
+ one can use this framework to assess whether the forecast has made efficient use of the available information represented by the series 
 \begin_inset Formula $X$
 \end_inset
 
- in
+ in 
 \begin_inset Formula $t$
 \end_inset
 
 .
  For this,
- one needs to construct the product series
+ one needs to construct the product series 
 \begin_inset Formula $Z_{t}^{k}=e_{ht}X_{t-k}^{c}$
 \end_inset
 
- with
+ with 
 \begin_inset Formula $k>0$
 \end_inset
 
- based on the recursively re-centered series
+ based on the recursively re-centered series 
 \begin_inset Formula $X_{t}^{c}=X_{t}-\text{median}(X_{1},X_{2},\ldots,X_{t})$
 \end_inset
 
@@ -8779,7 +8780,7 @@ Recursive
 
  This way of re-centering requires,
  however,
- that the series
+ that the series 
 \begin_inset Formula $X_{t}$
 \end_inset
 
@@ -8788,7 +8789,7 @@ Recursive
 
 \begin_layout Standard
 The sign and signed rank statistics are given by
-\begin_inset Formula
+\begin_inset Formula 
 \[
 S_{ok}=\sum_{t=k+1}^{T}u(Z_{t}^{k})\quad\text{and \quad}W_{ok}=\sum_{t=k+1}^{T}u(Z_{t}^{k})R_{1t}^{+},
 \]
@@ -8802,7 +8803,7 @@ noting that the ranks used refer to the forecast errors,
 
 ,
  to obtain a statistic with a known and valid distribution;
- see
+ see 
 \begin_inset CommandInset citation
 LatexCommand citet
 after "pp. 3"
@@ -8811,7 +8812,7 @@ literal "true"
 
 \end_inset
 
- or
+ or 
 \begin_inset CommandInset citation
 LatexCommand citet
 after "p. 560"
@@ -8822,23 +8823,23 @@ literal "true"
 
  for a discussion.
 \begin_inset Foot
-status collapsed
+status open
 
 \begin_layout Plain Layout
-When
+When 
 \begin_inset Formula $X_{t}$
 \end_inset
 
- is strictly exogenous without any feedback occurring from the forecast errors to future realizations of
+ is strictly exogenous without any feedback occurring from the forecast errors to future realizations of 
 \begin_inset Formula $X$
 \end_inset
 
- the ranks of
+ the ranks of 
 \begin_inset Formula $Z_{t}^{k}$
 \end_inset
 
  could also be used,
- and this would then indeed equal a Wilcoxon signed rank test on
+ and this would then indeed equal a Wilcoxon signed rank test on 
 \begin_inset Formula $Z_{t}^{k}$
 \end_inset
 
@@ -8851,7 +8852,7 @@ When
 \end_inset
 
  This orthogonality test can be achieved by passing the series as CGX in the bundle.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCGtest"
@@ -8938,53 +8939,53 @@ literal "true"
 
  propose a flexible class of loss functions,
  the so-called EKT loss function:
-\begin_inset Formula
+\begin_inset Formula 
 \[
 L(e)=\left[\alpha+(1-2\alpha)\mathbf{I}(e<0)\right]|e|^{p},\quad\alpha\in[0,1]
 \]
 
 \end_inset
 
-where
+where 
 \begin_inset Formula $\mathbf{I}$
 \end_inset
 
- is an indicator function which equals one if the forecast error
+ is an indicator function which equals one if the forecast error 
 \begin_inset Formula $e=y-f<0$
 \end_inset
 
 ,
  and otherwise zero.
- Asymmetric loss is given for
+ Asymmetric loss is given for 
 \begin_inset Formula $\alpha\neq0.5$
 \end_inset
 
 ,
  and where values exceeding 0.5 indicate greater aversion to positive forecast errors.
- Parameter
+ Parameter 
 \begin_inset Formula $p$
 \end_inset
 
  is a positive integer.
- Setting
+ Setting 
 \begin_inset Formula $p=1$
 \end_inset
 
  results in a lin-lin loss function with possibly different slopes under asymmetric loss.
- The quadratic loss function is given for the special setting
+ The quadratic loss function is given for the special setting 
 \begin_inset Formula $p=2$
 \end_inset
 
- and
+ and 
 \begin_inset Formula $\alpha=0.5$
 \end_inset
 
 .
- Asymmetric quadratic loss functions are produced under
+ Asymmetric quadratic loss functions are produced under 
 \begin_inset Formula $p=2$
 \end_inset
 
- and
+ and 
 \begin_inset Formula $\alpha\neq0.5$
 \end_inset
 
@@ -8992,17 +8993,17 @@ where
 \end_layout
 
 \begin_layout Standard
-The unknown loss function parameter
+The unknown loss function parameter 
 \begin_inset Formula $\alpha$
 \end_inset
 
  is estimated by means of a linear instrumental variable (IV) approach.
- The computation of the linear IV estimator
+ The computation of the linear IV estimator 
 \begin_inset Formula $\hat{\alpha}$
 \end_inset
 
  is done iteratively.
- Using the same notation as in
+ Using the same notation as in 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Elliot.etal2005"
@@ -9014,25 +9015,25 @@ literal "true"
 \begin_inset Formula $S$
 \end_inset
 
- to be the identity matrix
+ to be the identity matrix 
 \begin_inset Formula $I_{d}$
 \end_inset
 
 ,
- where
+ where 
 \begin_inset Formula $d$
 \end_inset
 
  refers to the number of instruments used.
- Based on the initial
+ Based on the initial 
 \begin_inset Formula $S$
 \end_inset
 
- one can compute the initial
+ one can compute the initial 
 \begin_inset Formula $\hat{\alpha}_{1}$
 \end_inset
 
- which in turn can be used to update the precision matrix
+ which in turn can be used to update the precision matrix 
 \begin_inset Formula $S^{-1}=S^{-1}(\hat{\alpha}_{1})$
 \end_inset
 
@@ -9043,18 +9044,19 @@ literal "true"
 \begin_layout Standard
 The user can use the framework to (i) test for symmetric loss,
  and (ii) for rationality.
- As
+ As 
 \begin_inset Formula $\hat{\alpha}$
 \end_inset
 
  is asymptotically normal and its variance is identical to the one obtained by the standard GMM estimator,
  one can test the null of symmetry,
+ 
 \begin_inset Formula $H_{0}:\alpha=0.5$
 \end_inset
 
 ,
  against the alternative,
-
+ 
 \begin_inset Formula $H_{0}:\alpha\neq0.5$
 \end_inset
 
@@ -9063,16 +9065,16 @@ The user can use the framework to (i) test for symmetric loss,
 \end_layout
 
 \begin_layout Standard
-For a given
+For a given 
 \begin_inset Formula $p_{0}$
 \end_inset
 
- the user can test for rationality if the number of instruments
+ the user can test for rationality if the number of instruments 
 \begin_inset Formula $d>1$
 \end_inset
 
 .
- Testing for over-identification by means of a
+ Testing for over-identification by means of a 
 \begin_inset Formula $J$
 \end_inset
 
@@ -9081,7 +9083,7 @@ For a given
 \begin_inset Formula $\alpha$
 \end_inset
 
- or (ii) by imposing the restriction of symmetry
+ or (ii) by imposing the restriction of symmetry 
 \begin_inset Formula $\alpha=0.5$
 \end_inset
 
@@ -9089,7 +9091,7 @@ For a given
 \end_layout
 
 \begin_layout Standard
-See Table
+See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doEKTtest"
@@ -9862,19 +9864,18 @@ Pesaran-Timmermann test of market timing – doPTtest()
 
 \begin_layout Standard
 While the Kuipers score just computes the difference between the hit rate,
-
+ 
 \begin_inset Formula $H$
 \end_inset
 
 ,
  and the false alarm rate,
-
+ 
 \begin_inset Formula $F$
 \end_inset
 
 ,
  it is not a proper statistical test.
-
 \begin_inset CommandInset citation
 LatexCommand citet
 after "PT"
@@ -9888,20 +9889,20 @@ literal "true"
 \end_layout
 
 \begin_layout Standard
-Let
+Let 
 \begin_inset Formula $f=\{0,1\}$
 \end_inset
 
- be a forecast of the binary variable
+ be a forecast of the binary variable 
 \begin_inset Formula $Y=\{0,1\}$
 \end_inset
 
 .
- Denote the corresponding time series of binary predictions as
+ Denote the corresponding time series of binary predictions as 
 \begin_inset Formula $x_{t}$
 \end_inset
 
- and actual realizations of
+ and actual realizations of 
 \begin_inset Quotes eld
 \end_inset
 
@@ -9909,12 +9910,12 @@ ups
 \begin_inset Quotes erd
 \end_inset
 
- (or unity values) as
+ (or unity values) as 
 \begin_inset Formula $y_{t}$
 \end_inset
 
 .
- How the forecaster obtains the forecasts
+ How the forecaster obtains the forecasts 
 \begin_inset Formula $x_{t}$
 \end_inset
 
@@ -9922,16 +9923,16 @@ ups
 \begin_inset space \thinspace{}
 \end_inset
 
-through a model of a latent variable in the background– is irrelevant here.
+ through a model of a latent variable in the background– is irrelevant here.
 \end_layout
 
 \begin_layout Standard
-The PT test statistic can be approximated by the t-ratio of the
+The PT test statistic can be approximated by the t-ratio of the 
 \begin_inset Formula $\beta_{1}$
 \end_inset
 
  coefficient of the following OLS regression
-\begin_inset Formula
+\begin_inset Formula 
 \[
 y_{t}=\beta_{0}+\beta_{1}x_{t}+u_{t}.
 \]
@@ -9939,7 +9940,7 @@ y_{t}=\beta_{0}+\beta_{1}x_{t}+u_{t}.
 \end_inset
 
 Under the null hypothesis that predictions and realizations are independently distributed,
- the restriction
+ the restriction 
 \begin_inset Formula $\beta_{1}=0$
 \end_inset
 
@@ -9947,7 +9948,7 @@ Under the null hypothesis that predictions and realizations are independently di
  The test statistic follows asymptotically a standard normal distribution.
  A rejection of the null hypothesis indicates predictive failure.
  Serial correlation in the errors,
-
+ 
 \begin_inset Formula $u_{t}$
 \end_inset
 
@@ -9957,12 +9958,12 @@ Under the null hypothesis that predictions and realizations are independently di
 
 \begin_layout Standard
 A second – non-regression based – approach to compute the test instead is to rely on the correlation coefficient between forecasts and predictions,
-
+ 
 \begin_inset Formula $\rho$
 \end_inset
 
 .
- The test statistics is computed by
+ The test statistics is computed by 
 \begin_inset Formula $\rho\times\sqrt{T}$
 \end_inset
 
@@ -9975,7 +9976,7 @@ A second – non-regression based – approach to compute the test instead is to
 \end_layout
 
 \begin_layout Standard
-See Table
+See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doPTtest"
@@ -10387,7 +10388,7 @@ literal "true"
 \end_inset
 
 ,
-
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 after "p. 398"
@@ -10434,7 +10435,7 @@ Diebold-Lopez direction-of-change test – doDLtest()
 \end_layout
 
 \begin_layout Standard
-Performs the Diebold-Lopez direction of change test which is in principle just Pearson's
+Performs the Diebold-Lopez direction of change test which is in principle just Pearson's 
 \begin_inset Formula $\chi$
 \end_inset
 
@@ -10452,7 +10453,7 @@ Performs the Diebold-Lopez direction of change test which is in principle just P
 \end_layout
 
 \begin_layout Standard
-See Table
+See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doDLtest"
@@ -10897,7 +10898,7 @@ Diebold-Mariano test – doDMtest()
 
 \begin_layout Standard
 First,
- note that there also exists a dedicated contributed gretl function package called
+ note that there also exists a dedicated contributed gretl function package called 
 \begin_inset Quotes eld
 \end_inset
 
@@ -10916,25 +10917,25 @@ The Diebold-Mariano (DM) test of equivalent expected loss takes explicitly into 
 \end_layout
 
 \begin_layout Standard
-We define the
+We define the 
 \begin_inset Formula $h$
 \end_inset
 
--step ahead forecast error and its associated loss function by
+-step ahead forecast error and its associated loss function by 
 \begin_inset Formula $e_{t+h|t}$
 \end_inset
 
- and
+ and 
 \begin_inset Formula $L(e_{t+h|t})$
 \end_inset
 
 ,
  respectively.
- The loss differential of two non-nested forecasts for observation
+ The loss differential of two non-nested forecasts for observation 
 \begin_inset Formula $t+h$
 \end_inset
 
- is given by
+ is given by 
 \begin_inset Formula $d_{12,t+h|t}=$
 \end_inset
 
@@ -10945,7 +10946,7 @@ We define the
 .
  Specifically,
  one can test the null hypothesis of equal predictive accuracy
-\begin_inset Formula
+\begin_inset Formula 
 \[
 H_{0}:\quad E(d_{12,t+h|t})=0
 \]
@@ -10954,7 +10955,7 @@ H_{0}:\quad E(d_{12,t+h|t})=0
 
 against either an one-sided alternative or against a two-sided alternative.
  Under the null,
- the test statistics is
+ the test statistics is 
 \begin_inset Formula $DM=\bar{d}_{12,t+h|t}/\widehat{\sigma}_{\bar{d}_{12,t+h|t}}\rightarrow N(0,1)$
 \end_inset
 
@@ -10970,15 +10971,15 @@ against either an one-sided alternative or against a two-sided alternative.
 \uwave off
 \noun off
 \color none
-
+ 
 \begin_inset Formula $\bar{d}_{12,t+h|t}=F^{-1}\sum_{j=1}^{F}d_{12,j,t+h|t}$
 \end_inset
 
- refers to the sample mean loss differential and
+ refers to the sample mean loss differential and 
 \begin_inset Formula $\widehat{\sigma}_{\bar{d}_{12,t+h|t}}$
 \end_inset
 
- is a consistent estimate of its standard deviation based on
+ is a consistent estimate of its standard deviation based on 
 \begin_inset Formula $F$
 \end_inset
 
@@ -10989,29 +10990,29 @@ against either an one-sided alternative or against a two-sided alternative.
 However,
  due to serial correlation in the forecast errors,
  we compute alternatively the following regression-based version using OLS combined with HAC robust standard errors:
-\begin_inset Formula
+\begin_inset Formula 
 \[
 d_{12,t+h|t}=\beta+u_{t}
 \]
 
 \end_inset
 
-where
+where 
 \begin_inset Formula $u_{t}$
 \end_inset
 
- is an
+ is an 
 \begin_inset Formula $i.i.d.$
 \end_inset
 
  zero-mean error term.
- The null of equal forecast accuracy between the two point forecasts is defined as
+ The null of equal forecast accuracy between the two point forecasts is defined as 
 \begin_inset Formula $\beta=0$
 \end_inset
 
 .
  The test statistics,
-
+ 
 \begin_inset Formula $t_{DM}$
 \end_inset
 
@@ -11028,27 +11029,27 @@ literal "true"
 \end_inset
 
  have suggested the following small-sample corrected degrees-of-freedom adjusted t-statistics
-\begin_inset Formula
+\begin_inset Formula 
 \[
 t_{HLN}=[1+F^{-1}(1-2\times h)+F^{-2}h\times(h-1)]^{0.5}\times t_{DM}
 \]
 
 \end_inset
 
-where
+where 
 \begin_inset Formula $F$
 \end_inset
 
- and
+ and 
 \begin_inset Formula $h$
 \end_inset
 
- refer to the number of forecasts and the
+ refer to the number of forecasts and the 
 \begin_inset Formula $h$
 \end_inset
 
 -step forecast horizon.
- See Table
+ See Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doDMtest"
@@ -11646,6 +11647,7 @@ literal "true"
 \end_inset
 
 ,
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Harvey.etal1997"
@@ -11702,68 +11704,68 @@ The Giacomini-White (GW) test is about equal conditional predictive ability.
 
 \begin_layout Standard
 The conditional test for forecasting performance tests whether the loss differential between two forecasts is systematically linked to current information,
-
+ 
 \begin_inset Formula $z_{t}$
 \end_inset
 
 .
  Compared to unconditional tests like Diebold-Mariano,
  the null hypothesis is then altered to
-\begin_inset Formula
+\begin_inset Formula 
 \[
 E\left[d_{12,t+h|t}(\hat{\beta}_{1,t},\hat{\beta}_{2,t},y_{t+h})|z_{t}\right]=0
 \]
 
 \end_inset
 
-where
+where 
 \begin_inset Formula $z_{t}$
 \end_inset
 
- is the information set (in Gretl terms a list of potential variables) available at time
+ is the information set (in Gretl terms a list of potential variables) available at time 
 \begin_inset Formula $t$
 \end_inset
 
 .
  In case the user selects the conditional approach,
- per default the lagged loss differential
+ per default the lagged loss differential 
 \begin_inset Formula $d_{12,t}$
 \end_inset
 
- enters the information set – the lag
+ enters the information set – the lag 
 \begin_inset Formula $h$
 \end_inset
 
- is viewed from the forecast target period
+ is viewed from the forecast target period 
 \begin_inset Formula $t+h$
 \end_inset
 
 .
  Additional conditioning variables may be included in the list 'z',
  for example further lags.
- It is the user's responsibility to specify only variables that are intrinsically observable in the forecast's base period
+ It is the user's responsibility to specify only variables that are intrinsically observable in the forecast's base period 
 \begin_inset Formula $t$
 \end_inset
 
 .
 \begin_inset Foot
-status collapsed
+status open
 
 \begin_layout Plain Layout
-Conditioning on
+Conditioning on 
 \begin_inset Formula $z_{t}$
 \end_inset
 
- essentially means that the moment products
+ essentially means that the moment products 
 \begin_inset Formula $z_{t}d_{12,t+h|t}$
 \end_inset
 
  are assessed.
- Our notation for the conditioning variables
+ Our notation for the conditioning variables 
 \begin_inset Formula $z_{t}$
 \end_inset
 
- corresponds to the so-called
+ corresponds to the so-called 
 \begin_inset Quotes eld
 \end_inset
 
@@ -11771,17 +11773,17 @@ test function
 \begin_inset Quotes erd
 \end_inset
 
-
+ 
 \begin_inset Formula $h_{t}$
 \end_inset
 
  in GW,
- but to avoid confusion with the forecast horizon
+ but to avoid confusion with the forecast horizon 
 \begin_inset Formula $h$
 \end_inset
 
 ,
- we re-use our general instrument symbol
+ we re-use our general instrument symbol 
 \begin_inset Formula $z_{t}$
 \end_inset
 
@@ -12168,7 +12170,7 @@ list
 \begin_inset Text
 
 \begin_layout Plain Layout
-series to condition on (only if
+series to condition on (only if 
 \begin_inset Formula $cond==1$
 \end_inset
 
@@ -12326,7 +12328,7 @@ scalar
 \begin_inset Text
 
 \begin_layout Plain Layout
-p-value based on
+p-value based on 
 \begin_inset Formula $\chi^{2}$
 \end_inset
 
@@ -12399,7 +12401,7 @@ We gratefully acknowledge useful comments from Michał Rubaszek.
 \end_layout
 
 \begin_layout Standard
-Implementation of
+Implementation of 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "ClarkWest2007"
@@ -12409,7 +12411,7 @@ literal "false"
 
 ,
  testing equal predictive accuracy in nested models (one-sided test);
- see Table
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:doCWtest"
@@ -12962,7 +12964,7 @@ nolink "false"
 status collapsed
 
 \begin_layout Plain Layout
-This will be transferred internally to the various function arguments
+This will be transferred internally to the various function arguments 
 \begin_inset Quotes eld
 \end_inset
 
@@ -12971,6 +12973,7 @@ z
 \end_inset
 
 ,
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -12979,7 +12982,7 @@ ref
 \end_inset
 
 ,
- or
+ or 
 \begin_inset Quotes eld
 \end_inset
 
@@ -13043,7 +13046,7 @@ Screenshot of the FEP graphical interface (a previous version,
 \begin_layout Standard
 The output from executing the function from the GUI is presented to the user in a new window,
  mostly simply with the printed test result.
- At the top of that output there is a toolbar including
+ At the top of that output there is a toolbar including 
 \begin_inset Quotes eld
 \end_inset
 
@@ -13051,7 +13054,7 @@ save
 \begin_inset Quotes erd
 \end_inset
 
- and
+ and 
 \begin_inset Quotes eld
 \end_inset
 
@@ -13078,7 +13081,7 @@ The concrete images of those icons will depend on your operating system and/or y
 
 \begin_layout Standard
 Note that only the actual test functions are choosable from the GUI,
- not the helper functions from Section
+ not the helper functions from Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Forecast-descriptive-statistics"
@@ -13102,20 +13105,20 @@ Illustrative example
 \begin_layout Standard
 In the following an applied example using survey-based forecasts for annual growth of euro area (EA) real GDP is presented.
  Forecasts are averages based on surveys among professional forecasters,
-
+ 
 \begin_inset Formula $fc_{t}$
 \end_inset
 
 ,
  conducted by the Economist magazine and obtained through the Macrobond database.
  The realizations,
-
+ 
 \begin_inset Formula $y_{t}$
 \end_inset
 
 ,
  are from the AMECO database provided by the European Commission.
- Both series' values are reported in the data appendix
+ Both series' values are reported in the data appendix 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Data"
@@ -13124,7 +13127,7 @@ nolink "false"
 \end_inset
 
 ,
- and Figure
+ and Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Forecast-error-for"
@@ -13133,7 +13136,7 @@ nolink "false"
 \end_inset
 
  depicts the forecast errors,
-
+ 
 \begin_inset Formula $e_{t}=y_{t}-fc_{t}$
 \end_inset
 
@@ -13213,7 +13216,7 @@ We run the parametric Mincer-Zarnowitz test on forecast unbiasedness using boots
  iid
 \emph default
 ) and HAC standard errors,
- see Section
+ see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Mincer-Zarnowitz"
@@ -13317,7 +13320,7 @@ As can be seen,
 
 \begin_layout Standard
 A non-parametric alternative test approach for forecast unbiasedness was proposed by Campbell and Ghysels,
- as discussed in Section
+ as discussed in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Campbell-&-Ghysels"
@@ -13347,22 +13350,22 @@ nolink "false"
  are already defined,
  the CG test can be performed as follows:
 \begin_inset Foot
-status collapsed
+status open
 
 \begin_layout Plain Layout
 Formatting the number printout as
 \family typewriter
-%.3f
+ %.3f
 \family default
  in the
 \family typewriter
-printf
+ printf
 \family default
  command is already slightly advanced,
  rounding to three decimal digits.
  A straightforward alternative that usually also works fine for floating point numbers is
 \family typewriter
-%g
+ %g
 \family default
 .
 \end_layout
@@ -13443,7 +13446,7 @@ Tests of efficiency
 
 \begin_layout Standard
 The Holden-Peel test is a parametric test of efficiency,
- see Section
+ see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Holden-Peel"
@@ -13453,7 +13456,7 @@ nolink "false"
 
 .
  We simply use lagged forecasts,
-
+ 
 \begin_inset Formula $fc_{t-1}$
 \end_inset
 
@@ -13517,7 +13520,7 @@ p-value.:
 
 \begin_layout Standard
 Hence,
- this parametric test result does not indicate any issue with forecast efficiency conditional on
+ this parametric test result does not indicate any issue with forecast efficiency conditional on 
 \begin_inset Formula $fc_{t-1}$
 \end_inset
 
@@ -13625,7 +13628,7 @@ Tests of (a)symmetric loss and forecast rationality
 \end_layout
 
 \begin_layout Standard
-The framework proposed by
+The framework proposed by 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Elliot.etal2005"
@@ -13638,7 +13641,7 @@ literal "true"
 \begin_inset space ~
 \end_inset
 
-Section
+Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Elliott,-Komunjer"
@@ -13656,7 +13659,7 @@ nolink "false"
 \family default
  is redundant,
  since the quadratic U-shape is the default,
- see Table
+ see Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Bundle-members-needed"
@@ -13814,7 +13817,7 @@ The null of symmetric loss can be rejected at the 5% level,
  and after imposing symmetry anyway one would indeed reject the null of forecast rationality at the 5% level.
  However,
  under the estimated asymmetric loss function one cannot reject the null of forecast rationality.
- Here the suggested conclusion is that the forecasts may be regarded as
+ Here the suggested conclusion is that the forecasts may be regarded as 
 \begin_inset Quotes eld
 \end_inset
 
@@ -13827,14 +13830,14 @@ rational
 \end_layout
 
 \begin_layout Standard
-The estimated
+The estimated 
 \begin_inset Formula $\hat{\alpha}$
 \end_inset
 
  is 0.236 which indicates greater aversion to negative forecast errors.
  This is perhaps not surprising considering the sequence of positive forecast errors in the first part of the sample.
  Apart from the reported test results,
- a plot of the estimated loss function is returned (see Figure
+ a plot of the estimated loss function is returned (see Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Estimated-loss-function"
@@ -13898,7 +13901,7 @@ Forecast comparison
 \end_layout
 
 \begin_layout Standard
-The Diebold-Mariano approach tests for equal predictive accuracy of two competing forecasts (Section
+The Diebold-Mariano approach tests for equal predictive accuracy of two competing forecasts (Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Diebold-Mariano"
@@ -13988,7 +13991,7 @@ p-value (small-sample):
 
 \begin_layout Standard
 The null hypothesis can be rejected at the 5% significance level for all three versions computed.
- The negative test statistic (-2.56) indicates that the
+ The negative test statistic (-2.56) indicates that the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14011,7 +14014,7 @@ Apart from point forecasts,
  Kuipers score
 \emph default
  (KS) is a widely applied simple statistic to summarize directional forecasts,
- see Section
+ see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:The-Kuipers-Score"
@@ -14075,7 +14078,7 @@ Kuipers Score   = 0.900
 
 \begin_layout Standard
 Accordingly,
- the forecasts have a perfect hit rate of 1 meaning that all
+ the forecasts have a perfect hit rate of 1 meaning that all 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14093,7 +14096,7 @@ Finally,
 \emph on
  Diebold-Lopez
 \emph default
- test (Section
+ test (Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Diebold-Lopez"
@@ -14104,11 +14107,11 @@ nolink "false"
 ) tests whether a directional forecast is significantly different from a coin flip.
  For reasons of backwards compatibility with older FEP versions the bundle for the DL test currently must not contain other non-binary
 \family typewriter
-y
+ y
 \family default
  and
 \family typewriter
-fc
+ fc
 \family default
  series,
  and therefore we cannot re-use the previously defined bundle.
@@ -14181,7 +14184,7 @@ p-value.:
 \end_layout
 
 \begin_layout Standard
-In this context the Pesaran-Timmermann test described in Section
+In this context the Pesaran-Timmermann test described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Pesaran-Timmermann"
@@ -14250,7 +14253,7 @@ Data
 \end_layout
 
 \begin_layout Standard
-For replication purposes we reproduce the data used in the illustration in Section
+For replication purposes we reproduce the data used in the illustration in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Illustrative-example"
@@ -14386,7 +14389,7 @@ Backwards incompatible,
 \end_deeper
 \begin_layout Itemize
 Internal:
- replace some deprecated
+ replace some deprecated 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14404,7 +14407,7 @@ version 2 .91 (May 2023)
 
 \begin_deeper
 \begin_layout Itemize
-Improve automatic handling of the required
+Improve automatic handling of the required 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14556,7 +14559,7 @@ version 2.4 (December 2019)
 
 \begin_deeper
 \begin_layout Itemize
-Fix ForecastingMetrics() function point forecast evaluation metrics
+Fix ForecastingMetrics() function point forecast evaluation metrics 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14569,7 +14572,7 @@ RMdSPE
 \end_layout
 
 \begin_layout Itemize
-Add additional point forecast evaluation metrics
+Add additional point forecast evaluation metrics 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14578,7 +14581,7 @@ MdE
 \end_inset
 
 ,
-
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14587,7 +14590,7 @@ MdAE
 \end_inset
 
 ,
-
+ 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14595,7 +14598,7 @@ MAM
 \begin_inset Quotes erd
 \end_inset
 
- and
+ and 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14641,7 +14644,7 @@ remove several deprecated aliases:
 
 \begin_layout Itemize
 Remove deprecated compatibility handling of y and fc in doDLtest.
- (Need to use the documented labels
+ (Need to use the documented labels 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14649,7 +14652,7 @@ yup
 \begin_inset Quotes erd
 \end_inset
 
- and
+ and 
 \begin_inset Quotes eld
 \end_inset
 
