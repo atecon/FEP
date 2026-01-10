@@ -118,7 +118,11 @@ function void doGWtest (bundle *b)
         printf "\n*** Warning: You have set the forecast horizon to h=0.\n"
     endif
     if !inbundle(b, "cond")
-        b.cond = 0	# 0: unconditional test
+        # New in 2025: make the (interesting) conditional case the default,
+        # because the unconditional approach is very similar (equivalent?)
+        # to the Diebold-Mariano test.
+        # (backwards-incompatible)
+        b.cond = 1	# 1: conditional 0: unconditional test
     endif
 
     series e1 = b.y - b.f1
@@ -143,6 +147,9 @@ function void doGWtest (bundle *b)
         # add additional regressors
         # TODO: maybe check and complain if a newly added regressor 
         # is equal to an already existing one?
+        # (Note 2025: however, nothing bad seems to happen in case 
+        #  of duplication, probably because gretl drops it silently;
+        #  so perhaps not that urgent.)
         
         if inbundle(b, "z")
             # compatibility for matrix input of z
@@ -165,6 +172,9 @@ function void doGWtest (bundle *b)
 
     # create the reg matrix given by lossdiff*ht', where ht is matrix of
     # instruments
+    # (TODO: in the unconditional case, h.inst only holds the constant,
+    #  so it seems redundant to construct the reg-list with an explicit
+    #  loop -- OTOH, it doesn't hurt, either...)
     list reg
     loop foreach i h_inst 
         series r$i = h_inst.$i * lossdiff
@@ -177,11 +187,15 @@ function void doGWtest (bundle *b)
         ols 0 reg --quiet
         scalar teststat = $T * $rsq	   # this only works for fhor=1!
     else
-        set hac_lag (b.fhor - 1)
-        # FIXME: according to GW on p.1557, in the unconditional case 
-        # the hac_lag must grow with the sample size, so we should use the 
-        # fixed b.fhor-1 only for the *conditional* case, not always.
-         
+        if b.cond
+            set hac_lag (b.fhor - 1)
+        else
+             # (new in 2025) according to GW on p.1557, in the unconditional case 
+             # the hac_lag must grow with the sample size, so we should use
+             # the fixed b.fhor-1 only for the *conditional* case, not always.
+            set hac_lag nw1
+        endif
+               
         matrix zbar = meanc({reg})'
         matrix omega = lrcovar({reg})
         scalar teststat = T * qform(zbar', invpd(omega))
@@ -225,7 +239,7 @@ end function
 
 ###############
 
-# Clark & West: APPROXIMATELY NORMAL TEST FOR EQUALPREDICTIVE ACCURACY
+# Clark & West: APPROXIMATELY NORMAL TEST FOR EQUAL PREDICTIVE ACCURACY
 # IN NESTED MODELS (2006/2007)
 
 function void doCWtest (bundle *b)

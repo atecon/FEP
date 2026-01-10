@@ -33,7 +33,7 @@ function bundle GUI_FEP(
       int flexarg[0::0] "bootrep (MZ,HP) / horizon (DM,GW,CW) / lag (CG)",
       int robortype[0:1:0] "robust (MZ,HP,PT) / loss (DM,GW,EKT)" \
       {"standard /U-shape", "robust /V-shape"},
-      int cond[0:1:0] "conditional predictive ability (GW)" \
+      int cond[0:1:1] "conditional predictive ability (GW)" \
       {"unconditional", "conditional"},
       int verbosity[0:1:0] "Verbosity" {"no details", "print details"},
       series fc2[null] "Alternative forecasts (DM,GW,CW)",
