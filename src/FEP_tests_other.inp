@@ -188,7 +188,8 @@ function void doGWtest (bundle *b)
         scalar teststat = $T * $rsq	   # this only works for fhor=1!
     else
         if b.cond
-            set hac_lag (b.fhor - 1)
+            scalar fhor_1 = b.fhor - 1
+            set hac_lag fhor_1
         else
              # (new in 2025) according to GW on p.1557, in the unconditional case 
              # the hac_lag must grow with the sample size, so we should use
